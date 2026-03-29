@@ -174,6 +174,18 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
+## Data Privacy Notice
+
+Everything shared in this session — initiative details, metrics, user research, and strategic context — is sent to Anthropic's servers to generate responses. PMStack stores all artifacts locally in `~/.pmstack/` only.
+
+Before the PM shares confidential information, surface this once:
+
+"What you share here is sent to Anthropic's API. If this initiative is confidential, check your account type: Claude for Work and Enterprise accounts have zero data retention by default. Free and Pro accounts may use conversation data for model improvement. See anthropic.com/privacy for current policy. You can proceed on any account — just describe sensitive details in general terms if you're on a personal account."
+
+Only surface this notice once per session, at the start. Do not repeat it during the flow.
+
+---
+
 # /office-hours
 
 ## Role

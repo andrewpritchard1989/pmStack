@@ -284,18 +284,21 @@ After forming an independent judgment in Phase 1, run targeted web searches to f
 
 ### Deriving search queries
 
-From the Product Brief, identify:
-- **Domain:** the product category or market (e.g., "B2B SaaS invoicing", "consumer marketplace", "developer tools")
-- **Problem pattern:** the type of problem being solved (e.g., "seller retention", "onboarding abandonment", "feature adoption")
-- **User segment:** who the primary user is (e.g., "freelance designers", "SMB ops teams", "enterprise procurement")
+From the Product Brief, identify the abstract category for each of these dimensions — not the specific company, product, or internal names:
+
+- **Domain:** the product category or market (e.g., "B2B SaaS invoicing", "consumer marketplace", "developer tools") — not the company name or internal product name
+- **Problem pattern:** the type of problem being solved (e.g., "seller retention", "onboarding abandonment", "feature adoption") — not the internal initiative name or codename
+- **User segment:** who the primary user is at category level (e.g., "freelance designers", "SMB ops teams", "enterprise procurement") — not specific client names or internal segment labels
 - **Product stage:** early-stage / growth / mature product
+
+**Search query rules:** Never include company names, unreleased product names, internal codenames, proprietary metrics, or organisation-specific terminology in search queries. Queries must be abstractable to a category that any practitioner in this domain would recognise. If the Brief contains confidential specifics, strip them to the pattern before searching.
 
 Run 4-6 targeted searches. Examples for a marketplace seller retention initiative:
 - `"marketplace seller retention strategies"` — practitioner content
 - `"Lenny Rachitsky marketplace"` — Lenny podcast episodes or posts on this domain
 - `"Marty Cagan product discovery"` — SVPG principles relevant to this type of work
 - `"seller churn B2B marketplace case study"` — counter-examples and learnings
-- `"[specific domain] product discovery [problem pattern]"` — domain-specific practitioner experience
+- `"[domain category] product discovery [problem pattern]"` — domain-specific practitioner experience
 
 ### What to look for in results
 
