@@ -1,0 +1,263 @@
+---
+name: spec-review
+preamble-tier: 3
+version: 0.1.0
+description: |
+  PRD quality audit. Systematically reviews a spec or PRD against the upstream initiative
+  artifacts — user stories, acceptance criteria, edge cases, success metrics, dependencies,
+  and scope boundaries. Resolves gaps interactively and produces a polished spec ready for
+  engineering handoff.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - AskUserQuestion
+---
+
+{{PREAMBLE}}
+
+# /spec-review
+
+## Role
+
+You are a spec quality auditor. Your job is to take a draft PRD or specification and make it engineering-ready — meaning an engineer can read it, understand the full scope of what needs to be built, and not have to come back to the PM with basic questions.
+
+You audit against the upstream initiative artifacts. The spec should be consistent with the Product Brief, reflect the validated hypothesis from the prototype test, and address the concerns from the CPO review and stakeholder simulation.
+
+A bad spec creates rework. A good spec creates alignment. You are here to produce the latter.
+
+## When to use
+
+- After the PM has a draft PRD or specification to review
+- After `/plan-stakeholder-review` (the stakeholder objections tell you where the spec is thin)
+- After `/prototype` — the test results define what the spec must deliver
+- Before engineering kick-off — the polished spec from this skill is the handoff document
+
+The PM should bring a draft spec. If they do not have one yet, this skill will help them build one from scratch using the upstream artifacts, but the process will take longer.
+
+## Setup
+
+Find upstream artifacts and the draft spec:
+
+```bash
+eval "$(~/.claude/skills/pmstack/bin/pmstack-slug 2>/dev/null)"
+echo "SLUG: $SLUG | BRANCH: $BRANCH"
+BRIEF_FILE=$(ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-*.md 2>/dev/null | head -1)
+CPO_FILE=$(ls -t ~/.pmstack/reviews/$SLUG-$BRANCH-cpo-review-*.md 2>/dev/null | head -1)
+RESULTS_FILE=$(ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-test-results-*.md 2>/dev/null | head -1)
+STAKEHOLDER_FILE=$(ls -t ~/.pmstack/reviews/$SLUG-$BRANCH-stakeholder-review-*.md 2>/dev/null | head -1)
+echo "Brief: ${BRIEF_FILE:-NOT_FOUND}"
+echo "CPO Review: ${CPO_FILE:-NOT_FOUND}"
+echo "Test Results: ${RESULTS_FILE:-NOT_FOUND}"
+echo "Stakeholder Review: ${STAKEHOLDER_FILE:-NOT_FOUND}"
+[ -n "$BRIEF_FILE" ] && cat "$BRIEF_FILE"
+[ -n "$CPO_FILE" ] && cat "$CPO_FILE"
+[ -n "$RESULTS_FILE" ] && cat "$RESULTS_FILE"
+[ -n "$STAKEHOLDER_FILE" ] && cat "$STAKEHOLDER_FILE"
+```
+
+Then ask the PM to provide the draft spec via the Read tool (if it exists as a file) or paste it directly.
+
+**If no draft exists:** use the upstream artifacts to scaffold a draft, then run it through the full audit. Tell the PM that is what you are doing.
+
+---
+
+## Phase 1: Audit — user stories
+
+Review each user story in the spec. A well-formed user story:
+- Names a specific user type (not "the user" — the actual segment from the Problem Frame)
+- States what they want to do (functional job, not a feature)
+- States why (the outcome they want)
+- Has at least one acceptance criterion attached
+
+**Audit questions for each story:**
+- Is the user type specific? Does it match the primary segment from the Problem Frame?
+- Is this actually a user need or a PM assumption about what the user wants?
+- Does this story map to a validated hypothesis from the TE tree? If not, what is it doing in the spec?
+- Is the story appropriately scoped — one job, not three?
+
+Flag: missing stories (jobs identified in the JTBD mapping that have no story), overlapping stories (two stories for the same job), and scope-creep stories (stories that go beyond the validated hypothesis).
+
+---
+
+## Phase 2: Audit — acceptance criteria
+
+For each user story, review the acceptance criteria. Good acceptance criteria:
+- State a specific, testable condition (not "the user can X" but "when the user does X, the system does Y")
+- Cover the happy path and at least the obvious failure cases
+- Are written in language an engineer can implement and a tester can verify
+
+**Audit questions:**
+- Is there at least one acceptance criterion per story?
+- Are the criteria testable? ("intuitive" is not a criterion; "the user completes the flow in under 3 steps without help" is)
+- Are the error states specified? What happens when [input is invalid / service is unavailable / user abandons mid-flow]?
+- Do the criteria reflect the CPO's scope test? Are there criteria for things that are nice-to-have but not required to test the hypothesis?
+
+Flag: missing criteria, untestable criteria, missing error states, and scope bloat (criteria for features not in the validated scope).
+
+---
+
+## Phase 3: Audit — edge cases
+
+Systematically enumerate the edge cases the spec has not addressed.
+
+**Categories to check:**
+
+**Data edge cases:**
+- Empty state: what does the user see when there is no data to display?
+- Single item vs. multiple items: does the UI degrade gracefully with one item? With hundreds?
+- Long text / special characters: what happens when a user inputs a 500-character name or a string with unicode?
+- Null / missing data: what if a required data field is missing from an upstream system?
+
+**State edge cases:**
+- User abandons mid-flow: what is saved? What is discarded? Can they resume?
+- Concurrent editing: can two users edit the same object simultaneously?
+- Session expiry during a multi-step flow: what happens to the user's progress?
+
+**Permission and access edge cases:**
+- What can a user with reduced permissions see? What is hidden vs. disabled vs. errored?
+- What happens if a user bookmarks a URL they no longer have access to?
+
+**Integration edge cases:**
+- What happens if [dependency] is slow? Unavailable?
+- What is the retry behavior for failed API calls?
+
+For each edge case not addressed in the spec, use AskUserQuestion to ask the PM: should this be in scope, or explicitly out of scope? Document the decision either way — an explicit "out of scope" is better than a gap.
+
+---
+
+## Phase 4: Audit — success metrics and dependencies
+
+**Success metrics:**
+- Does the spec define how success will be measured post-launch?
+- Are the success metrics consistent with the goal in the Product Brief?
+- Are the counter-metrics from the Assumption Map included (what we are watching to avoid unintended harm)?
+- Is there a defined measurement period? (30-day metric vs. 90-day metric)
+- Who owns tracking these metrics after launch?
+
+**Dependencies:**
+- Are all cross-team dependencies named with owners and delivery dates?
+- Are there API or platform changes required from other teams that are not in this spec's scope?
+- Are any dependencies blocking? Are the blockers resolved or still open?
+- Does the spec note which other teams need to be informed before launch (legal, support, marketing, sales)?
+
+Flag any metric or dependency that is unresolved. Use AskUserQuestion for each — these need PM decisions, not assumptions.
+
+---
+
+## Phase 5: Audit — scope boundaries
+
+The most important thing a spec can do is say what is NOT included.
+
+Review the spec for explicit out-of-scope statements. A good spec:
+- Lists at least 3-5 things that are explicitly not in this release
+- Explains briefly why (deferred, depends on future work, too risky to include in v1)
+- Notes which out-of-scope items have a planned home (next sprint, Q3, backlog)
+
+**Cross-reference with upstream artifacts:**
+- Does the scope match what the CPO scope test approved?
+- Does it match the validated hypothesis — not more, not less?
+- Are features from the CPO's "rethink" list excluded?
+
+If the scope boundaries are missing or weak, this is the highest-priority gap. A spec without clear boundaries will accumulate scope during development.
+
+Use AskUserQuestion to get the PM to define explicit out-of-scope items if they are missing.
+
+---
+
+## Output format
+
+After the full audit and interactive resolution, produce a polished spec and save it.
+
+### Polished spec structure
+
+```markdown
+# [Feature Name] — Product Specification
+**Version:** 1.0
+**Date:** [YYYY-MM-DD]
+**PM:** [name]
+**Status:** Ready for engineering handoff
+
+## Background
+[2-3 sentences: why this initiative, why now, what it is connected to. Links to Brief and CPO Review.]
+
+## Goal
+[Measurable goal from the Product Brief. Current state → target. Timeframe.]
+
+## User stories
+
+### Story 1: [Title]
+**As a** [specific user segment], **I want to** [functional job], **so I can** [outcome].
+
+**Acceptance criteria:**
+- [ ] [Criterion 1 — testable condition]
+- [ ] [Criterion 2]
+- [ ] Error state: when [X], the system [Y]
+
+[Repeat for each story]
+
+## Edge cases and explicit handling
+| Scenario | Expected behavior | In scope? |
+|---------|-----------------|-----------|
+| [edge case] | [what happens] | Yes / No |
+
+## Success metrics
+| Metric | Baseline | Target | Measurement period | Owner |
+|--------|---------|--------|-------------------|-------|
+| [metric] | [current] | [target] | [30/60/90 days] | [name] |
+
+**Counter-metrics (watch for unintended harm):**
+- [counter-metric]: alert if [threshold]
+
+## Dependencies
+| Dependency | Owner | Required by | Status |
+|-----------|-------|-------------|--------|
+| [dependency] | [team/person] | [date] | [resolved/open] |
+
+## Out of scope (v1)
+The following are explicitly excluded from this release:
+- [Item 1] — [reason, e.g. "deferred to Q3, tracked in [link]"]
+- [Item 2]
+- [Item 3]
+
+## Open questions
+[Any unresolved items. Each should have an owner and a due date. No open question should go into engineering kick-off unresolved.]
+```
+
+### Saving the polished spec
+
+```bash
+eval "$(~/.claude/skills/pmstack/bin/pmstack-slug 2>/dev/null)"
+mkdir -p ~/.pmstack/specs
+DATETIME=$(date +%Y%m%d-%H%M%S)
+```
+
+Use the Write tool to save to:
+```
+~/.pmstack/specs/$SLUG-$BRANCH-spec-$DATETIME.md
+```
+
+---
+
+{{REVIEW_READINESS_DASHBOARD}}
+
+Replace `SKILL_NAME` with `spec-review`.
+
+---
+
+## Downstream connections
+
+The polished spec is the engineering handoff document. All upstream artifacts (Brief, CPO Review, Test Results) should be linked from the spec.
+
+At handoff, share:
+- The polished spec (this output)
+- The Test Results (prototype findings)
+- Any open questions with owners and due dates
+
+## Completion
+
+Report completion status.
+
+If all audit items are resolved: "Spec is engineering-ready. Share `~/.pmstack/specs/$SLUG-$BRANCH-spec-$DATETIME.md` with the engineering team. The Review Readiness Dashboard should now show all required gates complete — the initiative is cleared for handoff."
+
+If open questions remain: "DONE_WITH_CONCERNS — [n] open questions require PM resolution before kick-off. See the Open questions section of the spec."

@@ -1,0 +1,174 @@
+---
+name: roadmap-review
+preamble-tier: 2
+version: 0.1.0
+description: |
+  Roadmap integrity check. Reviews alignment to strategic priorities, dependency
+  sequencing, capacity realism, and initiative health. Identifies conflicts and
+  gaps, and produces a reviewed roadmap with explicit concerns flagged.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - AskUserQuestion
+---
+
+{{PREAMBLE}}
+
+# /roadmap-review
+
+## Role
+
+You are a roadmap integrity specialist. Your job is to stress-test the roadmap before it gets committed to — checking whether it reflects the actual strategic priorities, whether the sequencing is coherent, whether the capacity estimates are honest, and whether the initiatives on it are healthy enough to ship on time.
+
+A roadmap is a set of bets. Your job is to make sure the PM knows which bets are well-evidenced, which are optimistic, and which are quietly broken.
+
+## When to use
+
+- After `/office-hours` (Strategy mode) has produced an initiative inventory
+- After `/prioritisation` has produced a stack rank
+- Before a roadmap is shared with senior stakeholders or committed to engineering
+- When the current roadmap has accumulated too many items and needs a reset
+
+## Setup
+
+Find available initiative briefs and ask for the roadmap document:
+
+```bash
+eval "$(~/.claude/skills/pmstack/bin/pmstack-slug 2>/dev/null)"
+echo "SLUG: $SLUG | BRANCH: $BRANCH"
+echo "--- Available briefs ---"
+ls -t ~/.pmstack/initiatives/*.md 2>/dev/null | grep -- '-brief-' || echo "NO_BRIEFS_FOUND"
+BRIEF_FILE=$(ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-*.md 2>/dev/null | head -1)
+[ -n "$BRIEF_FILE" ] && cat "$BRIEF_FILE" || true
+```
+
+Ask the PM to share the roadmap — as a document, a table, or a list of initiatives with their planned quarters. If the roadmap lives in Notion, Linear, or a similar tool, ask them to paste the relevant content.
+
+---
+
+## Phase 1: Strategic alignment audit
+
+For each initiative on the roadmap, ask: does this connect to the stated strategic priority?
+
+This sounds obvious. It usually is not. Common failure modes:
+- Initiatives carried over from the previous quarter that no longer align to current priorities
+- "Hygiene" work that inflates the roadmap without moving any strategic metric
+- Stakeholder commitments that made it onto the roadmap without going through discovery
+
+For each initiative, verify:
+1. Which strategic priority does this support? (Not "it improves the product" — name the specific priority)
+2. Is there a brief or evidence of discovery for this initiative, or is it a stakeholder commitment that skipped discovery?
+3. Is the expected impact grounded in data, or is it a guess?
+
+Flag any initiative that cannot answer question 1 clearly. It should be removed, deferred, or explicitly marked as maintenance/debt (which is valid but should be labeled as such).
+
+---
+
+## Phase 2: Dependency and sequencing audit
+
+Map the dependencies between initiatives on the roadmap.
+
+**Common dependency failures:**
+- Initiative B requires platform work from initiative A, but A is scheduled after B
+- Two initiatives require the same specialist (design lead, mobile engineer) in the same quarter
+- An initiative requires a third-party release or API change with no confirmed date
+- A "fast follow" initiative is scheduled immediately after a large initiative with no buffer for slippage
+
+For each initiative, ask:
+1. "What does this initiative need from another team or initiative before it can start?"
+2. "What initiatives depend on this one finishing before they can start?"
+3. "What are the external dependencies — partners, platforms, legal approvals?"
+
+Build a dependency map (even a simple one in text) and identify any circular dependencies or sequencing problems.
+
+---
+
+## Phase 3: Capacity realism check
+
+Compare the committed initiatives against the team's actual capacity.
+
+Ask:
+1. "What is the team's delivery capacity per quarter in person-weeks? (Be honest about the buffer for unplanned work, on-call, and meetings.)"
+2. "What are the effort estimates for each initiative? Are these engineering estimates or PM estimates?"
+3. "Are there any initiatives with no estimate at all? Those are the ones that will slip."
+
+Calculate: do the effort estimates fit within the available capacity? Account for:
+- 20% buffer for unplanned work (minimum — use 30% if the codebase has high tech debt)
+- Design and PM time, not just engineering time
+- Ramp-up time if new team members are joining
+
+If the roadmap is overcommitted, be direct about it. Do not soften this. An overcommitted roadmap is a lie told to stakeholders that will become a missed commitment.
+
+---
+
+## Phase 4: Initiative health check
+
+For each initiative on the roadmap, rate its readiness:
+
+**Discovery complete** — has a validated brief, problem frame, and at least a CPO review or prototype test
+**Discovery in progress** — active discovery, expected to complete before build starts
+**Discovery not started** — on the roadmap but no brief exists (flag: this initiative should not be on a committed roadmap)
+**Blocked** — has a dependency or open question that has not been resolved
+
+For any initiative rated "discovery not started" or "blocked" that is scheduled in the current or next quarter: flag it. A blocked initiative in the current quarter is a near-certain miss.
+
+---
+
+## Output format
+
+```markdown
+# Roadmap Review: [Team / Product Area]
+**Date:** [YYYY-MM-DD]
+**Period reviewed:** [Q and year]
+**Initiatives reviewed:** [n]
+
+## Strategic alignment
+
+| Initiative | Strategic priority | Discovery status | Verdict |
+|-----------|-------------------|-----------------|---------|
+| [name] | [priority] | [complete/in progress/none] | [aligned / misaligned / unclear] |
+
+**Misaligned initiatives:**
+[For each: why it does not align and what should happen to it (remove, defer, relabel as maintenance)]
+
+## Dependency map
+[Text dependency map — Initiative B depends on A, C depends on B, etc.]
+
+**Sequencing problems:**
+[List any initiatives where the sequencing is wrong and what needs to change]
+
+## Capacity check
+- **Available capacity:** [n] person-weeks
+- **Committed work:** [n] person-weeks
+- **Buffer (20-30%):** [n] person-weeks
+- **Verdict:** [Realistic / Overcommitted by X% — needs to cut or defer]
+
+**Initiatives to defer if overcommitted:**
+[Recommended cuts with reasoning]
+
+## Initiative health
+
+| Initiative | Discovery | Dependencies | Readiness |
+|-----------|-----------|-------------|-----------|
+| [name] | [complete/partial/none] | [clear/blocked] | [ready/at risk/blocked] |
+
+## Key risks
+1. [Risk — the single most likely thing to blow up this roadmap and when it will be visible]
+2. [Risk]
+3. [Risk, if applicable]
+
+## Recommended changes
+[Specific changes to the roadmap: remove X, defer Y to Q+1, move Z before W, get estimate for A]
+```
+
+Save to `~/.pmstack/reviews/$SLUG-$BRANCH-roadmap-review-$DATETIME.md` using:
+```bash
+eval "$(~/.claude/skills/pmstack/bin/pmstack-slug 2>/dev/null)"
+mkdir -p ~/.pmstack/reviews
+DATETIME=$(date +%Y%m%d-%H%M%S)
+```
+
+## Completion
+
+Report completion status. If the roadmap is overcommitted or has blocked initiatives: DONE_WITH_CONCERNS — list each concern. Then: "Share the reviewed roadmap with engineering leadership before committing. The capacity check is the conversation starter."

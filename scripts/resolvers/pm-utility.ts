@@ -13,6 +13,26 @@ DATETIME=$(date +%Y%m%d-%H%M%S)
 \`\`\``;
 }
 
+export function generateInitiativeDiscover(ctx: TemplateContext): string {
+  return `Run this to find and read the Product Brief for the current initiative:
+
+\`\`\`bash
+eval "$(${ctx.paths.binDir}/pmstack-slug 2>/dev/null)"
+echo "SLUG: $SLUG | BRANCH: $BRANCH"
+BRIEF_FILE=$(ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-*.md 2>/dev/null | head -1)
+if [ -z "$BRIEF_FILE" ]; then
+  echo "NO_BRIEF_FOUND"
+else
+  echo "BRIEF_FOUND: $BRIEF_FILE"
+  cat "$BRIEF_FILE"
+fi
+\`\`\`
+
+If \`NO_BRIEF_FOUND\`: stop and ask the PM to run \`/office-hours\` first. This skill requires a Product Brief to anchor the analysis. Do not proceed without one.
+
+If \`BRIEF_FOUND\`: read the full brief. Reference specific sections throughout the phases — the goal, opportunity mountains, hypotheses, and open questions are the primary anchors.`;
+}
+
 export function generateReviewReadinessDashboard(ctx: TemplateContext): string {
   return `## Review Readiness Dashboard
 

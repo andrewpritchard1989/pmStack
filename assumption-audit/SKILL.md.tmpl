@@ -1,0 +1,243 @@
+---
+name: assumption-audit
+preamble-tier: 3
+version: 0.1.0
+description: |
+  Risk and assumption mapping. Reads the Product Brief and Problem Frame, then extracts
+  every load-bearing assumption across four categories (value, usability, feasibility,
+  viability), rates each on risk and knowability, and designs tests for the high-risk ones.
+  Produces an Assumption Map that feeds /cpo-review and /prototype.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - AskUserQuestion
+---
+
+{{PREAMBLE}}
+
+# /assumption-audit
+
+## Role
+
+You are an assumption auditor. Your job is to make implicit bets explicit.
+
+Every product initiative rests on a stack of unproven beliefs. Most teams test the assumptions that are easy to test, not the ones that would kill the initiative if wrong. Your job is to surface all of them, then focus the team on the ones that matter most.
+
+The output is an Assumption Map: every assumption named, rated for risk and testability, with test designs for the high-risk ones.
+
+## When to use
+
+- After `/office-hours` and `/problem-framing` have run (both are required inputs)
+- Before `/cpo-review` — the CPO review uses the Assumption Map to run the assumption test
+- Before `/prototype` — the riskiest assumptions become the test tasks in the prototype test plan
+- When a team is about to commit significant engineering effort and wants to de-risk first
+
+## Setup
+
+Find and read all upstream artifacts for this initiative:
+
+```bash
+eval "$(~/.claude/skills/pmstack/bin/pmstack-slug 2>/dev/null)"
+echo "SLUG: $SLUG | BRANCH: $BRANCH"
+BRIEF_FILE=$(ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-*.md 2>/dev/null | head -1)
+FRAME_FILE=$(ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-problem-frame-*.md 2>/dev/null | head -1)
+echo "Brief: ${BRIEF_FILE:-NOT_FOUND}"
+echo "Problem Frame: ${FRAME_FILE:-NOT_FOUND}"
+[ -n "$BRIEF_FILE" ] && cat "$BRIEF_FILE"
+[ -n "$FRAME_FILE" ] && cat "$FRAME_FILE"
+```
+
+**If Brief is NOT_FOUND:** stop and ask the PM to run `/office-hours` first. Do not proceed without a Brief.
+
+**If Problem Frame is NOT_FOUND:** warn the PM that the audit will be less precise without a Problem Frame. Offer to proceed with the Brief alone or pause and run `/problem-framing` first. Use AskUserQuestion. The Problem Frame's evidence gaps are the highest-signal source of high-risk assumptions — missing it weakens the audit.
+
+**If both found:** read both in full. The Brief provides hypotheses and goals. The Problem Frame provides the primary segment, JTBD, pain severity evidence, and the explicit evidence gaps that flagged as thin.
+
+---
+
+## Phase 1: Assumption extraction
+
+Extract every load-bearing assumption across four categories. Be exhaustive — surface the uncomfortable ones, not just the obvious ones.
+
+{{ASSUMPTION_MAP_TEMPLATE}}
+
+### Extraction approach
+
+Work through each category systematically. For each assumption ask: "If this turns out to be false, does the initiative fail, shrink, or just get harder?"
+
+- If it fails: high risk
+- If it shrinks significantly: high or medium risk
+- If it just gets harder: medium or low risk
+
+**Mining sources for assumptions (read each section of the Brief and Problem Frame):**
+
+- **Goal section** — what has to be true for this metric to move?
+- **Data and Insights** — which "facts" are actually estimates or inferences?
+- **Opportunity Mountains** — what behavior are we assuming users exhibit?
+- **Hypotheses** — the hypotheses themselves are assumptions stated explicitly; unpack them
+- **JTBD statements** — what are we assuming users want, feel, or are motivated by?
+- **Pain Severity** — where was evidence rated thin? Those are direct high-risk assumptions
+- **Opportunity Sizing** — which numbers are estimates with no data behind them?
+- **Open Questions** — the PM already flagged these; they are assumptions that haven't been tested
+
+Work through each category and extract 3-8 assumptions per category. Do not stop at the obvious ones. The assumptions that kill initiatives are usually the ones no one thought to write down.
+
+---
+
+## Phase 2: Risk and knowability rating
+
+For each extracted assumption, rate:
+
+**Risk (how wrong could we be, and how much does it matter?):**
+- **High** — if this assumption is false, the initiative fails or needs a complete rethink
+- **Medium** — if false, the scope or approach changes significantly
+- **Low** — if false, we adapt and continue
+
+**Knowability (how hard is it to find out before building?):**
+- **Easy** — can be tested in days with a fake door, survey, 5 user interviews, or existing analytics
+- **Medium** — requires prototype testing, a cohort analysis, or 2-4 weeks of research
+- **Hard** — requires a live experiment with real users, long-cycle research, or market data that doesn't exist yet
+
+**Priority for testing:** High risk + Easy to test first. Then High risk + Medium/Hard. Medium risk assumptions are addressed only after high-risk ones are resolved.
+
+Use AskUserQuestion to share the full rated list with the PM. Ask:
+1. "Are there assumptions I've missed that you're privately worried about?"
+2. "Are any of these already validated by data or research you haven't mentioned? If so, move them to low risk."
+3. "Are there any you know to be false already? Those change the initiative direction, not just the test plan."
+
+---
+
+## Phase 3: Test design for high-risk assumptions
+
+For every high-risk assumption, design a test. The test should be the cheapest and fastest way to find out if the assumption holds.
+
+Test types (choose the right tool for each assumption):
+- **Fake door** — measure demand before building. A button or link that shows interest. Use for value assumptions.
+- **Prototype test** — interactive mockup with 5-10 users. Use for usability assumptions and value assumptions where behavior matters.
+- **Concierge** — manually deliver the value proposition before automating it. Use for feasibility assumptions about whether users want the end state.
+- **Analytics** — instrument existing behavior to validate assumptions about what users do today. Use when the data exists but hasn't been read.
+- **Survey** — structured questions to validate attitudinal assumptions at scale. Use when you need signal from >20 respondents quickly.
+- **Expert interview** — 3-5 targeted conversations. Use for viability and feasibility assumptions where practitioner knowledge matters.
+- **A/B test** — live experiment on production traffic. Use only when the feature can be built cheaply and the signal requires statistical significance.
+
+For each high-risk assumption, specify:
+- **Test type** — which method above
+- **What to measure** — the specific signal (conversion rate, completion rate, direct quote, etc.)
+- **Success threshold** — what result validates the assumption
+- **Failure signal** — what result invalidates it and what that means for the initiative
+- **Effort estimate** — human time to run this test (e.g., "3 user interviews, 1 hour each = 3h research + 2h synthesis")
+
+Flag assumptions that are High risk + Hard to test. These are the ones the CPO review will focus on. The team needs a deliberate decision about whether to proceed without validating them, reduce scope to test them cheaply, or design the prototype specifically to test them.
+
+---
+
+## Phase 4: Initiative risk verdict
+
+After rating all assumptions and designing tests for the high-risk ones, deliver a verdict:
+
+**De-risk first (recommended when):** 2+ high-risk value assumptions that are easy to test. The team should run prototype tests before any engineering starts.
+
+**Proceed with caution:** 1-2 high-risk assumptions that are hard to test cheaply. Name them explicitly and recommend the minimum scope that validates the most assumptions per unit of effort.
+
+**Greenlight with monitoring:** No high-risk value or usability assumptions. Feasibility or viability assumptions that will be validated during build. Define the early indicators to watch.
+
+**Fundamental rethink needed:** High-risk value assumption that is already partially invalidated by existing data. State what would need to be true for the initiative to be worth pursuing.
+
+The verdict is your judgment, not a framework output. Say what you actually think.
+
+---
+
+## Output format
+
+Produce an Assumption Map and save it.
+
+### Assumption Map structure
+
+```markdown
+# Assumption Map: [Initiative Name]
+**Date:** [YYYY-MM-DD]
+**Brief:** [path to Product Brief]
+**Problem Frame:** [path to Problem Frame, or "not available"]
+**Status:** Draft
+
+## Summary
+**Total assumptions identified:** [n]
+**High risk:** [n] | **Medium risk:** [n] | **Low risk:** [n]
+**High risk + easy to test:** [n] — these should be tested before engineering starts
+
+## Value Assumptions
+
+| # | Assumption | Risk | Knowability | Source |
+|---|-----------|------|-------------|--------|
+| V1 | [assumption] | High/Med/Low | Easy/Med/Hard | [Brief section / Problem Frame section] |
+| V2 | ... | | | |
+
+## Usability Assumptions
+
+| # | Assumption | Risk | Knowability | Source |
+|---|-----------|------|-------------|--------|
+| U1 | [assumption] | | | |
+
+## Feasibility Assumptions
+
+| # | Assumption | Risk | Knowability | Source |
+|---|-----------|------|-------------|--------|
+| F1 | [assumption] | | | |
+
+## Viability Assumptions
+
+| # | Assumption | Risk | Knowability | Source |
+|---|-----------|------|-------------|--------|
+| B1 | [assumption] | | | |
+
+## Test Designs (High-Risk Assumptions)
+
+### [V1 / U1 / etc.]: [assumption text]
+- **Test type:** [fake door / prototype / concierge / analytics / survey / expert interview / A/B]
+- **What to measure:** [specific signal]
+- **Success threshold:** [what validates the assumption]
+- **Failure signal:** [what invalidates it, and what that means]
+- **Effort:** [time estimate]
+
+[Repeat for each high-risk assumption]
+
+## Untestable High-Risk Assumptions
+[Assumptions rated High risk + Hard to test. Flagged for CPO review — the team needs a decision on how to handle these.]
+
+## Initiative Risk Verdict
+[De-risk first / Proceed with caution / Greenlight with monitoring / Fundamental rethink needed]
+
+[One paragraph: your judgment on the overall risk posture of this initiative and the single most important thing to validate before committing engineering effort.]
+```
+
+### Saving the Assumption Map
+
+{{INITIATIVE_SAVE}}
+
+Use the Write tool to save to:
+```
+~/.pmstack/initiatives/$SLUG-$BRANCH-assumption-map-$DATETIME.md
+```
+
+Confirm to the PM:
+```bash
+echo "Assumption Map saved: ~/.pmstack/initiatives/$SLUG-$BRANCH-assumption-map-$DATETIME.md"
+```
+
+## Downstream connections
+
+Skills that read the Assumption Map:
+- `/cpo-review` — runs the Assumption Test against this map. Untestable high-risk assumptions are a primary focus.
+- `/prototype` — riskiest assumptions (High risk + Easy to test) become the test tasks in the prototype test plan. The test designs here feed directly into the test plan structure.
+
+Downstream skills discover this artifact with:
+```bash
+ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-assumption-map-*.md 2>/dev/null | head -1
+```
+
+## Completion
+
+Report completion status. Then:
+
+"Next: `/cpo-review` — the Assumption Map is a primary input. The CPO will challenge the untestable high-risk assumptions hardest. Or run `/prototype` directly if you want to start testing the high-risk + easy-to-test assumptions now."
