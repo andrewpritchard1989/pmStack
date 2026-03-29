@@ -61,6 +61,21 @@ pmstack/
 ├── post-launch-review/          # Post-launch analysis (adapted from /retro)
 │   ├── SKILL.md.tmpl
 │   └── SKILL.md
+├── qbr-context/                 # QBR context gathering and audience profiling
+│   ├── SKILL.md.tmpl
+│   └── SKILL.md
+├── qbr-narrative/               # QBR narrative arc builder
+│   ├── SKILL.md.tmpl
+│   └── SKILL.md
+├── qbr-stress-test/             # QBR executive simulation
+│   ├── SKILL.md.tmpl
+│   └── SKILL.md
+├── qbr-red-team/                # QBR adversarial review
+│   ├── SKILL.md.tmpl
+│   └── SKILL.md
+├── qbr-generate/                # QBR final deliverable generator
+│   ├── SKILL.md.tmpl
+│   └── SKILL.md
 ├── browse/                      # Real browser (inherited from gstack)
 │   └── SKILL.md
 ├── setup-browser-cookies/       # Cookie import (inherited from gstack)
@@ -92,6 +107,11 @@ pmstack/
 /post-launch-review    Post-launch analysis — hypothesis validation, learnings, next steps.
 /browse                Real Chromium browser. Inherited from gstack.
 /setup-browser-cookies Import browser sessions for authenticated testing. Inherited from gstack.
+/qbr-context           Start here for QBR prep. Context gathering and audience profiling.
+/qbr-narrative         Build the narrative arc connecting team work to company goals.
+/qbr-stress-test       Simulate executive reactions to your QBR narrative.
+/qbr-red-team          Adversarial review — find weaknesses before the exec does.
+/qbr-generate          Produce final deliverable (slides, memo, or script).
 ```
 
 ## Skill flows by mode
@@ -125,6 +145,19 @@ pmstack/
 → Break into initiatives → each runs New Feature mode
 ```
 
+### QBR mode (full cycle)
+```
+/qbr-context → /qbr-narrative → /metrics-review
+→ /qbr-stress-test → /qbr-red-team → REVISION LOOP
+→ /qbr-generate → Final Deliverable
+```
+
+### QBR mode (quick — existing draft)
+```
+Upload deck/doc → /qbr-stress-test → /qbr-red-team
+→ REVISION LOOP → /qbr-generate → Final Deliverable
+```
+
 ## Filesystem state
 
 All artifacts are stored in `~/.pmstack/` and automatically discovered by downstream skills.
@@ -141,6 +174,12 @@ All artifacts are stored in `~/.pmstack/` and automatically discovered by downst
 ├── research/                      # Research briefs, interview guides, findings
 ├── competitive/                   # Competitive analysis reports
 ├── retros/                        # Post-launch review snapshots
+├── qbrs/                          # QBR Mode artifacts
+│   ├── {slug}-{branch}-context-{datetime}.md
+│   ├── {slug}-{branch}-narrative-{datetime}.md
+│   ├── {slug}-{branch}-stress-test-{datetime}.md
+│   ├── {slug}-{branch}-red-team-{datetime}.md
+│   └── {slug}-{branch}-output-{datetime}.md
 ├── sessions/                      # Active session tracking
 ├── analytics/                     # Usage analytics (local JSONL)
 └── config.yaml                    # User preferences

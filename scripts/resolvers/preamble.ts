@@ -16,9 +16,10 @@ import type { TemplateContext } from './types';
  * Skills by tier:
  *   T1: browse, setup-browser-cookies
  *   T2: post-launch-review, metrics-review, trade-off-analysis, comms-draft,
- *       prioritisation, roadmap-review
+ *       prioritisation, roadmap-review, qbr-generate
  *   T3: office-hours, problem-framing, assumption-audit, cpo-review, prototype,
- *       plan-stakeholder-review, spec-review, competitive-intel
+ *       plan-stakeholder-review, spec-review, competitive-intel,
+ *       qbr-context, qbr-narrative, qbr-stress-test, qbr-red-team
  */
 
 function generatePreambleBash(ctx: TemplateContext): string {
@@ -68,7 +69,12 @@ If output shows \`UPGRADE_AVAILABLE <old> <new>\`: tell the user "PMStack v{new}
 - Communications: \`/comms-draft\`
 - Post-launch: \`/post-launch-review\`
 - Browser: \`/browse\`
-- Cookie import: \`/setup-browser-cookies\``;
+- Cookie import: \`/setup-browser-cookies\`
+- QBR preparation: \`/qbr-context\` (start here for QBRs)
+- QBR narrative: \`/qbr-narrative\`
+- QBR stress test: \`/qbr-stress-test\`
+- QBR red team: \`/qbr-red-team\`
+- QBR output: \`/qbr-generate\``;
 }
 
 function generateVoiceDirective(tier: number): string {

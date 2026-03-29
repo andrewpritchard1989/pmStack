@@ -60,6 +60,11 @@ If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} i
 - Post-launch: `/post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
+- QBR preparation: `/qbr-context` (start here for QBRs)
+- QBR narrative: `/qbr-narrative`
+- QBR stress test: `/qbr-stress-test`
+- QBR red team: `/qbr-red-team`
+- QBR output: `/qbr-generate`
 
 ## Voice
 

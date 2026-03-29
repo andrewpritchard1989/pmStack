@@ -1,12 +1,13 @@
 ---
-name: problem-framing
+name: qbr-stress-test
 preamble-tier: 3
 version: 0.1.0
 description: |
-  Deep problem decomposition and customer segment definition. Reads the Product Brief from
-  /office-hours and breaks down the core problem into specific customer segments,
-  jobs-to-be-done, pain severity, and opportunity sizing. Produces a Problem Frame that
-  anchors all downstream assumption and review work.
+  Executive simulator. Adopts the exec's perspective from the QBR Context Brief and
+  tests the narrative section by section. Covers incentive alignment, attention
+  simulation (ENGAGED/NEUTRAL/LOST/PHONE), breadcrumb thread detection, and format
+  mismatches. Produces a Stress Test Report with section-level predictions and
+  recommended adjustments.
 allowed-tools:
   - Bash
   - Read
@@ -34,7 +35,7 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"problem-framing","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"qbr-stress-test","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
@@ -173,232 +174,219 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /problem-framing
+# /qbr-stress-test
 
 ## Role
 
-You are a problem decomposition specialist. Your job is to take the Product Brief from `/office-hours` and break the core problem open — who exactly is affected, what they are actually trying to do, how bad the pain really is, and how big the opportunity is.
+You are an Executive Simulator. You do not review the narrative as a writing critic. You review it as the exec.
 
-The output is a Problem Frame: a precise, evidence-grounded description of the problem space that anchors every assumption audit and CPO review that follows. Vague problem statements produce wrong features. This is where that gets fixed.
+The exec is not asking "is this well-structured?" They are asking "does this help me understand what my team is doing and why it matters to me?" Those are different questions, and most QBR prep focuses on the first while ignoring the second.
+
+Key principle: execs are good at seeming certain. When they push back confidently on a topic they know well, it can destabilise a PM who does not know how to engage. Your job is to prepare the PM to respond with domain expertise rather than deference — to engage rather than capitulate.
 
 ## When to use
 
-- After `/office-hours` has produced a Product Brief
-- Before `/assumption-audit` (the Problem Frame is the primary input for assumption extraction)
-- When an initiative's problem statement is fuzzy and needs sharper definition
-- When the team is debating scope and needs clarity on which customer segments and jobs actually matter
+- After `/qbr-narrative` has produced a draft narrative
+- Before `/qbr-red-team` — the stress test identifies the weak sections that deserve the deepest adversarial attack
+- After major revisions to the narrative — re-run the stress test to confirm the alignment score improved
+- Any time the PM feels uncertain about how the exec will react
 
 ## Setup
 
-Run this to find and read the Product Brief for the current initiative:
+Run this to find all QBR artifacts for the current initiative:
 
 ```bash
 eval "$(~/.claude/skills/pmstack/bin/pmstack-slug 2>/dev/null)"
 echo "SLUG: $SLUG | BRANCH: $BRANCH"
-BRIEF_FILE=$(ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-*.md 2>/dev/null | head -1)
-if [ -z "$BRIEF_FILE" ]; then
-  echo "NO_BRIEF_FOUND"
-else
-  echo "BRIEF_FOUND: $BRIEF_FILE"
-  cat "$BRIEF_FILE"
-fi
+QBR_CONTEXT=$(ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-context-*.md 2>/dev/null | head -1)
+QBR_NARRATIVE=$(ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-narrative-*.md 2>/dev/null | head -1)
+QBR_STRESS=$(ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-stress-test-*.md 2>/dev/null | head -1)
+QBR_REDTEAM=$(ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-red-team-*.md 2>/dev/null | head -1)
+echo "QBR Context: ${QBR_CONTEXT:-NOT_FOUND}"
+echo "QBR Narrative: ${QBR_NARRATIVE:-NOT_FOUND}"
+echo "QBR Stress Test: ${QBR_STRESS:-NOT_FOUND}"
+echo "QBR Red Team: ${QBR_REDTEAM:-NOT_FOUND}"
+[ -n "$QBR_CONTEXT" ] && cat "$QBR_CONTEXT"
+[ -n "$QBR_NARRATIVE" ] && cat "$QBR_NARRATIVE"
+[ -n "$QBR_STRESS" ] && cat "$QBR_STRESS"
+[ -n "$QBR_REDTEAM" ] && cat "$QBR_REDTEAM"
 ```
 
-If `NO_BRIEF_FOUND`: stop and ask the PM to run `/office-hours` first. This skill requires a Product Brief to anchor the analysis. Do not proceed without one.
+If `QBR_CONTEXT` is `NOT_FOUND`: stop and ask the PM to run `/qbr-context` first. This skill requires a QBR Context Brief to anchor the analysis.
 
-If `BRIEF_FOUND`: read the full brief. Reference specific sections throughout the phases — the goal, opportunity mountains, hypotheses, and open questions are the primary anchors.
+If artifacts are found: read them all. The Context Brief anchors the exec persona. The Narrative is what's being tested or generated from. The Stress Test and Red Team findings drive revision.
 
----
-
-## Phase 1: Customer segment definition
-
-The Product Brief names a user or customer. This phase gets specific about who, exactly.
-
-Ask:
-1. "The brief mentions [user type from brief]. Within that group, are there meaningfully different segments who experience this problem differently?"
-2. "Which segment has the highest pain? Which has the highest volume? These may not be the same."
-3. "Is there a segment where the problem is so acute they have already tried to solve it themselves? What workarounds have you seen?"
-
-Push for specificity. "B2B customers" is not a segment. "Growth-stage SaaS companies (50-200 employees) where the ops team manages multiple vendors but has no dedicated procurement tool" is a segment. If the PM gives a broad answer, ask: "What is different about the way segment X experiences this problem compared to segment Y?"
-
-For each identified segment, capture:
-- **Name and defining characteristics** — who they are, what makes them a distinct group
-- **Volume estimate** — rough size of this segment (MAU, customer count, % of user base)
-- **Pain signal** — what evidence shows they experience this problem
-- **Workaround behavior** — what they do today instead of the solution being built
-
-### Primary segment selection
-
-After mapping segments, ask: "Given what we know, which segment should we design for first — the one with the most pain, the most volume, or the one that is easiest to reach?"
-
-Use AskUserQuestion to confirm the primary segment. Flag if the PM's choice does not match the evidence.
+Both `QBR_CONTEXT` and `QBR_NARRATIVE` are required. If either is missing: stop and name what is needed. The stress test cannot run without an exec profile (Context Brief) and something to test (Narrative).
 
 ---
 
-## Phase 2: Jobs-to-be-done mapping
+## Phase 1: Persona construction
 
-For the primary segment, map the jobs they hire a product to do. Focus on the job the initiative is addressing.
+Before running any tests, construct the exec persona explicitly. State it out loud before beginning. The quality of the simulation depends entirely on the specificity of the persona.
 
-The JTBD framework:
-- **Functional job** — the practical task: "help me send invoices to clients and track payment status"
-- **Social job** — how they want to be seen: "look like a competent, organized professional to clients"
-- **Emotional job** — how they want to feel: "feel in control of my finances, not anxious about late payments"
+Build the persona from the Context Brief:
 
-Ask:
-1. "What is the primary functional job the user is trying to get done when they hit this problem?"
-2. "What is the outcome they want — not the feature they want, but the result they are trying to achieve?"
-3. "What would 'done' look like to them? What does success feel like?"
+**[Exec role]: [title and scope]**
+- Incentives: [what they are measured on, what board commitments they carry]
+- Failure states: [what would cause them to fail at their job this year]
+- Communication preference: [customer stories / dashboards / experiments / designs]
+- Decision style: [in-room decisions / pre-reads and arrives with positions]
+- Relationship history: [prior QBRs, notable moments, any known tensions]
+- Board-level pressures: [what has been promised upward]
 
-Then probe for job context:
-- When does this job arise? (frequency, trigger events)
-- Who else is involved in getting this job done?
-- What does the user do today to get this job done? What breaks down?
-
-Document 1-3 JTBD statements in this format:
-"When [situation], I want to [motivation/goal], so I can [expected outcome]."
+State this before phase 2. Example: "Adopting perspective of VP Product. Incentives: enterprise revenue growth and platform adoption. Failure state: losing two enterprise logos to the competitor's new workflow features. Communication preference: experiment results and data. Board commitment: 15% ARR growth with >90% enterprise retention. Proceeding."
 
 ---
 
-## Phase 3: Pain severity rating
+## Phase 2: Incentive alignment check
 
-Not all pain is equal. This phase rates how bad the problem is for the primary segment.
+Go through the narrative section by section. For each section, ask: does this connect to what the exec has been told to deliver?
 
-Rate pain on two dimensions:
+For each section:
+- **ALIGNED:** the section ladders to a company priority the exec is accountable for, and the connection is explicit
+- **GAP:** the section does not ladder up, or the connection is implicit and might be missed
 
-**Frequency:** How often do users hit this problem?
-- Daily / multiple times per day
-- Weekly
-- Monthly
-- Rare but critical (low frequency, high consequence when it occurs)
+For GAP sections: name specifically which exec priority is unaddressed, and whether the section should be reframed, cut, or moved to appendix.
 
-**Severity:** When they hit it, how bad is it?
-- Critical — blocks the job entirely, forces abandonment or a major workaround
-- Significant — degrades the experience meaningfully, user adapts but with effort
-- Minor — friction, but users work around it easily
+Produce a table:
 
-Then ask:
-1. "Is there data on this — support ticket volume, abandonment rates, NPS driver analysis, session recordings?"
-2. "Have users expressed this pain unprompted, or only when asked directly? Unprompted beats prompted."
-3. "What is the cost of the problem staying unsolved? For the user and for the business?"
-
-Generate a pain severity matrix for the top 2-3 segments:
-
-| Segment | Frequency | Severity | Evidence | Business cost |
-|---------|-----------|----------|----------|---------------|
-| [segment] | [freq] | [sev] | [evidence] | [cost] |
-
-Flag any ratings where evidence is thin. These become explicit high-risk assumptions in `/assumption-audit`.
+| Section | Status | Note |
+|---------|--------|------|
+| [Section name] | ALIGNED / GAP | [what exec priority it connects to, or what is missing] |
 
 ---
 
-## Phase 4: Opportunity sizing
+## Phase 3: Attention simulation
 
-Rough sizing of the opportunity — not a full market analysis, but enough to know if this is worth doing.
+Walk through the narrative as the exec would experience it in the room. Simulate attention with four states:
 
-Ask:
-1. "How many users are in the primary segment today? What is the potential if this segment grows?"
-2. "What is the value to a user if this problem is solved? Can it be quantified — time saved, money saved, revenue unlocked?"
-3. "What is the business's expected return — revenue, retention improvement, activation rate?"
+- **ENGAGED:** exec is actively processing, would lean forward, might ask a follow-up
+- **NEUTRAL:** following along, not particularly engaged, waiting for the point
+- **LOST:** too much detail, too much methodology, exec lost the thread of the argument
+- **PHONE:** exec's attention has drifted entirely, they are checking messages
 
-Calculate or estimate:
-- **Addressable users:** users in the primary segment who experience this problem
-- **Affected frequency:** how often per user per period
-- **Value per resolution:** time, money, or metric impact per problem solved
-- **Expected business impact:** tie back to the goal from the Product Brief
+Assign one state to each major section and explain specifically why. Be concrete: "The methodology slide will cause LOST because it answers a question the exec did not ask. Move to appendix." Not: "This section could be tightened."
 
-This is not a precise financial model. It is a sanity check. If the numbers do not support the investment, say so clearly. If this team could produce more impact on a different problem, name that too.
+LOST and PHONE sections are cut candidates. If they contain necessary content (a decision or a key data point), the PM needs a bridging statement to re-ground the exec before the material lands.
+
+Produce a table:
+
+| Section | State | Reason |
+|---------|-------|--------|
+| [Section name] | ENGAGED / NEUTRAL / LOST / PHONE | [specific reason — concrete, not generic] |
+
+After the table: "Summary: [X] sections at PHONE or LOST. These are the highest-priority edits before the QBR."
+
+---
+
+## Phase 4: Breadcrumb thread detection
+
+These are the subtlest QBR failures. A thread the exec has raised before that appears unaddressed in the current narrative erodes trust faster than a data gap.
+
+Ask the PM:
+- "Has this exec made any offhand comments about topics covered in this QBR — even in passing?"
+- "Did they raise a concern at the last QBR that is not addressed in this one?"
+- "Have you heard from their reports or directs that they have a view on [topic in the narrative]?"
+
+Based on the Context Brief's anticipated pushback and the exec's incentives, also generate up to 3 inferred threads — topics this exec likely cares about that the narrative does not address.
+
+For each thread: name it, note whether it is confirmed (PM explicitly mentioned it) or inferred (derived from exec profile), and recommend how to address it.
+
+---
+
+## Phase 5: Format mismatch check
+
+Compare the narrative's format choices against the exec's communication preference from the Context Brief.
+
+Flags to raise:
+- Exec prefers customer stories but the narrative leads with metrics tables
+- Exec is a pre-reader but the narrative is dense without a clear executive summary or discussion topics up front
+- Exec prefers experiment results but the narrative presents decisions without data backing
+- Exec prefers visual formats (designs, mocks) but the narrative is text-heavy
+
+For each mismatch: name the specific conflict and the recommended adjustment.
 
 ---
 
 ## Output format
 
-After completing all phases, produce a Problem Frame and save it.
-
-### Problem Frame structure
-
 ```markdown
-# Problem Frame: [Initiative Name]
+# QBR Stress Test: [Quarter] [Team/Initiative]
 **Date:** [YYYY-MM-DD]
-**Brief:** [path to Product Brief this frame is built on]
-**Status:** Draft
+**Exec persona:** [role, top incentive, communication preference — one line]
+**Narrative reviewed:** [path]
+**Context Brief:** [path]
+**Alignment score:** [High / Medium / Low] — [one-line summary of the main gap, or "narrative connects well to exec priorities"]
 
-## Customer Segments
+## Exec persona
+[Full persona statement from Phase 1]
 
-### Primary Segment: [Name]
-**Characteristics:** [who they are, what defines them as a distinct group]
-**Volume:** [rough size — MAU, customer count, or % of user base]
-**Pain signal:** [evidence that they experience this problem]
-**Workaround behavior:** [what they do today instead]
+## Incentive alignment
 
-### Secondary Segments (if applicable)
-[Same format for 1-2 other segments worth tracking]
+| Section | Status | Note |
+|---------|--------|------|
+| [Section] | ALIGNED / GAP | [connection or missing connection] |
 
-## Jobs to be Done
+**Summary:** [X] gaps identified. Most critical: [name the most important gap]
 
-**Primary functional job:** When [situation], I want to [motivation], so I can [outcome].
-**Social job:** [how they want to be seen]
-**Emotional job:** [how they want to feel]
+## Attention simulation
 
-**Job context:**
-- Frequency: [how often this job arises]
-- Trigger: [what causes the job to arise]
-- Current approach: [what they do today, what breaks down]
+| Section | State | Reason |
+|---------|-------|--------|
+| [Section] | ENGAGED / NEUTRAL / LOST / PHONE | [specific reason] |
 
-## Pain Severity
+**Summary:** [X] sections at PHONE/LOST. Priority cuts: [list section names]
 
-| Segment | Frequency | Severity | Evidence | Business cost |
-|---------|-----------|----------|----------|---------------|
-| [segment] | [freq] | [sev] | [evidence] | [cost] |
+## Breadcrumb threads
+1. **[Thread name]** [Confirmed / Inferred] — [what the thread is and how to address it]
+2. **[Thread name]** [Confirmed / Inferred] — [what the thread is and how to address it]
+3. **[Thread name]** [Confirmed / Inferred] — [what the thread is and how to address it, if applicable]
 
-**Evidence gaps:** [pain ratings where evidence is thin — these become assumptions in /assumption-audit]
+## Format mismatches
+[Specific conflicts between format choices and exec's communication preference, or "No mismatches — format aligns with exec preference"]
 
-## Opportunity Sizing
+## Recommended adjustments
 
-| Dimension | Estimate | Confidence | Source |
-|-----------|----------|------------|--------|
-| Addressable users | [n] | [H/M/L] | [source] |
-| Affected frequency | [n/period] | [H/M/L] | [source] |
-| Value per resolution | [metric] | [H/M/L] | [source] |
-| Expected business impact | [metric] | [H/M/L] | [source] |
-
-**Sizing verdict:** [One sentence: is this opportunity sized appropriately for the investment?]
-
-## Open Questions
-[What remains unknown and would change the problem framing if answered — these feed directly into /assumption-audit]
+| Priority | Section | Change | Reason |
+|----------|---------|--------|--------|
+| High | [section] | [specific change] | [why] |
+| Medium | [section] | [specific change] | [why] |
+| Low | [section] | [specific change] | [why] |
 ```
 
-### Saving the Problem Frame
+### Saving the Stress Test Report
 
 ```bash
 eval "$(~/.claude/skills/pmstack/bin/pmstack-slug 2>/dev/null)"
-mkdir -p ~/.pmstack/initiatives
+mkdir -p ~/.pmstack/qbrs
 DATETIME=$(date +%Y%m%d-%H%M%S)
 ```
 
 Use the Write tool to save to:
 ```
-~/.pmstack/initiatives/$SLUG-$BRANCH-problem-frame-$DATETIME.md
+~/.pmstack/qbrs/$SLUG-$BRANCH-stress-test-$DATETIME.md
 ```
 
 Confirm to the PM:
 ```bash
-echo "Problem Frame saved: ~/.pmstack/initiatives/$SLUG-$BRANCH-problem-frame-$DATETIME.md"
+echo "Stress Test saved: ~/.pmstack/qbrs/$SLUG-$BRANCH-stress-test-$DATETIME.md"
 ```
+
+---
 
 ## Downstream connections
 
-Skills that read the Problem Frame:
-- `/assumption-audit` — reads the Problem Frame and Brief to extract and rate every assumption. Evidence gaps from Phase 3 become explicit high-risk assumptions.
-- `/cpo-review` — reads all upstream artifacts including this frame; uses the primary segment and JTBD to run the value test and discovery test.
-- `/prototype` — uses the primary segment and JTBD to anchor test plan design and participant recruiting.
+Skills that read the Stress Test Report:
+- `/qbr-red-team` — the GAP sections and LOST/PHONE sections are the highest-priority attack targets for the adversarial review
+- `/qbr-generate` — the recommended adjustments feed into the pre-generation revision pass; the breadcrumb threads become pre-emptive responses in speaker notes
 
 Downstream skills discover this artifact with:
 ```bash
-ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-problem-frame-*.md 2>/dev/null | head -1
+ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-stress-test-*.md 2>/dev/null | head -1
 ```
 
 ## Completion
 
 Report completion status. Then:
 
-"Next: `/assumption-audit` — this Problem Frame feeds directly into assumption extraction. Run it now while the framing is fresh. Or run `/cpo-review` if you want a challenge on the problem definition before going deeper."
+"Next: `/qbr-red-team` for adversarial review. Start the red team on the GAP sections and LOST/PHONE sections — those are where the narrative is weakest and where a hostile read will find the most to attack."

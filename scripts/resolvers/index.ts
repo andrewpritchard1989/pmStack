@@ -11,7 +11,7 @@ import { generateCommandReference, generateSnapshotFlags, generateBrowseSetup } 
 import { generateSlugEval, generateSlugSetup, generateBaseBranchDetect, generateCoAuthorTrailer } from './utility';
 
 // PM-specific modules
-import { generateInitiativeSave, generateInitiativeDiscover, generateReviewReadinessDashboard } from './pm-utility';
+import { generateInitiativeSave, generateInitiativeDiscover, generateReviewReadinessDashboard, generateQbrSave, generateQbrDiscover } from './pm-utility';
 import { generateTeTreeTemplate, generateCpoChallengeFramework, generateAssumptionMapTemplate } from './pm-frameworks';
 
 export const RESOLVERS: Record<string, (ctx: TemplateContext) => string> = {
@@ -31,6 +31,8 @@ export const RESOLVERS: Record<string, (ctx: TemplateContext) => string> = {
   INITIATIVE_SAVE: generateInitiativeSave,
   INITIATIVE_DISCOVER: generateInitiativeDiscover,
   REVIEW_READINESS_DASHBOARD: generateReviewReadinessDashboard,
+  QBR_SAVE: generateQbrSave,
+  QBR_DISCOVER: generateQbrDiscover,
 
   // PM frameworks
   TE_TREE_TEMPLATE: generateTeTreeTemplate,

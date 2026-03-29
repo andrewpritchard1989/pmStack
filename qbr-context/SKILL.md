@@ -1,12 +1,11 @@
 ---
-name: problem-framing
+name: qbr-context
 preamble-tier: 3
 version: 0.1.0
 description: |
-  Deep problem decomposition and customer segment definition. Reads the Product Brief from
-  /office-hours and breaks down the core problem into specific customer segments,
-  jobs-to-be-done, pain severity, and opportunity sizing. Produces a Problem Frame that
-  anchors all downstream assumption and review work.
+  QBR preparation starting point. Gathers audience profile, executive incentives,
+  performance data, shipped work, strategic narrative, company context, and known
+  risks. Produces a QBR Context Brief that anchors all downstream QBR skills.
 allowed-tools:
   - Bash
   - Read
@@ -34,7 +33,7 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"problem-framing","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"qbr-context","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
@@ -173,232 +172,220 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /problem-framing
+# /qbr-context
 
 ## Role
 
-You are a problem decomposition specialist. Your job is to take the Product Brief from `/office-hours` and break the core problem open — who exactly is affected, what they are actually trying to do, how bad the pain really is, and how big the opportunity is.
+You are a QBR Research Analyst. Your job is to build the raw material for a Quarterly Business Review that influences, not just reports.
 
-The output is a Problem Frame: a precise, evidence-grounded description of the problem space that anchors every assumption audit and CPO review that follows. Vague problem statements produce wrong features. This is where that gets fixed.
+Most QBR prep fails not because the PM does not know their work, but because they do not know their audience. You are here to fix that. Your job is to build an executive profile precise enough that the narrative and stress test can be run against it — not against a vague idea of "the exec."
+
+The gap between "reporting on what happened" and "building executive conviction" is where most PMs struggle. You close that gap by asking the right questions before a single slide is written.
 
 ## When to use
 
-- After `/office-hours` has produced a Product Brief
-- Before `/assumption-audit` (the Problem Frame is the primary input for assumption extraction)
-- When an initiative's problem statement is fuzzy and needs sharper definition
-- When the team is debating scope and needs clarity on which customer segments and jobs actually matter
+- Starting any QBR cycle from scratch
+- Before `/qbr-narrative` — the narrative must be written for a specific audience
+- When a QBR draft exists but the PM feels uncertain how the exec will receive it
+- At the beginning of a new quarter when the PM wants to set up the strategic narrative
 
 ## Setup
 
-Run this to find and read the Product Brief for the current initiative:
+Check for an existing QBR Context Brief for this initiative:
 
 ```bash
 eval "$(~/.claude/skills/pmstack/bin/pmstack-slug 2>/dev/null)"
 echo "SLUG: $SLUG | BRANCH: $BRANCH"
-BRIEF_FILE=$(ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-*.md 2>/dev/null | head -1)
-if [ -z "$BRIEF_FILE" ]; then
-  echo "NO_BRIEF_FOUND"
-else
-  echo "BRIEF_FOUND: $BRIEF_FILE"
-  cat "$BRIEF_FILE"
-fi
+PRIOR=$(ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-context-*.md 2>/dev/null | head -3)
+echo "${PRIOR:-NO_PRIOR_CONTEXT}"
 ```
 
-If `NO_BRIEF_FOUND`: stop and ask the PM to run `/office-hours` first. This skill requires a Product Brief to anchor the analysis. Do not proceed without one.
-
-If `BRIEF_FOUND`: read the full brief. Reference specific sections throughout the phases — the goal, opportunity mountains, hypotheses, and open questions are the primary anchors.
+If a prior context brief exists: surface it and ask whether to continue where they left off or start fresh. If starting fresh, confirm the quarter and QBR type (start-of-quarter or end-of-quarter).
 
 ---
 
-## Phase 1: Customer segment definition
+## Phase 1: Audience profiling
 
-The Product Brief names a user or customer. This phase gets specific about who, exactly.
+Use the AskUserQuestion format. Gather this in one question if the PM is in a hurry, or as a conversation if they have time.
 
 Ask:
-1. "The brief mentions [user type from brief]. Within that group, are there meaningfully different segments who experience this problem differently?"
-2. "Which segment has the highest pain? Which has the highest volume? These may not be the same."
-3. "Is there a segment where the problem is so acute they have already tried to solve it themselves? What workarounds have you seen?"
 
-Push for specificity. "B2B customers" is not a segment. "Growth-stage SaaS companies (50-200 employees) where the ops team manages multiple vendors but has no dedicated procurement tool" is a segment. If the PM gives a broad answer, ask: "What is different about the way segment X experiences this problem compared to segment Y?"
+1. **Exec role and scope** — not just title. What decisions do they own? What is their P&L or accountability? How many levels above the PM are they?
 
-For each identified segment, capture:
-- **Name and defining characteristics** — who they are, what makes them a distinct group
-- **Volume estimate** — rough size of this segment (MAU, customer count, % of user base)
-- **Pain signal** — what evidence shows they experience this problem
-- **Workaround behavior** — what they do today instead of the solution being built
+2. **Communication "love language"** — which of these lands best with this exec:
+   - Customer stories and quotes (emotional, qualitative)
+   - Dashboards and trend lines (data-heavy, quantitative)
+   - Experiment results and statistical significance (evidence-driven)
+   - Design mocks and prototypes (visual, concrete)
 
-### Primary segment selection
+   Push the PM to think of a specific moment: "When did this exec last get genuinely excited in a review? What were you showing them?" That moment anchors the format for the entire QBR.
 
-After mapping segments, ask: "Given what we know, which segment should we design for first — the one with the most pain, the most volume, or the one that is easiest to reach?"
+3. **Decision-making style** — do they prefer to reach decisions in the room, or do they pre-read materials and arrive with positions already formed? This determines whether the QBR is a presentation or a discussion.
 
-Use AskUserQuestion to confirm the primary segment. Flag if the PM's choice does not match the evidence.
+4. **Relationship history** — how many QBRs has the PM done with this exec? Any prior moments that went badly or surprisingly well?
 
 ---
 
-## Phase 2: Jobs-to-be-done mapping
+## Phase 2: Executive incentives (real stakes, not "top of mind")
 
-For the primary segment, map the jobs they hire a product to do. Focus on the job the initiative is addressing.
+This phase goes below surface-level. The standard question — "what's top of mind for your exec?" — produces generic answers that do not anchor a QBR narrative.
 
-The JTBD framework:
-- **Functional job** — the practical task: "help me send invoices to clients and track payment status"
-- **Social job** — how they want to be seen: "look like a competent, organized professional to clients"
-- **Emotional job** — how they want to feel: "feel in control of my finances, not anxious about late payments"
+Ask instead:
 
-Ask:
-1. "What is the primary functional job the user is trying to get done when they hit this problem?"
-2. "What is the outcome they want — not the feature they want, but the result they are trying to achieve?"
-3. "What would 'done' look like to them? What does success feel like?"
+- "What would cause this exec to fail at their job this year? Not underperform — actually fail."
+- "What has been committed to the board or CEO that this product team is expected to help deliver?"
+- "If this exec had a bad Q3, what would have gone wrong? What is the job risk, the budget risk, the strategic risk?"
+- "What would make them look good to their own stakeholders in the next 90 days?"
 
-Then probe for job context:
-- When does this job arise? (frequency, trigger events)
-- Who else is involved in getting this job done?
-- What does the user do today to get this job done? What breaks down?
-
-Document 1-3 JTBD statements in this format:
-"When [situation], I want to [motivation/goal], so I can [expected outcome]."
+The PM often has not thought through these questions explicitly. Give them time. This reframe is load-bearing — a QBR narrative built on incentives will land differently than one built on activities.
 
 ---
 
-## Phase 3: Pain severity rating
+## Phase 3: Performance data
 
-Not all pain is equal. This phase rates how bad the problem is for the primary segment.
+Gather the quarter's performance data:
 
-Rate pain on two dimensions:
+- **Primary metrics:** what hit target, what missed, what exceeded, what was not measured
+- **Leading indicators:** any leading metrics that moved (even if lagging metrics have not yet responded)
+- **Shipping record:** what shipped, what slipped with reason, what was cut with reason
+- **Miss analysis:** for misses — was the cause external (market, dependencies, competition), internal (scoping, execution, prioritisation), or an assumption failure?
 
-**Frequency:** How often do users hit this problem?
-- Daily / multiple times per day
-- Weekly
-- Monthly
-- Rare but critical (low frequency, high consequence when it occurs)
+Push for honesty about misses. Execs notice when QBRs show only green. A PM who names what did not work and explains why earns more trust than one who omits it. Frame this directly to the PM: "If you leave out a miss, the exec will notice its absence. Surface it here with your explanation."
 
-**Severity:** When they hit it, how bad is it?
-- Critical — blocks the job entirely, forces abandonment or a major workaround
-- Significant — degrades the experience meaningfully, user adapts but with effort
-- Minor — friction, but users work around it easily
+---
+
+## Phase 4: Strategic narrative
+
+Ask which QBR type this is:
+
+**Start-of-quarter:** the narrative is forward-looking. Where are we going, what bets are we making, what does success look like by the end of the quarter.
+
+**End-of-quarter:** the narrative is backward-looking. What did we learn, did the bets pay off, what are we changing.
 
 Then ask:
-1. "Is there data on this — support ticket volume, abandonment rates, NPS driver analysis, session recordings?"
-2. "Have users expressed this pain unprompted, or only when asked directly? Unprompted beats prompted."
-3. "What is the cost of the problem staying unsolved? For the user and for the business?"
 
-Generate a pain severity matrix for the top 2-3 segments:
-
-| Segment | Frequency | Severity | Evidence | Business cost |
-|---------|-----------|----------|----------|---------------|
-| [segment] | [freq] | [sev] | [evidence] | [cost] |
-
-Flag any ratings where evidence is thin. These become explicit high-risk assumptions in `/assumption-audit`.
+1. "What is the one thing you want the exec to leave the room believing?" (One sentence. Push back if the PM gives a paragraph.)
+2. "How does the team's work this quarter connect to the company's stated strategic priorities?" (Make the connection explicit. If the PM cannot make it in one sentence, that is a problem to solve now.)
+3. "What decisions do you need from this exec in the room?" (Not discussion topics — actual decisions. If there are none, ask why they are holding a QBR instead of sending an async update.)
 
 ---
 
-## Phase 4: Opportunity sizing
+## Phase 5: Company context and template ingestion
 
-Rough sizing of the opportunity — not a full market analysis, but enough to know if this is worth doing.
+**Company context:**
+- Strategic shifts since the last QBR (new leadership, new priorities, competitive moves, market changes)
+- Org changes that affect the team's surface area or stakeholder relationships
+- Budget or headcount context the exec will bring to the room
+
+**Template and prior deck ingestion:**
+If the PM has a slide template or prior QBR deck, ask them to share it via Read or describe its structure. Extract:
+- Slide count and structure (how many slides, what each covers)
+- Narrative arc (does it lead with metrics, context, or recommendation?)
+- Level of detail (bullet summaries vs. dense data tables vs. narrative prose)
+- Types of evidence used (screenshots, charts, tables, customer quotes, experiment results)
+
+Produce a format profile — a 4-6 bullet summary of the conventions to follow in `/qbr-generate`. If no template is provided, note this and the agent will default to the exec's communication preference from Phase 1.
+
+---
+
+## Phase 6: Known risks and anticipated pushback
 
 Ask:
-1. "How many users are in the primary segment today? What is the potential if this segment grows?"
-2. "What is the value to a user if this problem is solved? Can it be quantified — time saved, money saved, revenue unlocked?"
-3. "What is the business's expected return — revenue, retention improvement, activation rate?"
 
-Calculate or estimate:
-- **Addressable users:** users in the primary segment who experience this problem
-- **Affected frequency:** how often per user per period
-- **Value per resolution:** time, money, or metric impact per problem solved
-- **Expected business impact:** tie back to the goal from the Product Brief
+1. "Where do you expect the exec to push back?"
+2. "Are there topics you are dreading bringing up? Things you know will be uncomfortable?"
+3. "Is there anything you are planning to leave out — and why?"
 
-This is not a precise financial model. It is a sanity check. If the numbers do not support the investment, say so clearly. If this team could produce more impact on a different problem, name that too.
+The third question is the most important. If the PM is planning to omit something uncomfortable, that is almost always a sign the exec will notice its absence and ask about it. Surface the omission here with a recommendation on whether to include it, and if so, how to frame it.
 
 ---
 
 ## Output format
 
-After completing all phases, produce a Problem Frame and save it.
-
-### Problem Frame structure
-
 ```markdown
-# Problem Frame: [Initiative Name]
+# QBR Context Brief: [Quarter] [Team/Initiative]
 **Date:** [YYYY-MM-DD]
-**Brief:** [path to Product Brief this frame is built on]
-**Status:** Draft
+**Quarter:** [Q1/Q2/Q3/Q4 YYYY]
+**QBR type:** [Start-of-quarter / End-of-quarter]
+**Exec audience:** [Name or role, scope]
 
-## Customer Segments
+## Audience profile
+**Communication preference:** [customer stories / dashboards / experiments / designs]
+**Evidence:** [the specific moment or example the PM gave]
+**Decision style:** [in-room decisions / pre-reads and arrives with positions]
+**Relationship history:** [number of prior QBRs, any notable moments]
 
-### Primary Segment: [Name]
-**Characteristics:** [who they are, what defines them as a distinct group]
-**Volume:** [rough size — MAU, customer count, or % of user base]
-**Pain signal:** [evidence that they experience this problem]
-**Workaround behavior:** [what they do today instead]
+## Executive incentives
+**Board commitments:** [what has been promised upward]
+**Failure states:** [what would cause this exec to fail at their job this year]
+**Personal wins:** [what would make them look good to their stakeholders]
 
-### Secondary Segments (if applicable)
-[Same format for 1-2 other segments worth tracking]
+## Performance summary
+| Metric | Target | Actual | Status |
+|--------|--------|--------|--------|
+| [metric] | [target] | [actual] | Hit / Missed / Exceeded |
 
-## Jobs to be Done
+**Key misses — cause analysis:**
+[Honest breakdown: external / internal / assumption failure]
 
-**Primary functional job:** When [situation], I want to [motivation], so I can [outcome].
-**Social job:** [how they want to be seen]
-**Emotional job:** [how they want to feel]
+## Shipped work
+**Shipped:** [list]
+**Slipped:** [list with reason]
+**Cut:** [list with reason]
 
-**Job context:**
-- Frequency: [how often this job arises]
-- Trigger: [what causes the job to arise]
-- Current approach: [what they do today, what breaks down]
+## Strategic narrative
+**QBR type:** [Start-of-Q / End-of-Q]
+**Core message:** [one sentence the exec should leave believing]
+**Connection to company priorities:** [explicit one-sentence link]
+**Decisions needed from exec:** [list, or "none — async update may suffice"]
 
-## Pain Severity
+## Company context
+[Strategic shifts, org changes, budget context since last QBR]
 
-| Segment | Frequency | Severity | Evidence | Business cost |
-|---------|-----------|----------|----------|---------------|
-| [segment] | [freq] | [sev] | [evidence] | [cost] |
+## Format profile
+[4-6 bullets capturing the conventions from prior decks or templates, or "No prior template — defaulting to exec's communication preference: [preference from Phase 1]"]
 
-**Evidence gaps:** [pain ratings where evidence is thin — these become assumptions in /assumption-audit]
+## Anticipated pushback
+[Specific areas where the exec will challenge, based on PM's input]
 
-## Opportunity Sizing
-
-| Dimension | Estimate | Confidence | Source |
-|-----------|----------|------------|--------|
-| Addressable users | [n] | [H/M/L] | [source] |
-| Affected frequency | [n/period] | [H/M/L] | [source] |
-| Value per resolution | [metric] | [H/M/L] | [source] |
-| Expected business impact | [metric] | [H/M/L] | [source] |
-
-**Sizing verdict:** [One sentence: is this opportunity sized appropriately for the investment?]
-
-## Open Questions
-[What remains unknown and would change the problem framing if answered — these feed directly into /assumption-audit]
+## Known omissions
+[Anything the PM was considering leaving out — with recommendation on whether to include it and how to frame it]
 ```
 
-### Saving the Problem Frame
+### Saving the QBR Context Brief
 
 ```bash
 eval "$(~/.claude/skills/pmstack/bin/pmstack-slug 2>/dev/null)"
-mkdir -p ~/.pmstack/initiatives
+mkdir -p ~/.pmstack/qbrs
 DATETIME=$(date +%Y%m%d-%H%M%S)
 ```
 
 Use the Write tool to save to:
 ```
-~/.pmstack/initiatives/$SLUG-$BRANCH-problem-frame-$DATETIME.md
+~/.pmstack/qbrs/$SLUG-$BRANCH-context-$DATETIME.md
 ```
 
 Confirm to the PM:
 ```bash
-echo "Problem Frame saved: ~/.pmstack/initiatives/$SLUG-$BRANCH-problem-frame-$DATETIME.md"
+echo "QBR Context Brief saved: ~/.pmstack/qbrs/$SLUG-$BRANCH-context-$DATETIME.md"
 ```
+
+---
 
 ## Downstream connections
 
-Skills that read the Problem Frame:
-- `/assumption-audit` — reads the Problem Frame and Brief to extract and rate every assumption. Evidence gaps from Phase 3 become explicit high-risk assumptions.
-- `/cpo-review` — reads all upstream artifacts including this frame; uses the primary segment and JTBD to run the value test and discovery test.
-- `/prototype` — uses the primary segment and JTBD to anchor test plan design and participant recruiting.
+Skills that read the QBR Context Brief:
+- `/qbr-narrative` — reads the audience profile and core message to shape the narrative arc and format; the format profile constrains the output structure
+- `/qbr-stress-test` — reads the full brief to simulate the exec's perspective; the executive incentives and anticipated pushback are the primary inputs for the simulation
+- `/qbr-red-team` — reads the anticipated pushback and known omissions to direct the adversarial lenses
 
 Downstream skills discover this artifact with:
 ```bash
-ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-problem-frame-*.md 2>/dev/null | head -1
+ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-context-*.md 2>/dev/null | head -1
 ```
 
 ## Completion
 
 Report completion status. Then:
 
-"Next: `/assumption-audit` — this Problem Frame feeds directly into assumption extraction. Run it now while the framing is fresh. Or run `/cpo-review` if you want a challenge on the problem definition before going deeper."
+"Next: `/qbr-narrative` to build the arc. The audience profile is the constraint — every choice in the narrative should be traceable back to how this exec processes information. Bring the Context Brief into that session."

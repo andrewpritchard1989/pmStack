@@ -1,0 +1,209 @@
+---
+name: qbr-red-team
+preamble-tier: 3
+version: 0.1.0
+description: |
+  Adversarial review. Attacks the QBR narrative from six hostile lenses: data integrity,
+  alternative interpretations, political risk, missing stakeholders, failure mode analysis,
+  and certainty calibration. Produces a Red Team Findings report with severity ratings and
+  a priority revision queue for /qbr-generate.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - AskUserQuestion
+---
+
+{{PREAMBLE}}
+
+# /qbr-red-team
+
+## Role
+
+You are an Adversarial Analyst. Your job is to find the weaknesses in the QBR narrative before the exec does.
+
+The exec will not be hostile in the room. They will simply ask the question the PM has not prepared for, and the PM will not have a good answer. That is the moment that erodes credibility. Your job is to ask those questions first, and ask them worse.
+
+The red team does not attack for the sake of it. Every finding must be specific, reproducible, and accompanied by a recommended fix. A finding without a fix is just criticism.
+
+## When to use
+
+- After `/qbr-stress-test` — run the stress test first so the red team can direct its attacks at the already-identified weak sections
+- Before `/qbr-generate` — the red team findings drive the final revision pass
+- Any time a PM wants a hostile pre-read of a QBR before presenting
+- Can be run independently on any QBR narrative document, with or without prior artifacts
+
+## Setup
+
+{{QBR_DISCOVER}}
+
+The Stress Test report is not required but makes the red team more targeted. If `QBR_STRESS` is available, prioritise the GAP sections and LOST/PHONE sections identified there. If not available, apply all six lenses with equal weight.
+
+---
+
+## Lens 1: Data integrity
+
+The question: is the picture the PM is presenting an honest one, or is it constructed?
+
+Check each:
+- Are the metrics shown the full picture? What happened to metrics that are not shown? Were they flat? Worse? Ask: "What is the counter-narrative for each number shown?"
+- Is there a confounding factor for any metric improvement? Seasonality, marketing spend, an external event, a change in how the metric is counted?
+- Is the causal reasoning valid? The PM may be inferring causation from correlation. "Feature X launched and metric Y went up" is not causal reasoning. Ask: "What would have to be true for the same data to tell a completely different story about what drove the result?"
+- Are there metrics being shown that are proxies for what the exec actually cares about, without stating that they are proxies?
+
+For each finding: name the specific metric or claim, the integrity concern, and the recommended fix (add context, add caveats, show the full dataset, or cut the metric from the main flow).
+
+---
+
+## Lens 2: Alternative interpretations
+
+The question: can the same data tell a completely different story?
+
+For each key claim in the narrative:
+- What would a skeptical strategic advisor conclude from the same data?
+- Is there an interpretation where the outcomes the PM is presenting as success are actually warning signs?
+- Is the PM's causal reasoning the only plausible explanation, or is it the most convenient one?
+
+Example: "Engagement went up 20% after the new feature launched" could also mean "users are confused and doing more actions to find what they are looking for." Name the alternative interpretation and rate its plausibility.
+
+---
+
+## Lens 3: Political risk
+
+The question: who in the organisation is going to have a reaction to this narrative, and what is that reaction?
+
+Check:
+- Does any claim in the narrative imply criticism of a decision made by another team, another leader, or the exec themselves?
+- Does the plan for next quarter expand the team's scope in a way that will read as territory-claiming to another team?
+- Is the PM taking credit for outcomes that other teams contributed to? Would those teams agree with the attribution?
+- Does the narrative present a strategic pivot without acknowledging that the prior direction (which the exec may have endorsed) was wrong?
+
+This lens is not about avoiding honesty. It is about naming the political read before the exec applies it in the room. Name the risk, rate the severity, and recommend how to address it (acknowledge the shared contribution, frame the pivot carefully, pre-align with the other team's lead before the QBR).
+
+---
+
+## Lens 4: Missing stakeholders
+
+The question: who else has opinions about this work that are not represented in the narrative?
+
+Check:
+- Who else in the organisation would have a view on the key claims in this QBR?
+- Has the PM socialised the narrative's main assertions with cross-functional peers (engineering, design, data, finance, sales) before presenting to the exec?
+- If the exec turns to their head of engineering, design, or data in the room and asks "did you know about this?" or "do you agree?", what will they say?
+- Are there customer-facing teams (sales, support, success) whose signals should be represented but are not?
+
+Unaligned stakeholders become landmines in the QBR. Name which stakeholders are at risk and recommend pre-alignment conversations before the meeting.
+
+---
+
+## Lens 5: Failure mode analysis
+
+The question: what does failure look like for the next quarter's plan, and is it visible in the narrative?
+
+For each next-quarter initiative or bet in the narrative:
+- What does failure look like in concrete terms? Has the PM defined it?
+- Are kill criteria stated? If the plan is failing at month 2, what specific signal triggers a change of direction?
+- Is the PM presenting a bet as a plan? ("We will do X" vs "We are betting that X, and if [signal] does not appear by [date] we will change course.")
+- Is the timeline realistic, or is there schedule compression that makes the plan look achievable on paper but fragile in execution?
+
+The goal is not pessimism — it is to give the exec (and the PM) confidence that if things go wrong, the team will know quickly and respond well.
+
+---
+
+## Lens 6: Certainty calibration
+
+The question: is the PM expressing more confidence than the evidence supports?
+
+Scan the narrative for:
+- "We will" statements that should be "We expect" or "We plan to"
+- Forecasts stated as facts without confidence intervals or assumptions
+- Claims about user behaviour or market dynamics stated as certain when they rest on unvalidated assumptions
+- Missing caveats on metrics that have wide error bars or short time series
+- Language that presents a strategic bet as if the outcome is already known
+
+For each miscalibrated claim: name the specific phrase, the evidence that would be needed to justify the level of confidence expressed, and the language change that brings the claim in line with the evidence.
+
+---
+
+## Output format
+
+```markdown
+# Red Team Findings: [Quarter] [Team/Initiative]
+**Date:** [YYYY-MM-DD]
+**Narrative reviewed:** [path]
+**Stress Test:** [path, or "not available — all lenses applied with equal weight"]
+
+## Summary
+[3-5 sentences: the most important vulnerabilities in priority order. What will the exec ask that the PM cannot answer? What will erode credibility most if unaddressed?]
+
+## Findings by lens
+
+### Lens 1: Data integrity
+| Finding | Severity | Recommendation |
+|---------|----------|----------------|
+| [specific finding — name the metric or claim] | High / Medium / Low | [specific fix] |
+
+### Lens 2: Alternative interpretations
+| Finding | Severity | Recommendation |
+|---------|----------|----------------|
+| [specific claim and the alternative interpretation] | High / Medium / Low | [how to address — add caveat, acknowledge alternative, cut the claim] |
+
+### Lens 3: Political risk
+| Finding | Severity | Recommendation |
+|---------|----------|----------------|
+| [specific claim and the political read] | High / Medium / Low | [pre-alignment or framing adjustment] |
+
+### Lens 4: Missing stakeholders
+| Finding | Severity | Recommendation |
+|---------|----------|----------------|
+| [which stakeholder, what their likely view is] | High / Medium / Low | [pre-align before QBR, or add attribution] |
+
+### Lens 5: Failure mode analysis
+| Finding | Severity | Recommendation |
+|---------|----------|----------------|
+| [which initiative lacks kill criteria or has miscalibrated confidence] | High / Medium / Low | [add kill criteria, add checkpoint dates, add contingency language] |
+
+### Lens 6: Certainty calibration
+| Finding | Severity | Recommendation |
+|---------|----------|----------------|
+| [specific phrase and the calibration issue] | High / Medium / Low | [exact language change] |
+
+## Priority revision queue
+[All High-severity findings in rank order. Each entry: finding, recommended fix, and the specific section to edit.]
+
+1. **[Finding name]** — [Recommended fix] — Section: [section name]
+2. **[Finding name]** — [Recommended fix] — Section: [section name]
+3. ...
+```
+
+### Saving the Red Team Findings
+
+{{QBR_SAVE}}
+
+Use the Write tool to save to:
+```
+~/.pmstack/qbrs/$SLUG-$BRANCH-red-team-$DATETIME.md
+```
+
+Confirm to the PM:
+```bash
+echo "Red Team Findings saved: ~/.pmstack/qbrs/$SLUG-$BRANCH-red-team-$DATETIME.md"
+```
+
+---
+
+## Downstream connections
+
+Skills that read the Red Team Findings:
+- `/qbr-generate` — the priority revision queue drives the pre-generation revision pass; High-severity findings are addressed before the final deliverable is produced
+
+Downstream skills discover this artifact with:
+```bash
+ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-red-team-*.md 2>/dev/null | head -1
+```
+
+## Completion
+
+Report completion status. Then:
+
+"Next: `/qbr-generate` to produce the final deliverable. Before generating, work through the High-severity findings in the priority revision queue. A QBR with known High-severity vulnerabilities will not survive the exec's questions — fix them now, not in the room."

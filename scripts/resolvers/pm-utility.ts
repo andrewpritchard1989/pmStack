@@ -33,6 +33,39 @@ If \`NO_BRIEF_FOUND\`: stop and ask the PM to run \`/office-hours\` first. This 
 If \`BRIEF_FOUND\`: read the full brief. Reference specific sections throughout the phases — the goal, opportunity mountains, hypotheses, and open questions are the primary anchors.`;
 }
 
+export function generateQbrSave(ctx: TemplateContext): string {
+  return `\`\`\`bash
+eval "$(${ctx.paths.binDir}/pmstack-slug 2>/dev/null)"
+mkdir -p ~/.pmstack/qbrs
+DATETIME=$(date +%Y%m%d-%H%M%S)
+\`\`\``;
+}
+
+export function generateQbrDiscover(ctx: TemplateContext): string {
+  return `Run this to find all QBR artifacts for the current initiative:
+
+\`\`\`bash
+eval "$(${ctx.paths.binDir}/pmstack-slug 2>/dev/null)"
+echo "SLUG: $SLUG | BRANCH: $BRANCH"
+QBR_CONTEXT=$(ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-context-*.md 2>/dev/null | head -1)
+QBR_NARRATIVE=$(ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-narrative-*.md 2>/dev/null | head -1)
+QBR_STRESS=$(ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-stress-test-*.md 2>/dev/null | head -1)
+QBR_REDTEAM=$(ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-red-team-*.md 2>/dev/null | head -1)
+echo "QBR Context: \${QBR_CONTEXT:-NOT_FOUND}"
+echo "QBR Narrative: \${QBR_NARRATIVE:-NOT_FOUND}"
+echo "QBR Stress Test: \${QBR_STRESS:-NOT_FOUND}"
+echo "QBR Red Team: \${QBR_REDTEAM:-NOT_FOUND}"
+[ -n "$QBR_CONTEXT" ] && cat "$QBR_CONTEXT"
+[ -n "$QBR_NARRATIVE" ] && cat "$QBR_NARRATIVE"
+[ -n "$QBR_STRESS" ] && cat "$QBR_STRESS"
+[ -n "$QBR_REDTEAM" ] && cat "$QBR_REDTEAM"
+\`\`\`
+
+If \`QBR_CONTEXT\` is \`NOT_FOUND\`: stop and ask the PM to run \`/qbr-context\` first. This skill requires a QBR Context Brief to anchor the analysis.
+
+If artifacts are found: read them all. The Context Brief anchors the exec persona. The Narrative is what's being tested or generated from. The Stress Test and Red Team findings drive revision.`;
+}
+
 export function generateReviewReadinessDashboard(ctx: TemplateContext): string {
   return `## Review Readiness Dashboard
 
