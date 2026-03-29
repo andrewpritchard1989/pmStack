@@ -82,7 +82,7 @@ T4: reserved (same as T3 currently)
 | Tier | Skills |
 |------|--------|
 | T1 | `browse`, `setup-browser-cookies` |
-| T2 | `post-launch-review`, `metrics-review`, `trade-off-analysis`, `comms-draft`, `prioritisation`, `roadmap-review` |
+| T2 | `post-launch-review`, `metrics-review`, `trade-off-analysis`, `comms-draft`, `prioritisation`, `roadmap-review`, `qbr-context`, `qbr-narrative`, `qbr-stress-test`, `qbr-red-team`, `qbr-generate` |
 | T3 | `office-hours`, `problem-framing`, `assumption-audit`, `cpo-review`, `prototype`, `plan-stakeholder-review`, `spec-review`, `competitive-intel` |
 
 Tier 3 includes the Initiative Context Discovery section in the preamble, which runs bash to find all upstream artifacts (brief, problem frame, assumption map, CPO review, prototype spec) before the skill body begins. This is in addition to any artifact discovery that individual skills do in their own Setup sections.
@@ -167,6 +167,12 @@ All PMStack artifacts are stored in `~/.pmstack/` and automatically discoverable
 │   └── {slug}-{branch}-competitive-intel-{datetime}.md  # Competitive Intel
 ├── retros/
 │   └── {slug}-{branch}-post-launch-review-{datetime}.md  # Post-launch Review
+├── qbrs/
+│   ├── {slug}-{branch}-context-{datetime}.md             # QBR Context (/qbr-context)
+│   ├── {slug}-{branch}-narrative-{datetime}.md           # QBR Narrative (/qbr-narrative)
+│   ├── {slug}-{branch}-stress-test-{datetime}.md         # Stress Test (/qbr-stress-test)
+│   ├── {slug}-{branch}-red-team-{datetime}.md            # Red Team (/qbr-red-team)
+│   └── {slug}-{branch}-output-{datetime}.md              # Final Output (/qbr-generate)
 ├── analytics/
 │   ├── skill-usage.jsonl                             # Telemetry (local only)
 │   └── {slug}-{branch}-measurement-plan-{datetime}.md   # Measurement Plan
@@ -261,6 +267,46 @@ Return to /office-hours (New Feature or Optimisation mode) with findings
 /prioritisation → /roadmap-review → /comms-draft
   ↓
 Break into individual initiatives → each runs New Feature mode
+```
+
+### QBR mode (full cycle)
+```
+/qbr-context
+  → Produces: QBR Context doc (audience profile, team work summary, decisions needed)
+  ↓
+/qbr-narrative
+  → Reads: QBR Context doc
+  → Produces: QBR Narrative arc
+  ↓
+/metrics-review (QBR pass)
+  → Reads: QBR Narrative arc
+  → Produces: Metrics Review (QBR)
+  ↓
+/qbr-stress-test
+  → Reads: QBR Narrative arc, Metrics Review
+  → Produces: Stress Test report
+  ↓
+/qbr-red-team
+  → Reads: QBR Narrative arc, Stress Test report
+  → Produces: Red Team report
+  ↓
+  [REVISION LOOP — address findings, update narrative, re-run stress test if needed]
+  ↓
+/qbr-generate
+  → Reads: All QBR artifacts
+  → Produces: Slide outline, exec memo, and/or speaker script
+  → Saves to: ~/.pmstack/qbrs/
+```
+
+### QBR mode (quick — existing draft)
+```
+Upload deck/doc
+  ↓
+/qbr-stress-test → /qbr-red-team
+  ↓
+  [REVISION LOOP]
+  ↓
+/qbr-generate → Final Deliverable
 ```
 
 ---

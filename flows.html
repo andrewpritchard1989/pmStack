@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMStack — Process Flows</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #f5f4f0;
+    color: #1a1a1a;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* Header */
+  .header { margin-bottom: 32px; }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .header h1 .version {
+    font-size: 13px;
+    font-weight: 500;
+    color: #888;
+  }
+  .header .subtitle {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #555;
+  }
+  .header .subtitle .badge-te {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 99px;
+    letter-spacing: 0.2px;
+    vertical-align: middle;
+  }
+  .header .subtitle .badge-updated {
+    display: inline-flex;
+    align-items: center;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 99px;
+    letter-spacing: 0.2px;
+    vertical-align: middle;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 8px 18px;
+    border-radius: 99px;
+    border: 1.5px solid #d1d0cb;
+    background: white;
+    font-size: 14px;
+    font-weight: 500;
+    color: #444;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .tab:hover { border-color: #999; color: #111; }
+  .tab.active {
+    background: #1a1a1a;
+    border-color: #1a1a1a;
+    color: white;
+  }
+
+  /* Flow panels */
+  .flow-panel { display: none; }
+  .flow-panel.active { display: block; }
+
+  /* Section headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    margin-top: 28px;
+  }
+  .section-header:first-child { margin-top: 0; }
+  .section-header .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #888;
+  }
+  .badge-te-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .badge-updated-sm {
+    display: inline-flex;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .badge-new-sm {
+    display: inline-flex;
+    background: #d1fae5;
+    color: #065f46;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .badge-optional-sm {
+    display: inline-flex;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* Connector */
+  .connector {
+    display: flex;
+    justify-content: center;
+    margin: 4px 0;
+    color: #ccc;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .connector.fork {
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .fork-line {
+    font-size: 12px;
+    color: #aaa;
+    font-style: italic;
+  }
+
+  /* Skill cards */
+  .skill-card {
+    background: white;
+    border: 1.5px solid #e5e4df;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .skill-card:hover { border-color: #c8c7c2; }
+
+  .skill-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    color: white;
+  }
+  .color-blue   { background: #3b82f6; }
+  .color-green  { background: #10b981; }
+  .color-orange { background: #f59e0b; }
+  .color-purple { background: #8b5cf6; }
+  .color-red    { background: #ef4444; }
+  .color-indigo { background: #6366f1; }
+  .color-pink   { background: #ec4899; }
+  .color-teal   { background: #14b8a6; }
+  .color-gray   { background: #6b7280; }
+
+  .skill-title {
+    flex: 1;
+    min-width: 0;
+  }
+  .skill-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .skill-time {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  .chevron {
+    color: #bbb;
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .skill-card.open .chevron { transform: rotate(90deg); }
+
+  .skill-body {
+    display: none;
+    border-top: 1.5px solid #f0efe9;
+    padding: 16px 18px 18px 60px;
+  }
+  .skill-card.open .skill-body { display: block; }
+
+  .skill-body p {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+  .skill-body p:last-child { margin-bottom: 0; }
+
+  .skill-body .meta-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    font-size: 12px;
+    color: #666;
+  }
+  .meta-item strong {
+    color: #333;
+    font-weight: 600;
+  }
+
+  .skill-body ul {
+    font-size: 14px;
+    color: #444;
+    padding-left: 18px;
+    margin-bottom: 12px;
+    line-height: 1.7;
+  }
+
+  .output-pill {
+    display: inline-block;
+    background: #f5f4f0;
+    border: 1px solid #e0dfd9;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 12px;
+    color: #555;
+    font-family: "SF Mono", "Fira Code", monospace;
+    margin-right: 6px;
+    margin-bottom: 4px;
+  }
+
+  /* Decision gate */
+  .decision-gate {
+    border: 1.5px solid #fbbf24;
+    background: #fffbeb;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 8px 0;
+    font-size: 14px;
+    color: #92400e;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .decision-gate .gate-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .decision-gate .gate-text strong { display: block; font-weight: 600; margin-bottom: 2px; }
+  .decision-gate .gate-text span { color: #78350f; font-size: 13px; }
+
+  /* Handoff callout */
+  .handoff {
+    border: 1.5px solid #a7f3d0;
+    background: #ecfdf5;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: #065f46;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+  }
+  .handoff .icon { font-size: 16px; }
+
+  /* Fork callout */
+  .fork-callout {
+    border: 1.5px solid #e0e7ff;
+    background: #eef2ff;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: #3730a3;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 8px 0;
+  }
+  .fork-callout .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .fork-callout .text strong { display: block; font-weight: 600; margin-bottom: 2px; }
+  .fork-callout .text span { font-size: 13px; color: #4338ca; }
+
+  /* Loop callout */
+  .loop-callout {
+    border: 1.5px solid #fce7f3;
+    background: #fdf2f8;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: #9d174d;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+  }
+
+  /* Feeds-into callout */
+  .feeds-into {
+    border: 1.5px solid #e5e7eb;
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+  }
+
+  /* Quick launch */
+  .quick-launch {
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1.5px solid #e5e4df;
+  }
+  .quick-launch h3 {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 12px;
+  }
+  .command-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cmd-pill {
+    background: white;
+    border: 1.5px solid #e0dfd9;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-family: "SF Mono", "Fira Code", monospace;
+    color: #333;
+  }
+  .cmd-pill.primary {
+    background: #1a1a1a;
+    border-color: #1a1a1a;
+    color: white;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>PMStack &mdash; Process Flows <span class="version">v1</span></h1>
+    <p class="subtitle">
+      Click each phase to expand.
+      <span class="badge-te">&#127807; Thoughtful Execution</span>
+      = Annina Koskinen's Spotify framework.
+      Skills chain automatically via <code>~/.pmstack/</code> artifacts.
+    </p>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="new-feature">New feature</div>
+    <div class="tab" data-tab="optimisation">Optimisation</div>
+    <div class="tab" data-tab="research">Research</div>
+    <div class="tab" data-tab="strategy">Strategy</div>
+    <div class="tab" data-tab="qbr">QBR</div>
+  </div>
+
+  <!-- ===== NEW FEATURE ===== -->
+  <div class="flow-panel active" id="tab-new-feature">
+
+    <div class="section-header">
+      <span class="section-label">Discovery</span>
+      <span class="badge-te-sm">&#127807; Thoughtful Execution</span>
+    </div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-blue">1</div>
+        <div class="skill-title">
+          <div class="skill-name">/office-hours <span style="font-weight:400;color:#888;font-size:13px;">— new feature mode</span></div>
+          <div class="skill-time">30&ndash;45 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Start here. A structured discovery session that surfaces the goal, the user segment, the problem evidence, and which Thoughtful Execution opportunity mountains to explore.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Input</strong> — your initiative idea</div>
+          <div class="meta-item"><strong>Output</strong> — Product Brief + TE tree (draft)</div>
+        </div>
+        <ul>
+          <li>Names the measurable goal (not "improve" — a number)</li>
+          <li>Surfaces data and existing evidence</li>
+          <li>Maps at least 3 opportunity mountains before picking one</li>
+          <li>Generates hypotheses and candidate solution designs per mountain</li>
+          <li>Writes the Product Brief to <code>~/.pmstack/initiatives/</code></li>
+        </ul>
+        <div>
+          <span class="output-pill">Product Brief</span>
+          <span class="output-pill">TE Tree (draft)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-green">2</div>
+        <div class="skill-title">
+          <div class="skill-name">/problem-framing</div>
+          <div class="skill-time">15&ndash;20 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Deep decomposition of the problem space. Forces precision on who is affected, what job they need to get done, how severe the pain is, and how large the opportunity is.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — Product Brief</div>
+          <div class="meta-item"><strong>Output</strong> — Problem Framing doc</div>
+        </div>
+        <ul>
+          <li>Customer segments and JTBD for each</li>
+          <li>Pain severity scoring (1&ndash;5) per segment</li>
+          <li>Opportunity sizing — rough TAM and addressable users</li>
+          <li>Problem statement locked: "When [segment] tries to [job], they struggle with [pain] because [root cause]."</li>
+        </ul>
+        <div>
+          <span class="output-pill">Problem Framing doc</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-orange">3</div>
+        <div class="skill-title">
+          <div class="skill-name">/assumption-audit</div>
+          <div class="skill-time">15 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Extracts every assumption baked into the Product Brief and Problem Framing, then rates each by risk and designability. The riskiest ones become the core test tasks in /prototype.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — Product Brief, Problem Framing</div>
+          <div class="meta-item"><strong>Output</strong> — Assumption Map</div>
+        </div>
+        <ul>
+          <li>Assumptions extracted across: user behaviour, problem severity, willingness to pay, technical feasibility, market timing</li>
+          <li>Risk score per assumption (Impact x Uncertainty)</li>
+          <li>Test design for each high-risk assumption</li>
+          <li>Kill criteria — which assumptions, if wrong, kill the initiative</li>
+        </ul>
+        <div>
+          <span class="output-pill">Assumption Map</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <span class="section-label">Expert Validation &amp; Prototype</span>
+    </div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-purple">4</div>
+        <div class="skill-title">
+          <div class="skill-name">/cpo-review</div>
+          <div class="skill-time">10&ndash;15 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Chief Product Officer challenge. The agent adopts the persona of a senior CPO and runs six tests against the initiative, then does targeted web research to find case studies, counter-examples, and expert perspectives that back up or challenge its verdict.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — Brief, TE tree, Problem Framing, Assumption Map</div>
+          <div class="meta-item"><strong>Output</strong> — CPO Review Report</div>
+        </div>
+        <ul>
+          <li><strong>Value test</strong> — real demand, or shipping because a competitor has it?</li>
+          <li><strong>Discovery test</strong> — genuine user research, or stakeholder order dressed up?</li>
+          <li><strong>Scope test</strong> — narrowest wedge, or gold-plated before testing?</li>
+          <li><strong>Strategic fit test</strong> — what are you saying no to?</li>
+          <li><strong>Assumption test</strong> — what kills the whole thing if it's wrong?</li>
+          <li><strong>TE tree challenge</strong> — did you actually explore multiple mountains?</li>
+        </ul>
+        <p>Verdict: Proceed / Conditional proceed / Rethink / Kill.</p>
+        <div>
+          <span class="output-pill">CPO Review Report</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-red">5</div>
+        <div class="skill-title">
+          <div class="skill-name">/prototype <span style="font-weight:400;color:#888;font-size:13px;">— build &amp; test with customers</span></div>
+          <div class="skill-time">1&ndash;3 hours</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Reads all prior artifacts and auto-drafts a test plan. Then generates a structured prompt for Figma Make, an HTML prototype, or a React artifact. You review and tweak the plan — you don't start from scratch.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — Brief, TE tree, Assumption Map, CPO Review</div>
+          <div class="meta-item"><strong>Output</strong> — Prototype + Test Results</div>
+        </div>
+        <ul>
+          <li>Assumption Map's high-risk items become test tasks</li>
+          <li>CPO's challenges become observation criteria and interview questions</li>
+          <li>Output options: Figma Make prompt, HTML prototype, React artifact</li>
+          <li>After testing: updates the TE tree with results</li>
+        </ul>
+        <div>
+          <span class="output-pill">Prototype spec</span>
+          <span class="output-pill">Test results</span>
+          <span class="output-pill">TE Tree (updated)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="decision-gate">
+      <div class="gate-icon">&#9889;</div>
+      <div class="gate-text">
+        <strong>Decision gate</strong>
+        <span>Proceed to spec? Iterate on a different TE branch? Pivot? Kill?</span>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <span class="section-label">Specification</span>
+    </div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-indigo">6</div>
+        <div class="skill-title">
+          <div class="skill-name">/plan-stakeholder-review</div>
+          <div class="skill-time">20&ndash;30 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Simulates how engineering, design, and business stakeholders will react to the initiative. Surfaces cross-stakeholder conflicts before the real meeting.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — CPO Review, Test Results, Product Brief</div>
+          <div class="meta-item"><strong>Output</strong> — Stakeholder Review doc</div>
+        </div>
+        <ul>
+          <li>Engineering lens: feasibility, scope creep risk, technical debt implications</li>
+          <li>Design lens: UX coherence, accessibility, user mental model conflicts</li>
+          <li>Business lens: revenue impact, legal and compliance, support load</li>
+          <li>Conflict map: where these lenses disagree and what to resolve before spec</li>
+        </ul>
+        <div>
+          <span class="output-pill">Stakeholder Review doc</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-pink">7</div>
+        <div class="skill-title">
+          <div class="skill-name">/spec-review</div>
+          <div class="skill-time">20&ndash;30 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>PRD quality audit. Checks every user story, acceptance criterion, edge case, success metric, and dependency. Produces a polished spec ready for engineering.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — All prior artifacts</div>
+          <div class="meta-item"><strong>Output</strong> — Polished spec in <code>~/.pmstack/specs/</code></div>
+        </div>
+        <ul>
+          <li>User stories in "As a / I want / So that" format</li>
+          <li>Acceptance criteria — specific, testable, complete</li>
+          <li>Edge cases and error states covered</li>
+          <li>Success metrics with baselines and targets</li>
+          <li>Dependencies flagged (API, data, third-party)</li>
+        </ul>
+        <div>
+          <span class="output-pill">Polished PRD spec</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="handoff">
+      <div class="icon">&#10003;</div>
+      <div><strong>Engineering Handoff</strong> &mdash; Required gates: Problem Framing, Assumption Audit, CPO Review, Prototype Test. Spec Review strongly recommended.</div>
+    </div>
+
+  </div>
+
+  <!-- ===== OPTIMISATION ===== -->
+  <div class="flow-panel" id="tab-optimisation">
+
+    <div class="section-header">
+      <span class="section-label">Discovery</span>
+    </div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-blue">1</div>
+        <div class="skill-title">
+          <div class="skill-name">/office-hours <span style="font-weight:400;color:#888;font-size:13px;">— optimisation mode</span></div>
+          <div class="skill-time">20&ndash;30 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Structured session for improving something that already exists. Focuses on the current metric, what's driving the gap, and which levers are available.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Input</strong> — metric you want to move + current data</div>
+          <div class="meta-item"><strong>Output</strong> — Product Brief (optimisation)</div>
+        </div>
+        <ul>
+          <li>Defines the metric precisely (numerator, denominator, segment)</li>
+          <li>Diagnoses root causes of the gap</li>
+          <li>Maps opportunity levers — which ones are controllable vs. external</li>
+          <li>Applies Thoughtful Execution: multiple hypotheses before picking a lever</li>
+        </ul>
+        <div><span class="output-pill">Product Brief (opt)</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-green">2</div>
+        <div class="skill-title">
+          <div class="skill-name">/metrics-review</div>
+          <div class="skill-time">15&ndash;20 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Measurement plan audit. Checks that the metric you're optimising is the right proxy, that baselines exist, that counter-metrics are in place, and that you have sufficient statistical power.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — Product Brief</div>
+          <div class="meta-item"><strong>Output</strong> — Measurement Plan</div>
+        </div>
+        <ul>
+          <li>Proxy metric validity — does moving this actually move the north star?</li>
+          <li>Baseline check — do you have enough data to detect a change?</li>
+          <li>Counter-metrics — what could improve without real user benefit?</li>
+          <li>Sample size and runtime estimates for the experiment</li>
+        </ul>
+        <div><span class="output-pill">Measurement Plan</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-purple">3</div>
+        <div class="skill-title">
+          <div class="skill-name">/cpo-review</div>
+          <div class="skill-time">10&ndash;15 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>CPO challenge for optimisation work. Is this metric actually worth moving? Is this the right lever? What does the research say about this type of optimisation?</p>
+        <div><span class="output-pill">CPO Review Report</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-orange">4</div>
+        <div class="skill-title">
+          <div class="skill-name">/trade-off-analysis</div>
+          <div class="skill-time">15&ndash;20 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Structured analysis for genuine trade-offs in the optimisation — speed vs. quality, growth vs. retention, one segment vs. another. Captures the decision and the reasoning.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Best for</strong> — decisions with no clearly right answer</div>
+        </div>
+        <ul>
+          <li>Decision framed as a genuine either/or (not a false trade-off)</li>
+          <li>Criteria ranked by importance</li>
+          <li>Each option scored against criteria</li>
+          <li>Decision captured and logged for post-launch review</li>
+        </ul>
+        <div><span class="output-pill">Trade-off doc</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-red">5</div>
+        <div class="skill-title">
+          <div class="skill-name">/prototype</div>
+          <div class="skill-time">1&ndash;3 hours</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Builds the optimisation variant and auto-drafts a test plan from the Measurement Plan. In optimisation mode, success criteria come from the Measurement Plan rather than the Assumption Map.</p>
+        <div><span class="output-pill">Prototype</span><span class="output-pill">Test Results</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="handoff">
+      <div class="icon">&#10003;</div>
+      <div><strong>Engineering Handoff</strong> &mdash; Ship the experiment.</div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-gray">6</div>
+        <div class="skill-title">
+          <div class="skill-name">/post-launch-review <span style="font-weight:400;color:#888;font-size:13px;">— after the experiment</span></div>
+          <div class="skill-time">20&ndash;30 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Post-launch analysis. Did the hypothesis hold? What did the data actually say? What's the next branch to explore on the TE tree?</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — Measurement Plan, experiment results</div>
+          <div class="meta-item"><strong>Output</strong> — Post-launch Review snapshot</div>
+        </div>
+        <ul>
+          <li>Hypothesis validated, partially validated, or refuted?</li>
+          <li>Counter-metric check — anything moved unexpectedly?</li>
+          <li>TE tree updated — which mountain to explore next?</li>
+          <li>Learnings logged to <code>~/.pmstack/retros/</code></li>
+        </ul>
+        <div><span class="output-pill">Post-launch Review</span><span class="output-pill">TE Tree (updated)</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== RESEARCH ===== -->
+  <div class="flow-panel" id="tab-research">
+
+    <div class="section-header">
+      <span class="section-label">Explore</span>
+    </div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-blue">1</div>
+        <div class="skill-title">
+          <div class="skill-name">/office-hours <span style="font-weight:400;color:#888;font-size:13px;">— research mode</span></div>
+          <div class="skill-time">20&ndash;30 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Scopes the research question. Prevents the classic mistake of going into research without a falsifiable hypothesis — research without a hypothesis produces insights nobody acts on.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Input</strong> — problem space or question</div>
+          <div class="meta-item"><strong>Output</strong> — Research Brief</div>
+        </div>
+        <ul>
+          <li>Research question in falsifiable form</li>
+          <li>What you already believe (so you can notice when you're wrong)</li>
+          <li>Who to talk to and why that segment specifically</li>
+          <li>What the research will NOT answer (scope boundary)</li>
+        </ul>
+        <div><span class="output-pill">Research Brief</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-purple">2</div>
+        <div class="skill-title">
+          <div class="skill-name">/cpo-review</div>
+          <div class="skill-time">10&ndash;15 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>CPO challenge before spending research time. Is this the most important question to answer right now? Is your hypothesis actually falsifiable? What does the existing literature say?</p>
+        <div><span class="output-pill">CPO Review Report</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="fork-callout">
+      <div class="icon">&#8645;</div>
+      <div class="text">
+        <strong>Fork — choose your research method</strong>
+        <span>User interviews (primary research) OR /prototype as a concept test (stimulus-based research). Pick based on whether you need to understand the problem or validate a solution direction.</span>
+      </div>
+    </div>
+
+    <div class="section-header" style="margin-top: 20px;">
+      <span class="section-label">Optional</span>
+      <span class="badge-optional-sm">Can run in parallel</span>
+    </div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-teal">3</div>
+        <div class="skill-title">
+          <div class="skill-name">/competitive-intel</div>
+          <div class="skill-time">20&ndash;40 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Competitive landscape analysis using the real Chromium browser. Browses competitor products, reads analyst reports, and structures findings into a landscape map.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Uses</strong> — /browse (authenticated Chromium)</div>
+          <div class="meta-item"><strong>Output</strong> — Competitive Analysis report</div>
+        </div>
+        <ul>
+          <li>Competitor feature comparison matrix</li>
+          <li>Positioning and differentiation gaps</li>
+          <li>Jobs-to-be-done each competitor is solving (and ignoring)</li>
+          <li>Screenshots saved to <code>~/.pmstack/competitive/</code></li>
+        </ul>
+        <div><span class="output-pill">Competitive Analysis</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="feeds-into">
+      <div>&#8594;</div>
+      <div>Synthesis feeds into <strong>New Feature</strong> or <strong>Optimisation</strong> mode. Run /office-hours with research findings in hand.</div>
+    </div>
+
+  </div>
+
+  <!-- ===== STRATEGY ===== -->
+  <div class="flow-panel" id="tab-strategy">
+
+    <div class="section-header">
+      <span class="section-label">Portfolio</span>
+    </div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-blue">1</div>
+        <div class="skill-title">
+          <div class="skill-name">/office-hours <span style="font-weight:400;color:#888;font-size:13px;">— strategy mode</span></div>
+          <div class="skill-time">30&ndash;45 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Frames the strategic question at the portfolio level. What is the company trying to achieve in this period? Which bets are on the table? What are the sequencing constraints?</p>
+        <div><span class="output-pill">Strategy Brief</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-purple">2</div>
+        <div class="skill-title">
+          <div class="skill-name">/cpo-review</div>
+          <div class="skill-time">10&ndash;15 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>CPO challenge at the portfolio level. Are these the right bets? Is the sequencing defensible? What's the strategic logic, and does the evidence support it?</p>
+        <div><span class="output-pill">CPO Review Report</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-orange">3</div>
+        <div class="skill-title">
+          <div class="skill-name">/prioritisation</div>
+          <div class="skill-time">20&ndash;30 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Multi-framework scoring across your initiative list. Runs ICE, RICE, opportunity scoring, and cost of delay in parallel, then synthesises a recommended order with the reasoning behind it.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Input</strong> — list of initiatives or features</div>
+          <div class="meta-item"><strong>Output</strong> — Prioritised stack with scoring</div>
+        </div>
+        <ul>
+          <li>ICE (Impact, Confidence, Ease)</li>
+          <li>RICE (Reach, Impact, Confidence, Effort)</li>
+          <li>Opportunity scoring (importance vs. satisfaction gap)</li>
+          <li>Cost of delay (urgency x value)</li>
+          <li>Sensitivity analysis — what changes if one score is wrong?</li>
+        </ul>
+        <div><span class="output-pill">Prioritised stack</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-indigo">4</div>
+        <div class="skill-title">
+          <div class="skill-name">/roadmap-review</div>
+          <div class="skill-time">20&ndash;30 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Roadmap integrity check. Is this actually achievable? Are the dependencies sequenced correctly? Is capacity realistic? Are there any initiatives that block others from starting?</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Input</strong> — roadmap document or initiative list</div>
+          <div class="meta-item"><strong>Output</strong> — Roadmap Review report</div>
+        </div>
+        <ul>
+          <li>Strategic alignment check — does each item connect to a company goal?</li>
+          <li>Dependency map — what can't start until something else ships?</li>
+          <li>Capacity realism — is there enough time, given known constraints?</li>
+          <li>Risk items flagged — which bets are underfunded or overly optimistic?</li>
+        </ul>
+        <div><span class="output-pill">Roadmap Review report</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-teal">5</div>
+        <div class="skill-title">
+          <div class="skill-name">/comms-draft</div>
+          <div class="skill-time">15&ndash;20 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Writes the strategic narrative for the roadmap — to executives, to engineering, to the broader team. Different versions for different audiences. Reads the roadmap and prioritisation docs to write from evidence, not from scratch.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Output options</strong> — exec memo, all-hands doc, engineering brief, changelog</div>
+        </div>
+        <div><span class="output-pill">Comms drafts</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="feeds-into">
+      <div>&#8594;</div>
+      <div>Each initiative on the roadmap runs its own <strong>New Feature</strong> or <strong>Optimisation</strong> flow before engineering handoff.</div>
+    </div>
+
+  </div>
+
+  <!-- ===== QBR ===== -->
+  <div class="flow-panel" id="tab-qbr">
+
+    <div class="section-header">
+      <span class="section-label">Full cycle</span>
+      <span class="badge-new-sm">QBR mode</span>
+    </div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-blue">1</div>
+        <div class="skill-title">
+          <div class="skill-name">/qbr-context</div>
+          <div class="skill-time">20&ndash;30 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Start here for QBR prep. Gathers the context needed for a compelling review: who the audience is, what they care about, what they already know, and what decisions they need to make.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Input</strong> — QBR audience, team context</div>
+          <div class="meta-item"><strong>Output</strong> — QBR Context doc</div>
+        </div>
+        <ul>
+          <li>Audience profiling — executive priorities, known concerns, hot buttons</li>
+          <li>What the audience is expecting vs. what they need to hear</li>
+          <li>Decisions they need to make (don't just inform — drive a decision)</li>
+          <li>Team work summary — what shipped, what moved, what didn't</li>
+        </ul>
+        <div><span class="output-pill">QBR Context doc</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-green">2</div>
+        <div class="skill-title">
+          <div class="skill-name">/qbr-narrative</div>
+          <div class="skill-time">20&ndash;30 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Builds the narrative arc that connects your team's work to the company's goals. A QBR is not a feature list — it's a story of strategic progress and what comes next.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — QBR Context doc</div>
+          <div class="meta-item"><strong>Output</strong> — QBR Narrative arc</div>
+        </div>
+        <ul>
+          <li>Opening frame — why does this quarter matter in the larger story?</li>
+          <li>Progress narrative — what moved, and what did that unlock?</li>
+          <li>Honest assessment — what didn't work, and what was learned?</li>
+          <li>Forward ask — what decision or resource enables the next chapter?</li>
+        </ul>
+        <div><span class="output-pill">QBR Narrative arc</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-orange">3</div>
+        <div class="skill-title">
+          <div class="skill-name">/metrics-review <span style="font-weight:400;color:#888;font-size:13px;">— QBR metrics pass</span></div>
+          <div class="skill-time">15 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Sanity-checks the metrics you're presenting. Are the numbers defensible? Are you presenting the metric that matters, or the one that looks best? Is the framing honest?</p>
+        <div><span class="output-pill">Metrics Review (QBR)</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-red">4</div>
+        <div class="skill-title">
+          <div class="skill-name">/qbr-stress-test</div>
+          <div class="skill-time">15&ndash;20 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Simulates executive reactions to your QBR narrative. The agent plays multiple executive personas (CEO, CFO, engineering VP, sales VP) and pushes back on the weakest parts of your story before the real meeting.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — Narrative arc, Metrics Review</div>
+          <div class="meta-item"><strong>Output</strong> — Stress Test report</div>
+        </div>
+        <ul>
+          <li>"If this metric is up, why is revenue flat?" — CFO probe</li>
+          <li>"Why did this take the whole quarter?" — CEO pressure</li>
+          <li>"What's the dependency on my team?" — Engineering VP concern</li>
+          <li>Each challenge comes with the specific slide or claim it's attacking</li>
+        </ul>
+        <div><span class="output-pill">Stress Test report</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-purple">5</div>
+        <div class="skill-title">
+          <div class="skill-name">/qbr-red-team</div>
+          <div class="skill-time">15&ndash;20 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Adversarial review. Finds the weakest claims, the most misleading framings, and the questions you're hoping nobody asks. Find them now, not in the room.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — Narrative arc, Stress Test report</div>
+          <div class="meta-item"><strong>Output</strong> — Red Team report</div>
+        </div>
+        <ul>
+          <li>Claims that are technically true but misleading</li>
+          <li>Data gaps where you'd need to say "I'll follow up"</li>
+          <li>Logical inconsistencies between slides</li>
+          <li>The question you're most hoping doesn't get asked — and the answer</li>
+        </ul>
+        <div><span class="output-pill">Red Team report</span></div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="loop-callout">
+      <div style="font-size:16px; flex-shrink:0;">&#8635;</div>
+      <div style="font-size:14px; color:#9d174d; margin-left:10px;"><strong>Revision loop</strong> &mdash; Address red team findings, update the narrative, re-run stress test if major changes were made.</div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="skill-card" onclick="toggle(this)">
+      <div class="skill-header">
+        <div class="step-num color-indigo">6</div>
+        <div class="skill-title">
+          <div class="skill-name">/qbr-generate</div>
+          <div class="skill-time">20&ndash;30 min</div>
+        </div>
+        <div class="chevron">&#9658;</div>
+      </div>
+      <div class="skill-body">
+        <p>Produces the final QBR deliverable from all prior artifacts. Generates slides (structured outline), an exec memo, or a speaker script — or all three.</p>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Reads</strong> — All QBR artifacts</div>
+          <div class="meta-item"><strong>Output options</strong> — Slide outline, exec memo, speaker script</div>
+        </div>
+        <ul>
+          <li>Slide outline: title, key message, supporting data, speaker note per slide</li>
+          <li>Exec memo: 1-pager with context, progress, ask, and next steps</li>
+          <li>Speaker script: what to say out loud for each slide</li>
+          <li>Saved to <code>~/.pmstack/qbrs/</code></li>
+        </ul>
+        <div>
+          <span class="output-pill">Slide outline</span>
+          <span class="output-pill">Exec memo</span>
+          <span class="output-pill">Speaker script</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">&#8595;</div>
+
+    <div class="handoff">
+      <div class="icon">&#9733;</div>
+      <div><strong>Final deliverable ready.</strong> All artifacts saved to <code>~/.pmstack/qbrs/</code>.</div>
+    </div>
+
+    <div class="section-header" style="margin-top:32px;">
+      <span class="section-label">Quick path</span>
+      <span class="badge-optional-sm">Existing draft</span>
+    </div>
+
+    <div style="background:white; border:1.5px solid #e5e4df; border-radius:12px; padding:18px 20px; font-size:14px; color:#444; line-height:1.7;">
+      Already have a deck or doc? Upload it and skip context-gathering.<br>
+      <strong style="color:#111;">Upload deck/doc &rarr; /qbr-stress-test &rarr; /qbr-red-team &rarr; Revision loop &rarr; /qbr-generate</strong>
+    </div>
+
+  </div>
+
+  <!-- Quick launch -->
+  <div class="quick-launch">
+    <h3>Quick launch</h3>
+    <div class="command-grid">
+      <div class="cmd-pill primary">/office-hours</div>
+      <div class="cmd-pill">/cpo-review</div>
+      <div class="cmd-pill">/assumption-audit</div>
+      <div class="cmd-pill">/prototype</div>
+      <div class="cmd-pill">/metrics-review</div>
+      <div class="cmd-pill">/prioritisation</div>
+      <div class="cmd-pill">/spec-review</div>
+      <div class="cmd-pill">/competitive-intel</div>
+      <div class="cmd-pill">/qbr-context</div>
+      <div class="cmd-pill">/qbr-generate</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(card) {
+    card.classList.toggle('open');
+  }
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.flow-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

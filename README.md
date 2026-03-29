@@ -26,6 +26,11 @@ PMStack is a fork of [gstack](https://github.com/garrytan/gstack). It preserves 
 | `/competitive-intel` | Competitive landscape analysis using the `/browse` real browser. |
 | `/comms-draft` | Product communication writer — launch announcements, internal updates, changelogs, emails. |
 | `/post-launch-review` | Post-launch analysis — hypothesis validation, what was learned, what comes next. |
+| `/qbr-context` | Start here for QBR prep. Context gathering and audience profiling. |
+| `/qbr-narrative` | Build the narrative arc connecting team work to company goals. |
+| `/qbr-stress-test` | Simulate executive reactions to your QBR narrative before the real meeting. |
+| `/qbr-red-team` | Adversarial review — find weaknesses, misleading claims, and unanswered questions. |
+| `/qbr-generate` | Produce the final deliverable: slide outline, exec memo, or speaker script. |
 | `/browse` | Persistent Chromium browser for authenticated research and prototype review. |
 | `/setup-browser-cookies` | Import browser sessions so `/browse` can access authenticated pages. |
 
@@ -49,7 +54,7 @@ Clone PMStack into your Claude Code skills directory and run the setup script. T
 
 ```bash
 cd ~/.claude/skills
-git clone https://github.com/your-username/pmstack pmstack
+git clone https://github.com/andrewpritchard1989/pmStack pmstack
 cd pmstack
 ./setup
 ```
@@ -64,7 +69,7 @@ To install PMStack scoped to a single project (skills available only when Claude
 
 ```bash
 cd /your/project
-git clone https://github.com/your-username/pmstack .pmstack
+git clone https://github.com/andrewpritchard1989/pmStack .pmstack
 cd .pmstack
 ./setup --local
 ```
@@ -136,6 +141,25 @@ Portfolio-level thinking — prioritisation, sequencing, roadmap decisions.
 → Break into initiatives → each runs New Feature mode
 ```
 
+#### QBR
+
+Preparing a quarterly business review. Two paths depending on whether you're starting fresh or already have a draft.
+
+**Full cycle (starting from scratch):**
+
+```
+/qbr-context → /qbr-narrative → /metrics-review
+→ /qbr-stress-test → /qbr-red-team → REVISION LOOP
+→ /qbr-generate → Final Deliverable
+```
+
+**Quick path (existing deck or doc):**
+
+```
+Upload deck/doc → /qbr-stress-test → /qbr-red-team
+→ REVISION LOOP → /qbr-generate → Final Deliverable
+```
+
 ### Invoking a skill directly
 
 Every skill can be invoked as a one-off without running the full flow. Skills that require upstream artifacts (like `/cpo-review` needing a Product Brief) will tell you what is missing and ask you to run the prerequisite skill first.
@@ -172,6 +196,7 @@ All artifacts are written to `~/.pmstack/` and automatically discovered by downs
 ├── research/           # Research briefs, interview guides, findings
 ├── competitive/        # Competitive analysis reports
 ├── retros/             # Post-launch review snapshots
+├── qbrs/               # QBR artifacts (context, narrative, stress test, red team, output)
 ├── sessions/           # Active session tracking
 ├── analytics/          # Local skill usage log (JSONL)
 └── config.yaml         # User preferences
