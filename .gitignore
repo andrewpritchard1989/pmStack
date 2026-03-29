@@ -1,0 +1,13 @@
+.env
+node_modules/
+browse/dist/
+.pmstack/
+.claude/skills/
+.agents/
+/tmp/
+*.log
+*.bun-build
+.env.local
+.env.*
+!.env.example
+bun.lockb

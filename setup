@@ -1,0 +1,228 @@
+#!/usr/bin/env bash
+# pmstack setup — build browser binary + register skills with Claude Code
+set -e
+
+if ! command -v bun >/dev/null 2>&1; then
+  echo "Error: bun is required but not installed." >&2
+  echo "Install it: curl -fsSL https://bun.sh/install | BUN_VERSION=1.3.10 bash" >&2
+  exit 1
+fi
+
+INSTALL_PMSTACK_DIR="$(cd "$(dirname "$0")" && pwd)"
+SOURCE_PMSTACK_DIR="$(cd "$(dirname "$0")" && pwd -P)"
+INSTALL_SKILLS_DIR="$(dirname "$INSTALL_PMSTACK_DIR")"
+BROWSE_BIN="$SOURCE_PMSTACK_DIR/browse/dist/browse"
+
+IS_WINDOWS=0
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*|Windows_NT) IS_WINDOWS=1 ;;
+esac
+
+# ─── Parse flags ──────────────────────────────────────────────
+LOCAL_INSTALL=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --local) LOCAL_INSTALL=1; shift ;;
+    *) shift ;;
+  esac
+done
+
+# --local: install to .claude/skills/ in the current working directory
+if [ "$LOCAL_INSTALL" -eq 1 ]; then
+  INSTALL_SKILLS_DIR="$(pwd)/.claude/skills"
+  mkdir -p "$INSTALL_SKILLS_DIR"
+fi
+
+ensure_playwright_browser() {
+  if [ "$IS_WINDOWS" -eq 1 ]; then
+    (
+      cd "$SOURCE_PMSTACK_DIR"
+      node -e "const { chromium } = require('playwright'); (async () => { const b = await chromium.launch(); await b.close(); })()" 2>/dev/null
+    )
+  else
+    (
+      cd "$SOURCE_PMSTACK_DIR"
+      bun --eval 'import { chromium } from "playwright"; const browser = await chromium.launch(); await browser.close();'
+    ) >/dev/null 2>&1
+  fi
+}
+
+# 1. Build browse binary if needed (smart rebuild: stale sources, package.json, lock)
+NEEDS_BUILD=0
+if [ ! -x "$BROWSE_BIN" ]; then
+  NEEDS_BUILD=1
+elif [ -n "$(find "$SOURCE_PMSTACK_DIR/browse/src" -type f -newer "$BROWSE_BIN" -print -quit 2>/dev/null)" ]; then
+  NEEDS_BUILD=1
+elif [ "$SOURCE_PMSTACK_DIR/package.json" -nt "$BROWSE_BIN" ]; then
+  NEEDS_BUILD=1
+elif [ -f "$SOURCE_PMSTACK_DIR/bun.lock" ] && [ "$SOURCE_PMSTACK_DIR/bun.lock" -nt "$BROWSE_BIN" ]; then
+  NEEDS_BUILD=1
+fi
+
+if [ "$NEEDS_BUILD" -eq 1 ]; then
+  echo "Building browse binary..."
+  (
+    cd "$SOURCE_PMSTACK_DIR"
+    bun install
+    bun run build
+  )
+  if [ ! -f "$SOURCE_PMSTACK_DIR/browse/dist/.version" ]; then
+    git -C "$SOURCE_PMSTACK_DIR" rev-parse HEAD > "$SOURCE_PMSTACK_DIR/browse/dist/.version" 2>/dev/null || true
+  fi
+fi
+
+if [ ! -x "$BROWSE_BIN" ]; then
+  echo "PMStack setup failed: browse binary missing at $BROWSE_BIN" >&2
+  exit 1
+fi
+
+# 2. Ensure Playwright's Chromium is available
+if ! ensure_playwright_browser; then
+  echo "Installing Playwright Chromium..."
+  (
+    cd "$SOURCE_PMSTACK_DIR"
+    bunx playwright install chromium
+  )
+
+  if [ "$IS_WINDOWS" -eq 1 ]; then
+    if ! command -v node >/dev/null 2>&1; then
+      echo "PMStack setup failed: Node.js is required on Windows" >&2
+      echo "  Install Node.js: https://nodejs.org/" >&2
+      exit 1
+    fi
+    echo "Windows detected — verifying Node.js can load Playwright..."
+    (
+      cd "$SOURCE_PMSTACK_DIR"
+      node -e "require('playwright')" 2>/dev/null || npm install --no-save playwright
+    )
+  fi
+fi
+
+if ! ensure_playwright_browser; then
+  echo "PMStack setup failed: Playwright Chromium could not be launched" >&2
+  exit 1
+fi
+
+# 3. Create ~/.pmstack state directory and subdirectories
+echo "Creating PMStack state directory..."
+mkdir -p \
+  "$HOME/.pmstack/initiatives" \
+  "$HOME/.pmstack/reviews" \
+  "$HOME/.pmstack/specs" \
+  "$HOME/.pmstack/research" \
+  "$HOME/.pmstack/competitive" \
+  "$HOME/.pmstack/retros" \
+  "$HOME/.pmstack/sessions" \
+  "$HOME/.pmstack/analytics" \
+  "$HOME/.pmstack/projects"
+
+# Create default config.yaml if it doesn't exist
+CONFIG_FILE="$HOME/.pmstack/config.yaml"
+if [ ! -f "$CONFIG_FILE" ]; then
+  cat > "$CONFIG_FILE" << 'EOF'
+# PMStack configuration
+# Proactive skill suggestions (default: true)
+proactive: true
+
+# Default prototype tool: figma-make | html | artifact
+prototype_tool: figma-make
+
+# Required gates for engineering handoff
+gates:
+  problem_framing: true
+  assumption_audit: true
+  cpo_review: true
+  prototype_test: true
+EOF
+  echo "Created default config at $CONFIG_FILE"
+fi
+
+# ─── Helper: link PMStack skill subdirectories into a skills parent directory ──
+link_pmstack_skill_dirs() {
+  local pmstack_dir="$1"
+  local skills_dir="$2"
+  local linked=()
+  for skill_dir in "$pmstack_dir"/*/; do
+    if [ -f "$skill_dir/SKILL.md" ]; then
+      skill_name="$(basename "$skill_dir")"
+      # Skip node_modules and dist
+      [ "$skill_name" = "node_modules" ] && continue
+      [ "$skill_name" = "dist" ] && continue
+      target="$skills_dir/$skill_name"
+      # Create or update symlink; skip if a real file/directory exists
+      if [ -L "$target" ] || [ ! -e "$target" ]; then
+        ln -snf "pmstack/$skill_name" "$target"
+        linked+=("$skill_name")
+      fi
+    fi
+  done
+  if [ ${#linked[@]} -gt 0 ]; then
+    echo "  linked skills: ${linked[*]}"
+  fi
+}
+
+# ─── Helper: remove stale PMStack skill symlinks ──────────────────────────────
+cleanup_stale_pmstack_symlinks() {
+  local pmstack_dir="$1"
+  local skills_dir="$2"
+  local removed=()
+  for target in "$skills_dir"/*/; do
+    target="${target%/}"
+    if [ -L "$target" ]; then
+      link_dest="$(readlink "$target" 2>/dev/null || true)"
+      case "$link_dest" in
+        pmstack/*|*/pmstack/*)
+          skill_name="$(basename "$target")"
+          # Only remove if the source skill dir no longer has a SKILL.md
+          if [ ! -f "$pmstack_dir/$skill_name/SKILL.md" ]; then
+            rm -f "$target"
+            removed+=("$skill_name")
+          fi
+          ;;
+      esac
+    fi
+  done
+  if [ ${#removed[@]} -gt 0 ]; then
+    echo "  cleaned up stale symlinks: ${removed[*]}"
+  fi
+}
+
+# 4. Install for Claude Code
+SKILLS_BASENAME="$(basename "$INSTALL_SKILLS_DIR")"
+
+if [ "$SKILLS_BASENAME" = "skills" ]; then
+  mkdir -p "$INSTALL_SKILLS_DIR/pmstack"
+
+  # Symlink the pmstack directory itself (so skill paths like ~/.claude/skills/pmstack/browse work)
+  PMSTACK_LINK="$INSTALL_SKILLS_DIR/pmstack"
+  if [ ! -L "$PMSTACK_LINK" ]; then
+    # If it's already a symlink or doesn't exist, create/update the symlink
+    rm -rf "$PMSTACK_LINK" 2>/dev/null || true
+    ln -snf "$SOURCE_PMSTACK_DIR" "$PMSTACK_LINK"
+  fi
+
+  # Clean up any stale skill symlinks
+  cleanup_stale_pmstack_symlinks "$SOURCE_PMSTACK_DIR" "$INSTALL_SKILLS_DIR"
+
+  # Link each skill directory directly (so /office-hours, /cpo-review etc. work as slash commands)
+  link_pmstack_skill_dirs "$SOURCE_PMSTACK_DIR" "$INSTALL_SKILLS_DIR"
+
+  if [ "$LOCAL_INSTALL" -eq 1 ]; then
+    echo "PMStack ready (project-local)."
+    echo "  skills: $INSTALL_SKILLS_DIR"
+  else
+    echo "PMStack ready."
+    echo "  skills: $INSTALL_SKILLS_DIR/pmstack/"
+  fi
+  echo "  browse: $BROWSE_BIN"
+  echo "  state:  $HOME/.pmstack/"
+else
+  echo "PMStack ready."
+  echo "  browse: $BROWSE_BIN"
+  echo "  state:  $HOME/.pmstack/"
+  echo "  (skipped skill symlinks — not inside .claude/skills/)"
+fi
+
+echo ""
+echo "Start with: /office-hours"
+echo ""
