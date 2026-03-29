@@ -36,6 +36,25 @@ PMStack is a fork of [gstack](https://github.com/garrytan/gstack). It preserves 
 
 ---
 
+## Data privacy
+
+Everything shared with PMStack skills — initiative details, metrics, team context, strategic plans, QBR content — is sent to Anthropic's servers to generate responses. PMStack itself stores all artifacts locally in `~/.pmstack/` and does not transmit them anywhere. The API call to Claude is what carries your data.
+
+**Account types and data retention:**
+
+| Account | Data used for training? | Recommended for confidential work? |
+|---|---|---|
+| Claude.ai Free / Pro | Yes, by default | No |
+| Claude for Work | No (zero retention by default) | Yes |
+| Claude.ai Enterprise | No (zero retention by default) | Yes |
+| API key (direct) | No, by default | Yes |
+
+If you are on a Free or Pro account and your initiative contains confidential information, describe the problem in general terms rather than pasting internal metrics, unreleased product names, or company-specific strategy verbatim.
+
+See [anthropic.com/privacy](https://anthropic.com/privacy) for current policy details.
+
+---
+
 ## Prerequisites
 
 - **[Claude Code](https://claude.ai/code)** — the CLI or desktop app
