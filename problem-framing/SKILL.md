@@ -39,33 +39,33 @@ echo '{"skill":"pm-problem-framing","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","rep
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
+types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/pm-office-hours` (start here)
-- Problem definition: `/pm-problem-framing`
-- Assumption testing: `/pm-assumption-audit`
-- CPO challenge: `/pm-cpo-review`
-- Prototyping: `/pm-prototype`
-- Stakeholder simulation: `/pm-plan-stakeholder-review`
-- Spec audit: `/pm-spec-review`
-- Prioritisation: `/pm-prioritisation`
-- Trade-off decisions: `/pm-trade-off-analysis`
-- Metrics: `/pm-metrics-review`
-- Roadmap: `/pm-roadmap-review`
-- Competitive research: `/pm-competitive-intel`
-- Communications: `/pm-comms-draft`
-- Post-launch: `/pm-post-launch-review`
+- Discovery: `/office-hours` (start here)
+- Problem definition: `/problem-framing`
+- Assumption testing: `/assumption-audit`
+- CPO challenge: `/cpo-review`
+- Prototyping: `/prototype`
+- Stakeholder simulation: `/plan-stakeholder-review`
+- Spec audit: `/spec-review`
+- Prioritisation: `/prioritisation`
+- Trade-off decisions: `/trade-off-analysis`
+- Metrics: `/metrics-review`
+- Roadmap: `/roadmap-review`
+- Competitive research: `/competitive-intel`
+- Communications: `/comms-draft`
+- Post-launch: `/post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/pm-qbr-context` (start here for QBRs)
-- QBR narrative: `/pm-qbr-narrative`
-- QBR stress test: `/pm-qbr-stress-test`
-- QBR red team: `/pm-qbr-red-team`
-- QBR output: `/pm-qbr-generate`
+- QBR preparation: `/qbr-context` (start here for QBRs)
+- QBR narrative: `/qbr-narrative`
+- QBR stress test: `/qbr-stress-test`
+- QBR red team: `/qbr-red-team`
+- QBR output: `/qbr-generate`
 
 ## Voice
 
@@ -204,7 +204,7 @@ else
 fi
 ```
 
-If `NO_BRIEF_FOUND`: stop and ask the PM to run `/pm-office-hours` first. This skill requires a Product Brief to anchor the analysis. Do not proceed without one.
+If `NO_BRIEF_FOUND`: stop and ask the PM to run `/office-hours` first. This skill requires a Product Brief to anchor the analysis. Do not proceed without one.
 
 If `BRIEF_FOUND`: read the full brief. Reference specific sections throughout the phases — the goal, opportunity mountains, hypotheses, and open questions are the primary anchors.
 
