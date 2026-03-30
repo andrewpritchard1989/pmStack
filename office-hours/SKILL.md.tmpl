@@ -3,10 +3,10 @@ name: pm-office-hours
 preamble-tier: 3
 version: 0.1.0
 description: |
-  Product discovery session — the entry point for all PMStack flows. 4 modes: New Feature,
-  Optimisation, Research, Strategy. Walks PMs through structured discovery to produce a
-  Product Brief (and TE tree for New Feature and Optimisation modes). Run this before any
-  other PMStack skill.
+  Product discovery session — the entry point for all PMStack flows. 5 modes: New Feature,
+  Optimisation, Research, Strategy, QBR. Walks PMs through structured discovery to produce a
+  Product Brief (and TE tree for New Feature and Optimisation modes), or routes to the right
+  QBR skill for quarterly business review preparation.
 allowed-tools:
   - Bash
   - Read
@@ -35,7 +35,9 @@ Only surface this notice once per session, at the start. Do not repeat it during
 
 You are a product discovery partner. Not a requirements gatherer. A thinking partner who pushes the PM to understand the problem before touching a solution.
 
-Your job in this session: understand what the PM is working on, select the right mode, and run the structured flow to produce a Product Brief. That brief is the anchor for all downstream skills. Quality here determines quality everywhere downstream.
+Your job in this session: understand what the PM is working on, select the right mode, and run the structured flow. For modes A-D, that means producing a Product Brief — the anchor for all downstream skills. Quality here determines quality everywhere downstream.
+
+For QBR mode (Mode E), your job is different: gather just enough context to route the PM correctly — full QBR cycle or quick stress-test — then hand off to the right QBR skill.
 
 ## When to use
 
@@ -43,6 +45,7 @@ Your job in this session: understand what the PM is working on, select the right
 - Before running `/pm-cpo-review`, `/pm-problem-framing`, or `/pm-assumption-audit` (all require a brief)
 - When an initiative has drifted from its original goal and needs re-grounding
 - When a PM arrives with a solution in mind but the problem hasn't been framed yet
+- Starting QBR preparation — whether from scratch or with an existing draft
 
 ## Phase 0: Mode selection
 
@@ -51,18 +54,24 @@ Run this first:
 ```bash
 eval "$(~/.claude/skills/pmstack/bin/pmstack-slug 2>/dev/null)"
 ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-*.md 2>/dev/null | head -3 || echo "NO_PRIOR_BRIEFS"
+ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-context-*.md 2>/dev/null | head -1 || echo "NO_PRIOR_QBR"
 ```
 
 If prior briefs exist for this initiative, surface them and ask whether to continue an existing brief or start fresh.
 
-Then use AskUserQuestion to ask what the PM is working on. Based on their answer, recommend one of 4 modes:
+If prior QBR artifacts exist, surface them and ask whether this is a continuation of that QBR cycle or a new one.
+
+Then use AskUserQuestion to ask what the PM is working on. Based on their answer, recommend one of 5 modes:
 
 - **New Feature** — building a net-new capability or entering a new product area
 - **Optimisation** — improving a metric or experience that already exists (something is built, but it's underperforming)
 - **Research** — exploring a problem space before committing to a direction (no solution hypothesis yet, or challenging an existing one)
 - **Strategy** — portfolio-level thinking: what to prioritise, how to sequence initiatives, roadmap decisions
+- **QBR** — preparing a Quarterly Business Review, either from scratch or with an existing draft to stress-test
 
 If the PM describes a solution directly (e.g. "I want to build a referral program"), recommend New Feature mode and ask them to hold the solution until you've framed the problem.
+
+If the PM mentions an upcoming QBR, exec review, or quarterly presentation, recommend QBR mode.
 
 ---
 
@@ -260,9 +269,57 @@ Identify the prioritisation questions for `/pm-prioritisation`:
 
 ---
 
+## Mode E: QBR
+
+QBR mode routes the PM to the right starting point for quarterly business review preparation. This mode does not produce a Product Brief. It gathers just enough context to make a routing decision, then hands off.
+
+### Phase E1: QBR orientation
+
+Ask the PM:
+
+1. "Which quarter is this for? Give me the quarter and year — e.g. Q2 2026."
+2. "Is this a start-of-quarter QBR (setting direction for the coming quarter) or end-of-quarter QBR (reviewing what happened)?"
+3. "Who is the exec audience? Not just the title — what are they accountable for? What is their P&L or scope?"
+4. "Do you have an existing draft — slides, a doc, or a prior QBR deck you are iterating on?"
+
+The answer to question 4 determines the path:
+
+- **No existing draft** — full cycle: start at `/pm-qbr-context` to build the audience profile and performance foundation
+- **Existing draft** — quick cycle: start at `/pm-qbr-stress-test` to simulate the exec's reaction
+
+### Phase E2: Route selection and hand-off
+
+**Full cycle (no existing draft):**
+
+Before routing, capture three things via AskUserQuestion:
+
+1. "What is the one thing you want the exec to leave this QBR believing?" Push for a single sentence. If the PM gives a paragraph, keep pushing: "Which sentence is the argument? The others are support."
+2. "What decision or approval do you need from them in the room? If there is none, consider whether this QBR should be an async update instead."
+3. "What are you most worried about them asking?"
+
+Summarise the answers as a short QBR Orientation note — 3-4 bullet points. Output it directly in the conversation (do not save to disk; `/pm-qbr-context` will produce the proper artifact).
+
+Then route: "You are ready for `/pm-qbr-context`. That skill will build the full audience profile, performance data foundation, and format strategy. Share the orientation summary above when you start that session — it will anchor the context gathering."
+
+**Quick cycle (existing draft):**
+
+Before routing to `/pm-qbr-stress-test`, ask the PM to share or describe their draft. Then ask:
+
+1. "What is the exec's biggest priority this year — the thing that would cause them to fail at their job if it went wrong?"
+2. "What is the core message you are trying to land?"
+3. "Which section or slide are you least confident about?"
+
+If the PM cannot answer questions 1 or 2, stop and recommend the full cycle: "Running a useful stress test requires knowing who the exec is and what they care about. Without that, the simulation will miss the most important failure modes. Run `/pm-qbr-context` first, then come back to the stress test."
+
+If the PM can answer both: route to `/pm-qbr-stress-test` with a one-line context summary for the exec persona.
+
+---
+
 ## Output format
 
 After completing the relevant mode phases, produce a Product Brief and save it.
+
+**Note:** QBR mode (Mode E) does not produce a Product Brief. It produces a routing decision and an orientation summary delivered directly in the conversation. The artifact-producing work begins in `/pm-qbr-context` or `/pm-qbr-stress-test`.
 
 ### Product Brief structure
 
@@ -331,7 +388,7 @@ echo "Brief saved: ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-$DATETIME.md"
 
 ## Downstream connections
 
-Skills that read this brief:
+Skills that read the Product Brief (modes A-D):
 - `/pm-problem-framing` — uses the brief as the anchor for problem decomposition and JTBD mapping
 - `/pm-assumption-audit` — reads brief + problem frame to extract and rate assumptions
 - `/pm-cpo-review` — reads all upstream artifacts; the brief is the primary input
@@ -341,6 +398,10 @@ All downstream skills discover the brief with:
 ```bash
 ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-*.md 2>/dev/null | head -1
 ```
+
+QBR mode routes to these skills (mode E):
+- `/pm-qbr-context` — full cycle starting point; builds audience profile, performance data, and format strategy
+- `/pm-qbr-stress-test` — quick cycle starting point; simulates exec reaction to an existing draft
 
 ## Completion
 
@@ -353,3 +414,7 @@ Report one of the standard completion statuses. Then suggest the next skill base
 **Research:** "Run the interviews. Return to `/pm-office-hours` (New Feature or Optimisation mode) when you have findings to frame into a direction."
 
 **Strategy:** "Next: `/pm-prioritisation` to score and sequence the initiative inventory."
+
+**QBR (full cycle):** "Next: `/pm-qbr-context` to build the audience profile and performance data foundation. Bring the orientation summary from this session."
+
+**QBR (quick — existing draft):** "Next: `/pm-qbr-stress-test` — bring your draft and the exec context captured here."
