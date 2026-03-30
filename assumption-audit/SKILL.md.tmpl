@@ -1,12 +1,12 @@
 ---
-name: assumption-audit
+name: pm-assumption-audit
 preamble-tier: 3
 version: 0.1.0
 description: |
   Risk and assumption mapping. Reads the Product Brief and Problem Frame, then extracts
   every load-bearing assumption across four categories (value, usability, feasibility,
   viability), rates each on risk and knowability, and designs tests for the high-risk ones.
-  Produces an Assumption Map that feeds /cpo-review and /prototype.
+  Produces an Assumption Map that feeds /pm-cpo-review and /pm-prototype.
 allowed-tools:
   - Bash
   - Read
@@ -16,7 +16,7 @@ allowed-tools:
 
 {{PREAMBLE}}
 
-# /assumption-audit
+# /pm-assumption-audit
 
 ## Role
 
@@ -28,9 +28,9 @@ The output is an Assumption Map: every assumption named, rated for risk and test
 
 ## When to use
 
-- After `/office-hours` and `/problem-framing` have run (both are required inputs)
-- Before `/cpo-review` — the CPO review uses the Assumption Map to run the assumption test
-- Before `/prototype` — the riskiest assumptions become the test tasks in the prototype test plan
+- After `/pm-office-hours` and `/pm-problem-framing` have run (both are required inputs)
+- Before `/pm-cpo-review` — the CPO review uses the Assumption Map to run the assumption test
+- Before `/pm-prototype` — the riskiest assumptions become the test tasks in the prototype test plan
 - When a team is about to commit significant engineering effort and wants to de-risk first
 
 ## Setup
@@ -48,9 +48,9 @@ echo "Problem Frame: ${FRAME_FILE:-NOT_FOUND}"
 [ -n "$FRAME_FILE" ] && cat "$FRAME_FILE"
 ```
 
-**If Brief is NOT_FOUND:** stop and ask the PM to run `/office-hours` first. Do not proceed without a Brief.
+**If Brief is NOT_FOUND:** stop and ask the PM to run `/pm-office-hours` first. Do not proceed without a Brief.
 
-**If Problem Frame is NOT_FOUND:** warn the PM that the audit will be less precise without a Problem Frame. Offer to proceed with the Brief alone or pause and run `/problem-framing` first. Use AskUserQuestion. The Problem Frame's evidence gaps are the highest-signal source of high-risk assumptions — missing it weakens the audit.
+**If Problem Frame is NOT_FOUND:** warn the PM that the audit will be less precise without a Problem Frame. Offer to proceed with the Brief alone or pause and run `/pm-problem-framing` first. Use AskUserQuestion. The Problem Frame's evidence gaps are the highest-signal source of high-risk assumptions — missing it weakens the audit.
 
 **If both found:** read both in full. The Brief provides hypotheses and goals. The Problem Frame provides the primary segment, JTBD, pain severity evidence, and the explicit evidence gaps that flagged as thin.
 
@@ -228,8 +228,8 @@ echo "Assumption Map saved: ~/.pmstack/initiatives/$SLUG-$BRANCH-assumption-map-
 ## Downstream connections
 
 Skills that read the Assumption Map:
-- `/cpo-review` — runs the Assumption Test against this map. Untestable high-risk assumptions are a primary focus.
-- `/prototype` — riskiest assumptions (High risk + Easy to test) become the test tasks in the prototype test plan. The test designs here feed directly into the test plan structure.
+- `/pm-cpo-review` — runs the Assumption Test against this map. Untestable high-risk assumptions are a primary focus.
+- `/pm-prototype` — riskiest assumptions (High risk + Easy to test) become the test tasks in the prototype test plan. The test designs here feed directly into the test plan structure.
 
 Downstream skills discover this artifact with:
 ```bash
@@ -240,4 +240,4 @@ ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-assumption-map-*.md 2>/dev/null | hea
 
 Report completion status. Then:
 
-"Next: `/cpo-review` — the Assumption Map is a primary input. The CPO will challenge the untestable high-risk assumptions hardest. Or run `/prototype` directly if you want to start testing the high-risk + easy-to-test assumptions now."
+"Next: `/pm-cpo-review` — the Assumption Map is a primary input. The CPO will challenge the untestable high-risk assumptions hardest. Or run `/pm-prototype` directly if you want to start testing the high-risk + easy-to-test assumptions now."

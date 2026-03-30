@@ -1,10 +1,10 @@
 ---
-name: metrics-review
+name: pm-metrics-review
 preamble-tier: 2
 version: 0.1.0
 description: |
   Measurement plan audit for product initiatives. Reviews the measurement plan from
-  /office-hours (Optimisation mode) or a PM-provided plan. Audits proxy metrics,
+  /pm-office-hours (Optimisation mode) or a PM-provided plan. Audits proxy metrics,
   baselines, counter-metrics, statistical significance requirements, and experiment
   design. Produces a hardened Measurement Plan.
 allowed-tools:
@@ -34,38 +34,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"metrics-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-metrics-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -140,7 +140,7 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /metrics-review
+# /pm-metrics-review
 
 ## Role
 
@@ -150,7 +150,7 @@ A bad measurement plan produces either false confidence (the metric moved but fo
 
 ## When to use
 
-- After `/office-hours` (Optimisation mode) has produced a measurement scaffold
+- After `/pm-office-hours` (Optimisation mode) has produced a measurement scaffold
 - Before an experiment or A/B test goes into engineering
 - When a PM is setting success metrics for a new feature
 - When a past experiment produced ambiguous results and the team wants to understand why

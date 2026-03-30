@@ -1,5 +1,5 @@
 ---
-name: qbr-context
+name: pm-qbr-context
 preamble-tier: 3
 version: 0.1.0
 description: |
@@ -27,7 +27,7 @@ Only surface this notice once per session, at the start. Do not repeat it during
 
 ---
 
-# /qbr-context
+# /pm-qbr-context
 
 ## Role
 
@@ -40,7 +40,7 @@ The gap between "reporting on what happened" and "building executive conviction"
 ## When to use
 
 - Starting any QBR cycle from scratch
-- Before `/qbr-narrative` — the narrative must be written for a specific audience
+- Before `/pm-qbr-narrative` — the narrative must be written for a specific audience
 - When a QBR draft exists but the PM feels uncertain how the exec will receive it
 - At the beginning of a new quarter when the PM wants to set up the strategic narrative
 
@@ -139,7 +139,7 @@ If the PM has a slide template or prior QBR deck, ask them to share it via Read 
 - Level of detail (bullet summaries vs. dense data tables vs. narrative prose)
 - Types of evidence used (screenshots, charts, tables, customer quotes, experiment results)
 
-Produce a format profile — a 4-6 bullet summary of the conventions to follow in `/qbr-generate`. If no template is provided, note this and the agent will default to the exec's communication preference from Phase 1.
+Produce a format profile — a 4-6 bullet summary of the conventions to follow in `/pm-qbr-generate`. If no template is provided, note this and the agent will default to the exec's communication preference from Phase 1.
 
 ---
 
@@ -226,9 +226,9 @@ echo "QBR Context Brief saved: ~/.pmstack/qbrs/$SLUG-$BRANCH-context-$DATETIME.m
 ## Downstream connections
 
 Skills that read the QBR Context Brief:
-- `/qbr-narrative` — reads the audience profile and core message to shape the narrative arc and format; the format profile constrains the output structure
-- `/qbr-stress-test` — reads the full brief to simulate the exec's perspective; the executive incentives and anticipated pushback are the primary inputs for the simulation
-- `/qbr-red-team` — reads the anticipated pushback and known omissions to direct the adversarial lenses
+- `/pm-qbr-narrative` — reads the audience profile and core message to shape the narrative arc and format; the format profile constrains the output structure
+- `/pm-qbr-stress-test` — reads the full brief to simulate the exec's perspective; the executive incentives and anticipated pushback are the primary inputs for the simulation
+- `/pm-qbr-red-team` — reads the anticipated pushback and known omissions to direct the adversarial lenses
 
 Downstream skills discover this artifact with:
 ```bash
@@ -239,4 +239,4 @@ ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-context-*.md 2>/dev/null | head -1
 
 Report completion status. Then:
 
-"Next: `/qbr-narrative` to build the arc. The audience profile is the constraint — every choice in the narrative should be traceable back to how this exec processes information. Bring the Context Brief into that session."
+"Next: `/pm-qbr-narrative` to build the arc. The audience profile is the constraint — every choice in the narrative should be traceable back to how this exec processes information. Bring the Context Brief into that session."

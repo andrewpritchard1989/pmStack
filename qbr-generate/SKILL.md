@@ -1,5 +1,5 @@
 ---
-name: qbr-generate
+name: pm-qbr-generate
 preamble-tier: 2
 version: 0.1.0
 description: |
@@ -34,38 +34,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"qbr-generate","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-qbr-generate","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -140,17 +140,17 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /qbr-generate
+# /pm-qbr-generate
 
 ## Role
 
 You are a Document Producer. The heavy analytical work is done. Your job is to apply the format choices, incorporate the revisions, and produce something the PM can present or hand off today.
 
-This skill assembles — it does not re-analyse. If new strategic concerns surface during generation, note them in a section at the end of the deliverable and recommend re-running `/qbr-stress-test` or `/qbr-red-team`. Do not delay generating to resolve them.
+This skill assembles — it does not re-analyse. If new strategic concerns surface during generation, note them in a section at the end of the deliverable and recommend re-running `/pm-qbr-stress-test` or `/pm-qbr-red-team`. Do not delay generating to resolve them.
 
 ## When to use
 
-- After `/qbr-stress-test` and `/qbr-red-team` have both run (the revision pass depends on their output)
+- After `/pm-qbr-stress-test` and `/pm-qbr-red-team` have both run (the revision pass depends on their output)
 - When the PM is ready to produce the actual deck, memo, or script
 - In the quick QBR flow: after uploading an existing deck and running it through stress test and red team
 
@@ -175,7 +175,7 @@ echo "Red Team: ${QBR_REDTEAM:-NOT_FOUND}"
 [ -n "$QBR_REDTEAM" ] && cat "$QBR_REDTEAM"
 ```
 
-If neither `QBR_CONTEXT` nor `QBR_NARRATIVE` is found: stop. Ask the PM to run `/qbr-context` and `/qbr-narrative` first, or share the existing QBR material directly by pasting it into the conversation.
+If neither `QBR_CONTEXT` nor `QBR_NARRATIVE` is found: stop. Ask the PM to run `/pm-qbr-context` and `/pm-qbr-narrative` first, or share the existing QBR material directly by pasting it into the conversation.
 
 If `QBR_STRESS` or `QBR_REDTEAM` is missing: note it and proceed. The revision pass will be limited, but generating is still possible.
 
@@ -551,7 +551,7 @@ ls -lh ~/.pmstack/qbrs/$SLUG-$BRANCH-output-$DATETIME.*
 
 This is the terminal skill in the QBR Mode flow. There is no downstream consumer.
 
-After the QBR: if the exec's reaction generates a new strategic direction or reveals gaps in the team's understanding, return to `/qbr-context` for the next quarter. Capture what landed well and what did not in the Context Brief for the next cycle.
+After the QBR: if the exec's reaction generates a new strategic direction or reveals gaps in the team's understanding, return to `/pm-qbr-context` for the next quarter. Capture what landed well and what did not in the Context Brief for the next cycle.
 
 ## Completion
 

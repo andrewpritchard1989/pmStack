@@ -1,5 +1,5 @@
 ---
-name: prototype
+name: pm-prototype
 preamble-tier: 3
 version: 0.1.0
 description: |
@@ -16,7 +16,7 @@ allowed-tools:
 
 {{PREAMBLE}}
 
-# /prototype
+# /pm-prototype
 
 ## Role
 
@@ -28,8 +28,8 @@ This is the final required gate before engineering handoff. If the test passes, 
 
 ## When to use
 
-- After `/cpo-review` (the CPO's challenges become the test observation criteria)
-- After `/assumption-audit` (the riskiest assumptions become the test tasks)
+- After `/pm-cpo-review` (the CPO's challenges become the test observation criteria)
+- After `/pm-assumption-audit` (the riskiest assumptions become the test tasks)
 - When the PM is ready to test a specific hypothesis with real users before committing to build
 - When the initiative has cleared the CPO review and needs a prototype to validate key unknowns
 
@@ -54,7 +54,7 @@ echo "CPO Review: ${CPO_FILE:-NOT_FOUND}"
 [ -n "$CPO_FILE" ] && cat "$CPO_FILE"
 ```
 
-**If Brief is NOT_FOUND:** stop. Ask the PM to run `/office-hours` first.
+**If Brief is NOT_FOUND:** stop. Ask the PM to run `/pm-office-hours` first.
 
 **If other artifacts are missing:** note the gaps and continue. A missing CPO Review means the test plan cannot be anchored to the CPO's challenges — flag this and derive test criteria from the Assumption Map directly.
 
@@ -212,7 +212,7 @@ Produce a Prototype Spec and save it. The test results are saved separately afte
 1. [Set up the prototype — if Figma Make, paste the prompt. If HTML, open index.html.]
 2. [Recruit [n] participants matching [criteria]]
 3. [Run sessions using the test tasks and observation criteria above]
-4. [Return to `/prototype` with findings to generate the Test Results artifact]
+4. [Return to `/pm-prototype` with findings to generate the Test Results artifact]
 
 ## Assumptions being tested
 | Assumption | Category | Risk | Test task |
@@ -281,8 +281,8 @@ Replace `SKILL_NAME` with `prototype-test`.
 ## Downstream connections
 
 Skills that read the Prototype Spec and Test Results:
-- `/plan-stakeholder-review` — uses the test results as evidence when simulating stakeholder questions
-- `/spec-review` — the validated hypothesis and test results define what belongs in the spec
+- `/pm-plan-stakeholder-review` — uses the test results as evidence when simulating stakeholder questions
+- `/pm-spec-review` — the validated hypothesis and test results define what belongs in the spec
 
 Downstream skills discover these artifacts with:
 ```bash
@@ -298,4 +298,4 @@ Report completion status. If the test plan and prototype have been generated but
 
 If Test Results have been documented:
 
-"Next: `/plan-stakeholder-review` to simulate how engineering, design, and business stakeholders will respond to this initiative before you take it into planning. Or `/spec-review` if you are moving directly to writing the PRD."
+"Next: `/pm-plan-stakeholder-review` to simulate how engineering, design, and business stakeholders will respond to this initiative before you take it into planning. Or `/pm-spec-review` if you are moving directly to writing the PRD."

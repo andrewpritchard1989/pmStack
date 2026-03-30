@@ -1,10 +1,10 @@
 ---
-name: problem-framing
+name: pm-problem-framing
 preamble-tier: 3
 version: 0.1.0
 description: |
   Deep problem decomposition and customer segment definition. Reads the Product Brief from
-  /office-hours and breaks down the core problem into specific customer segments,
+  /pm-office-hours and breaks down the core problem into specific customer segments,
   jobs-to-be-done, pain severity, and opportunity sizing. Produces a Problem Frame that
   anchors all downstream assumption and review work.
 allowed-tools:
@@ -16,18 +16,18 @@ allowed-tools:
 
 {{PREAMBLE}}
 
-# /problem-framing
+# /pm-problem-framing
 
 ## Role
 
-You are a problem decomposition specialist. Your job is to take the Product Brief from `/office-hours` and break the core problem open — who exactly is affected, what they are actually trying to do, how bad the pain really is, and how big the opportunity is.
+You are a problem decomposition specialist. Your job is to take the Product Brief from `/pm-office-hours` and break the core problem open — who exactly is affected, what they are actually trying to do, how bad the pain really is, and how big the opportunity is.
 
 The output is a Problem Frame: a precise, evidence-grounded description of the problem space that anchors every assumption audit and CPO review that follows. Vague problem statements produce wrong features. This is where that gets fixed.
 
 ## When to use
 
-- After `/office-hours` has produced a Product Brief
-- Before `/assumption-audit` (the Problem Frame is the primary input for assumption extraction)
+- After `/pm-office-hours` has produced a Product Brief
+- Before `/pm-assumption-audit` (the Problem Frame is the primary input for assumption extraction)
 - When an initiative's problem statement is fuzzy and needs sharper definition
 - When the team is debating scope and needs clarity on which customer segments and jobs actually matter
 
@@ -114,7 +114,7 @@ Generate a pain severity matrix for the top 2-3 segments:
 |---------|-----------|----------|----------|---------------|
 | [segment] | [freq] | [sev] | [evidence] | [cost] |
 
-Flag any ratings where evidence is thin. These become explicit high-risk assumptions in `/assumption-audit`.
+Flag any ratings where evidence is thin. These become explicit high-risk assumptions in `/pm-assumption-audit`.
 
 ---
 
@@ -177,7 +177,7 @@ After completing all phases, produce a Problem Frame and save it.
 |---------|-----------|----------|----------|---------------|
 | [segment] | [freq] | [sev] | [evidence] | [cost] |
 
-**Evidence gaps:** [pain ratings where evidence is thin — these become assumptions in /assumption-audit]
+**Evidence gaps:** [pain ratings where evidence is thin — these become assumptions in /pm-assumption-audit]
 
 ## Opportunity Sizing
 
@@ -191,7 +191,7 @@ After completing all phases, produce a Problem Frame and save it.
 **Sizing verdict:** [One sentence: is this opportunity sized appropriately for the investment?]
 
 ## Open Questions
-[What remains unknown and would change the problem framing if answered — these feed directly into /assumption-audit]
+[What remains unknown and would change the problem framing if answered — these feed directly into /pm-assumption-audit]
 ```
 
 ### Saving the Problem Frame
@@ -211,9 +211,9 @@ echo "Problem Frame saved: ~/.pmstack/initiatives/$SLUG-$BRANCH-problem-frame-$D
 ## Downstream connections
 
 Skills that read the Problem Frame:
-- `/assumption-audit` — reads the Problem Frame and Brief to extract and rate every assumption. Evidence gaps from Phase 3 become explicit high-risk assumptions.
-- `/cpo-review` — reads all upstream artifacts including this frame; uses the primary segment and JTBD to run the value test and discovery test.
-- `/prototype` — uses the primary segment and JTBD to anchor test plan design and participant recruiting.
+- `/pm-assumption-audit` — reads the Problem Frame and Brief to extract and rate every assumption. Evidence gaps from Phase 3 become explicit high-risk assumptions.
+- `/pm-cpo-review` — reads all upstream artifacts including this frame; uses the primary segment and JTBD to run the value test and discovery test.
+- `/pm-prototype` — uses the primary segment and JTBD to anchor test plan design and participant recruiting.
 
 Downstream skills discover this artifact with:
 ```bash
@@ -224,4 +224,4 @@ ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-problem-frame-*.md 2>/dev/null | head
 
 Report completion status. Then:
 
-"Next: `/assumption-audit` — this Problem Frame feeds directly into assumption extraction. Run it now while the framing is fresh. Or run `/cpo-review` if you want a challenge on the problem definition before going deeper."
+"Next: `/pm-assumption-audit` — this Problem Frame feeds directly into assumption extraction. Run it now while the framing is fresh. Or run `/pm-cpo-review` if you want a challenge on the problem definition before going deeper."

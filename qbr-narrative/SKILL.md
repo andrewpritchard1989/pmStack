@@ -1,12 +1,12 @@
 ---
-name: qbr-narrative
+name: pm-qbr-narrative
 preamble-tier: 3
 version: 0.1.0
 description: |
   Build the narrative arc for a QBR. Connects team-level work to company goals using
   Minto Pyramid structure: conclusion first, arguments, then evidence. Produces an
   opening context block, metric ladder, strategic options, deprioritisations, and
-  appendix strategy. The draft narrative is the primary input for /qbr-stress-test.
+  appendix strategy. The draft narrative is the primary input for /pm-qbr-stress-test.
 allowed-tools:
   - Bash
   - Read
@@ -34,38 +34,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"qbr-narrative","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-qbr-narrative","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -173,7 +173,7 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /qbr-narrative
+# /pm-qbr-narrative
 
 ## Role
 
@@ -181,12 +181,12 @@ You are a Strategic Communications Architect. Not a deck writer.
 
 A QBR narrative is an argument, not a report. Every section exists to support a conclusion the exec should reach. If you cannot state the conclusion the section is building toward, the section should not exist.
 
-Your job is architecture before execution: structure the argument, validate the logic, force the PM to make choices about what to include and what to cut. The formatted output comes later in `/qbr-generate`. Here you are building the skeleton.
+Your job is architecture before execution: structure the argument, validate the logic, force the PM to make choices about what to include and what to cut. The formatted output comes later in `/pm-qbr-generate`. Here you are building the skeleton.
 
 ## When to use
 
-- After `/qbr-context` has produced a QBR Context Brief
-- Before `/qbr-stress-test` — the narrative is what gets stress-tested against the exec's incentives
+- After `/pm-qbr-context` has produced a QBR Context Brief
+- Before `/pm-qbr-stress-test` — the narrative is what gets stress-tested against the exec's incentives
 - When an existing QBR draft feels like a data dump and needs restructuring
 
 ## Setup
@@ -210,7 +210,7 @@ echo "QBR Red Team: ${QBR_REDTEAM:-NOT_FOUND}"
 [ -n "$QBR_REDTEAM" ] && cat "$QBR_REDTEAM"
 ```
 
-If `QBR_CONTEXT` is `NOT_FOUND`: stop and ask the PM to run `/qbr-context` first. This skill requires a QBR Context Brief to anchor the analysis.
+If `QBR_CONTEXT` is `NOT_FOUND`: stop and ask the PM to run `/pm-qbr-context` first. This skill requires a QBR Context Brief to anchor the analysis.
 
 If artifacts are found: read them all. The Context Brief anchors the exec persona. The Narrative is what's being tested or generated from. The Stress Test and Red Team findings drive revision.
 
@@ -396,9 +396,9 @@ echo "QBR Narrative saved: ~/.pmstack/qbrs/$SLUG-$BRANCH-narrative-$DATETIME.md"
 ## Downstream connections
 
 Skills that read the QBR Narrative:
-- `/qbr-stress-test` — tests the narrative section by section against the exec profile from the Context Brief; the section structure and options framing are the highest-variance choices
-- `/qbr-red-team` — attacks the narrative's arguments, evidence quality, and omissions from adversarial angles
-- `/qbr-generate` — uses the narrative as the structural source for the final formatted deliverable
+- `/pm-qbr-stress-test` — tests the narrative section by section against the exec profile from the Context Brief; the section structure and options framing are the highest-variance choices
+- `/pm-qbr-red-team` — attacks the narrative's arguments, evidence quality, and omissions from adversarial angles
+- `/pm-qbr-generate` — uses the narrative as the structural source for the final formatted deliverable
 
 Downstream skills discover this artifact with:
 ```bash
@@ -409,4 +409,4 @@ ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-narrative-*.md 2>/dev/null | head -1
 
 Report completion status. Then:
 
-"Next: `/qbr-stress-test` to simulate how the exec will receive this. Specifically the section order and the options framing — those are the highest-variance choices in the narrative. Run the stress test before making further edits."
+"Next: `/pm-qbr-stress-test` to simulate how the exec will receive this. Specifically the section order and the options framing — those are the highest-variance choices in the narrative. Run the stress test before making further edits."

@@ -148,11 +148,16 @@ link_pmstack_skill_dirs() {
       # Skip node_modules and dist
       [ "$skill_name" = "node_modules" ] && continue
       [ "$skill_name" = "dist" ] && continue
-      target="$skills_dir/$skill_name"
+      # Skip skills provided by gstack — they share the same namespace and gstack owns them
+      [ "$skill_name" = "browse" ] && continue
+      [ "$skill_name" = "setup-browser-cookies" ] && continue
+      # Prefix all pmstack skills with pm- so they coexist with gstack globally
+      link_name="pm-$skill_name"
+      target="$skills_dir/$link_name"
       # Create or update symlink; skip if a real file/directory exists
       if [ -L "$target" ] || [ ! -e "$target" ]; then
         ln -snf "pmstack/$skill_name" "$target"
-        linked+=("$skill_name")
+        linked+=("$link_name")
       fi
     fi
   done
@@ -172,11 +177,13 @@ cleanup_stale_pmstack_symlinks() {
       link_dest="$(readlink "$target" 2>/dev/null || true)"
       case "$link_dest" in
         pmstack/*|*/pmstack/*)
-          skill_name="$(basename "$target")"
+          link_name="$(basename "$target")"
+          # Strip pm- prefix to get the source skill directory name
+          skill_name="${link_name#pm-}"
           # Only remove if the source skill dir no longer has a SKILL.md
           if [ ! -f "$pmstack_dir/$skill_name/SKILL.md" ]; then
             rm -f "$target"
-            removed+=("$skill_name")
+            removed+=("$link_name")
           fi
           ;;
       esac
@@ -204,7 +211,7 @@ if [ "$SKILLS_BASENAME" = "skills" ]; then
   # Clean up any stale skill symlinks
   cleanup_stale_pmstack_symlinks "$SOURCE_PMSTACK_DIR" "$INSTALL_SKILLS_DIR"
 
-  # Link each skill directory directly (so /office-hours, /cpo-review etc. work as slash commands)
+  # Link each skill directory directly (so /pm-office-hours, /cpo-review etc. work as slash commands)
   link_pmstack_skill_dirs "$SOURCE_PMSTACK_DIR" "$INSTALL_SKILLS_DIR"
 
   if [ "$LOCAL_INSTALL" -eq 1 ]; then
@@ -224,5 +231,5 @@ else
 fi
 
 echo ""
-echo "Start with: /office-hours"
+echo "Start with: /pm-office-hours"
 echo ""

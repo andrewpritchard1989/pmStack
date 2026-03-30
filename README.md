@@ -1,6 +1,6 @@
 # PMStack
 
-PMStack turns Claude Code into a team of product management specialists. Each skill is a slash command that gives Claude a defined role, a structured methodology, and opinionated output formats. Skills chain together — the Product Brief from `/office-hours` is automatically discovered by `/cpo-review`, which feeds into `/prototype`, which feeds into `/spec-review`.
+PMStack turns Claude Code into a team of product management specialists. Each skill is a slash command that gives Claude a defined role, a structured methodology, and opinionated output formats. Skills chain together — the Product Brief from `/pm-office-hours` is automatically discovered by `/pm-cpo-review`, which feeds into `/pm-prototype`, which feeds into `/pm-spec-review`.
 
 The sprint process: **Discover → Define → Validate → Decide → Specify → Handoff**
 
@@ -12,25 +12,25 @@ PMStack is a fork of [gstack](https://github.com/garrytan/gstack). It preserves 
 
 | Skill | What it does |
 |---|---|
-| `/office-hours` | Entry point. Product discovery session with 4 modes: New Feature, Optimisation, Research, Strategy. |
-| `/problem-framing` | Deep problem decomposition — customer segments, jobs-to-be-done, pain severity, opportunity sizing. |
-| `/assumption-audit` | Extract every assumption, rate risk, and design tests for the high-risk ones. |
-| `/cpo-review` | Chief Product Officer challenge — 6-test review + targeted web research. Delivers a verdict. |
-| `/prototype` | Auto-drafts a test plan from all prior artifacts, then generates a Figma Make prompt, HTML prototype, or React artifact. |
-| `/plan-stakeholder-review` | Simulates engineering, design, and business perspectives. Surfaces cross-stakeholder conflicts. |
-| `/spec-review` | PRD quality audit — user stories, acceptance criteria, edge cases, success metrics, dependencies. |
-| `/prioritisation` | Multi-framework scoring: ICE, RICE, opportunity scoring, cost of delay. |
-| `/trade-off-analysis` | Structured analysis for genuine trade-offs. Heavy use of AskUserQuestion to capture the decision. |
-| `/metrics-review` | Measurement plan audit — proxy metrics, baselines, counter-metrics, statistical significance. |
-| `/roadmap-review` | Roadmap integrity check — alignment, dependencies, capacity realism. |
-| `/competitive-intel` | Competitive landscape analysis using the `/browse` real browser. |
-| `/comms-draft` | Product communication writer — launch announcements, internal updates, changelogs, emails. |
-| `/post-launch-review` | Post-launch analysis — hypothesis validation, what was learned, what comes next. |
-| `/qbr-context` | Start here for QBR prep. Context gathering and audience profiling. |
-| `/qbr-narrative` | Build the narrative arc connecting team work to company goals. |
-| `/qbr-stress-test` | Simulate executive reactions to your QBR narrative before the real meeting. |
-| `/qbr-red-team` | Adversarial review — find weaknesses, misleading claims, and unanswered questions. |
-| `/qbr-generate` | Produce the final deliverable: slide outline, exec memo, or speaker script. |
+| `/pm-office-hours` | Entry point. Product discovery session with 4 modes: New Feature, Optimisation, Research, Strategy. |
+| `/pm-problem-framing` | Deep problem decomposition — customer segments, jobs-to-be-done, pain severity, opportunity sizing. |
+| `/pm-assumption-audit` | Extract every assumption, rate risk, and design tests for the high-risk ones. |
+| `/pm-cpo-review` | Chief Product Officer challenge — 6-test review + targeted web research. Delivers a verdict. |
+| `/pm-prototype` | Auto-drafts a test plan from all prior artifacts, then generates a Figma Make prompt, HTML prototype, or React artifact. |
+| `/pm-plan-stakeholder-review` | Simulates engineering, design, and business perspectives. Surfaces cross-stakeholder conflicts. |
+| `/pm-spec-review` | PRD quality audit — user stories, acceptance criteria, edge cases, success metrics, dependencies. |
+| `/pm-prioritisation` | Multi-framework scoring: ICE, RICE, opportunity scoring, cost of delay. |
+| `/pm-trade-off-analysis` | Structured analysis for genuine trade-offs. Heavy use of AskUserQuestion to capture the decision. |
+| `/pm-metrics-review` | Measurement plan audit — proxy metrics, baselines, counter-metrics, statistical significance. |
+| `/pm-roadmap-review` | Roadmap integrity check — alignment, dependencies, capacity realism. |
+| `/pm-competitive-intel` | Competitive landscape analysis using the `/browse` real browser. |
+| `/pm-comms-draft` | Product communication writer — launch announcements, internal updates, changelogs, emails. |
+| `/pm-post-launch-review` | Post-launch analysis — hypothesis validation, what was learned, what comes next. |
+| `/pm-qbr-context` | Start here for QBR prep. Context gathering and audience profiling. |
+| `/pm-qbr-narrative` | Build the narrative arc connecting team work to company goals. |
+| `/pm-qbr-stress-test` | Simulate executive reactions to your QBR narrative before the real meeting. |
+| `/pm-qbr-red-team` | Adversarial review — find weaknesses, misleading claims, and unanswered questions. |
+| `/pm-qbr-generate` | Produce the final deliverable: slide outline, exec memo, or speaker script. |
 | `/browse` | Persistent Chromium browser for authenticated research and prototype review. |
 | `/setup-browser-cookies` | Import browser sessions so `/browse` can access authenticated pages. |
 
@@ -107,10 +107,10 @@ git pull
 
 ### Starting a session
 
-Always start with `/office-hours`. It asks what you are working on and selects the right mode.
+Always start with `/pm-office-hours`. It asks what you are working on and selects the right mode.
 
 ```
-/office-hours
+/pm-office-hours
 ```
 
 ### Skill flows by mode
@@ -122,9 +122,9 @@ PMStack organises its skills into four flows depending on what kind of product w
 Building a net-new capability. The full flow is required for engineering handoff.
 
 ```
-/office-hours → /problem-framing → /assumption-audit
-→ /cpo-review → /prototype → DECISION GATE
-→ /plan-stakeholder-review → /spec-review → Engineering Handoff
+/pm-office-hours → /pm-problem-framing → /pm-assumption-audit
+→ /pm-cpo-review → /pm-prototype → DECISION GATE
+→ /pm-plan-stakeholder-review → /pm-spec-review → Engineering Handoff
 ```
 
 **Required gates before engineering handoff:** Problem Framing, Assumption Audit, CPO Review, Prototype Test.
@@ -134,9 +134,9 @@ Building a net-new capability. The full flow is required for engineering handoff
 Improving a metric or experience that already exists.
 
 ```
-/office-hours → /metrics-review → /cpo-review
-→ /trade-off-analysis → /prototype → Engineering Handoff
-→ /post-launch-review  (after the experiment)
+/pm-office-hours → /pm-metrics-review → /pm-cpo-review
+→ /pm-trade-off-analysis → /pm-prototype → Engineering Handoff
+→ /pm-post-launch-review  (after the experiment)
 ```
 
 #### Research
@@ -144,9 +144,9 @@ Improving a metric or experience that already exists.
 Exploring a problem space before committing to a direction.
 
 ```
-/office-hours → /cpo-review
-→ FORK: user interviews OR /prototype (concept test)
-→ /competitive-intel (optional) → Synthesis
+/pm-office-hours → /pm-cpo-review
+→ FORK: user interviews OR /pm-prototype (concept test)
+→ /pm-competitive-intel (optional) → Synthesis
 → feeds into New Feature or Optimisation mode
 ```
 
@@ -155,8 +155,8 @@ Exploring a problem space before committing to a direction.
 Portfolio-level thinking — prioritisation, sequencing, roadmap decisions.
 
 ```
-/office-hours → /cpo-review → /prioritisation
-→ /roadmap-review → /comms-draft
+/pm-office-hours → /pm-cpo-review → /pm-prioritisation
+→ /pm-roadmap-review → /pm-comms-draft
 → Break into initiatives → each runs New Feature mode
 ```
 
@@ -167,36 +167,36 @@ Preparing a quarterly business review. Two paths depending on whether you're sta
 **Full cycle (starting from scratch):**
 
 ```
-/qbr-context → /qbr-narrative → /metrics-review
-→ /qbr-stress-test → /qbr-red-team → REVISION LOOP
-→ /qbr-generate → Final Deliverable
+/pm-qbr-context → /pm-qbr-narrative → /pm-metrics-review
+→ /pm-qbr-stress-test → /pm-qbr-red-team → REVISION LOOP
+→ /pm-qbr-generate → Final Deliverable
 ```
 
 **Quick path (existing deck or doc):**
 
 ```
-Upload deck/doc → /qbr-stress-test → /qbr-red-team
-→ REVISION LOOP → /qbr-generate → Final Deliverable
+Upload deck/doc → /pm-qbr-stress-test → /pm-qbr-red-team
+→ REVISION LOOP → /pm-qbr-generate → Final Deliverable
 ```
 
 ### Invoking a skill directly
 
-Every skill can be invoked as a one-off without running the full flow. Skills that require upstream artifacts (like `/cpo-review` needing a Product Brief) will tell you what is missing and ask you to run the prerequisite skill first.
+Every skill can be invoked as a one-off without running the full flow. Skills that require upstream artifacts (like `/pm-cpo-review` needing a Product Brief) will tell you what is missing and ask you to run the prerequisite skill first.
 
 ```
-/cpo-review
-/assumption-audit
-/metrics-review
-/competitive-intel
+/pm-cpo-review
+/pm-assumption-audit
+/pm-metrics-review
+/pm-competitive-intel
 ```
 
 Skills that do not depend on upstream artifacts can always be run standalone:
 
 ```
-/trade-off-analysis    # bring your own decision context
-/comms-draft           # bring your own launch brief or context
-/roadmap-review        # bring your own roadmap document
-/prioritisation        # bring your own list of initiatives
+/pm-trade-off-analysis    # bring your own decision context
+/pm-comms-draft           # bring your own launch brief or context
+/pm-roadmap-review        # bring your own roadmap document
+/pm-prioritisation        # bring your own list of initiatives
 ```
 
 ---
@@ -211,7 +211,7 @@ All artifacts are written to `~/.pmstack/` and automatically discovered by downs
 ~/.pmstack/
 ├── initiatives/        # Product Briefs, TE trees, prototype specs, test results
 ├── reviews/            # CPO reviews, stakeholder reviews
-├── specs/              # Polished specs from /spec-review
+├── specs/              # Polished specs from /pm-spec-review
 ├── research/           # Research briefs, interview guides, findings
 ├── competitive/        # Competitive analysis reports
 ├── retros/             # Post-launch review snapshots
@@ -225,7 +225,7 @@ Artifact naming follows the pattern `{slug}-{branch}-{type}-{datetime}.md`, wher
 
 ### Review Readiness Dashboard
 
-Every review skill (`/problem-framing`, `/assumption-audit`, `/cpo-review`, `/prototype`) logs its result. At the end of each review, a dashboard is rendered showing gate status for engineering handoff:
+Every review skill (`/pm-problem-framing`, `/pm-assumption-audit`, `/pm-cpo-review`, `/pm-prototype`) logs its result. At the end of each review, a dashboard is rendered showing gate status for engineering handoff:
 
 ```
 +====================================================================+

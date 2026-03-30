@@ -1,12 +1,12 @@
 ---
-name: qbr-red-team
+name: pm-qbr-red-team
 preamble-tier: 3
 version: 0.1.0
 description: |
   Adversarial review. Attacks the QBR narrative from six hostile lenses: data integrity,
   alternative interpretations, political risk, missing stakeholders, failure mode analysis,
   and certainty calibration. Produces a Red Team Findings report with severity ratings and
-  a priority revision queue for /qbr-generate.
+  a priority revision queue for /pm-qbr-generate.
 allowed-tools:
   - Bash
   - Read
@@ -34,38 +34,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"qbr-red-team","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-qbr-red-team","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -173,7 +173,7 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /qbr-red-team
+# /pm-qbr-red-team
 
 ## Role
 
@@ -185,8 +185,8 @@ The red team does not attack for the sake of it. Every finding must be specific,
 
 ## When to use
 
-- After `/qbr-stress-test` — run the stress test first so the red team can direct its attacks at the already-identified weak sections
-- Before `/qbr-generate` — the red team findings drive the final revision pass
+- After `/pm-qbr-stress-test` — run the stress test first so the red team can direct its attacks at the already-identified weak sections
+- Before `/pm-qbr-generate` — the red team findings drive the final revision pass
 - Any time a PM wants a hostile pre-read of a QBR before presenting
 - Can be run independently on any QBR narrative document, with or without prior artifacts
 
@@ -211,7 +211,7 @@ echo "QBR Red Team: ${QBR_REDTEAM:-NOT_FOUND}"
 [ -n "$QBR_REDTEAM" ] && cat "$QBR_REDTEAM"
 ```
 
-If `QBR_CONTEXT` is `NOT_FOUND`: stop and ask the PM to run `/qbr-context` first. This skill requires a QBR Context Brief to anchor the analysis.
+If `QBR_CONTEXT` is `NOT_FOUND`: stop and ask the PM to run `/pm-qbr-context` first. This skill requires a QBR Context Brief to anchor the analysis.
 
 If artifacts are found: read them all. The Context Brief anchors the exec persona. The Narrative is what's being tested or generated from. The Stress Test and Red Team findings drive revision.
 
@@ -377,7 +377,7 @@ echo "Red Team Findings saved: ~/.pmstack/qbrs/$SLUG-$BRANCH-red-team-$DATETIME.
 ## Downstream connections
 
 Skills that read the Red Team Findings:
-- `/qbr-generate` — the priority revision queue drives the pre-generation revision pass; High-severity findings are addressed before the final deliverable is produced
+- `/pm-qbr-generate` — the priority revision queue drives the pre-generation revision pass; High-severity findings are addressed before the final deliverable is produced
 
 Downstream skills discover this artifact with:
 ```bash
@@ -388,4 +388,4 @@ ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-red-team-*.md 2>/dev/null | head -1
 
 Report completion status. Then:
 
-"Next: `/qbr-generate` to produce the final deliverable. Before generating, work through the High-severity findings in the priority revision queue. A QBR with known High-severity vulnerabilities will not survive the exec's questions — fix them now, not in the room."
+"Next: `/pm-qbr-generate` to produce the final deliverable. Before generating, work through the High-severity findings in the priority revision queue. A QBR with known High-severity vulnerabilities will not survive the exec's questions — fix them now, not in the room."

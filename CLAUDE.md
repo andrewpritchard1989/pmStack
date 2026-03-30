@@ -4,7 +4,7 @@ This is the project configuration for **PMStack**, a product management toolkit 
 
 ## What PMStack is
 
-PMStack is a collection of SKILL.md files that give AI agents structured roles for product management work. Each skill is a specialist with a defined methodology, a structured workflow, and opinionated output formats. Skills feed into each other — the Product Brief from `/office-hours` is automatically discovered by `/cpo-review`, which feeds into `/prototype`, which feeds into `/spec-review`.
+PMStack is a collection of SKILL.md files that give AI agents structured roles for product management work. Each skill is a specialist with a defined methodology, a structured workflow, and opinionated output formats. Skills feed into each other — the Product Brief from `/pm-office-hours` is automatically discovered by `/pm-cpo-review`, which feeds into `/pm-prototype`, which feeds into `/pm-spec-review`.
 
 The sprint process: **Discover → Define → Validate → Decide → Specify → Handoff**
 
@@ -91,71 +91,71 @@ pmstack/
 ## Available skills
 
 ```
-/office-hours          Start here. Product discovery session with 4 modes.
-/problem-framing       Deep problem decomposition and segment definition.
-/assumption-audit      Extract, rate, and design tests for every assumption.
-/cpo-review            Chief Product Officer review — opinionated challenge + web research.
-/prototype             Build prototype (Figma Make / HTML / Artifact) and test with customers.
-/plan-stakeholder-review  Simulate engineering, design, and business stakeholder perspectives.
-/spec-review           PRD quality audit — user stories, acceptance criteria, edge cases.
-/prioritisation        Multi-framework scoring (ICE, RICE, opportunity, cost of delay).
-/trade-off-analysis    Structured decision analysis for genuine trade-offs.
-/metrics-review        Measurement plan audit — proxy metrics, baselines, counter-metrics.
-/roadmap-review        Roadmap integrity — alignment, dependencies, capacity.
-/competitive-intel     Competitive landscape analysis using /browse.
-/comms-draft           Product communication drafts for different audiences.
-/post-launch-review    Post-launch analysis — hypothesis validation, learnings, next steps.
+/pm-office-hours          Start here. Product discovery session with 4 modes.
+/pm-problem-framing       Deep problem decomposition and segment definition.
+/pm-assumption-audit      Extract, rate, and design tests for every assumption.
+/pm-cpo-review            Chief Product Officer review — opinionated challenge + web research.
+/pm-prototype             Build prototype (Figma Make / HTML / Artifact) and test with customers.
+/pm-plan-stakeholder-review  Simulate engineering, design, and business stakeholder perspectives.
+/pm-spec-review           PRD quality audit — user stories, acceptance criteria, edge cases.
+/pm-prioritisation        Multi-framework scoring (ICE, RICE, opportunity, cost of delay).
+/pm-trade-off-analysis    Structured decision analysis for genuine trade-offs.
+/pm-metrics-review        Measurement plan audit — proxy metrics, baselines, counter-metrics.
+/pm-roadmap-review        Roadmap integrity — alignment, dependencies, capacity.
+/pm-competitive-intel     Competitive landscape analysis using /browse.
+/pm-comms-draft           Product communication drafts for different audiences.
+/pm-post-launch-review    Post-launch analysis — hypothesis validation, learnings, next steps.
 /browse                Real Chromium browser. Inherited from gstack.
 /setup-browser-cookies Import browser sessions for authenticated testing. Inherited from gstack.
-/qbr-context           Start here for QBR prep. Context gathering and audience profiling.
-/qbr-narrative         Build the narrative arc connecting team work to company goals.
-/qbr-stress-test       Simulate executive reactions to your QBR narrative.
-/qbr-red-team          Adversarial review — find weaknesses before the exec does.
-/qbr-generate          Produce final deliverable (slides, memo, or script).
+/pm-qbr-context           Start here for QBR prep. Context gathering and audience profiling.
+/pm-qbr-narrative         Build the narrative arc connecting team work to company goals.
+/pm-qbr-stress-test       Simulate executive reactions to your QBR narrative.
+/pm-qbr-red-team          Adversarial review — find weaknesses before the exec does.
+/pm-qbr-generate          Produce final deliverable (slides, memo, or script).
 ```
 
 ## Skill flows by mode
 
 ### New Feature mode
 ```
-/office-hours (new feature) → /problem-framing → /assumption-audit
-→ /cpo-review → /prototype → DECISION GATE
-→ /plan-stakeholder-review → /spec-review → Engineering Handoff
+/pm-office-hours (new feature) → /pm-problem-framing → /pm-assumption-audit
+→ /pm-cpo-review → /pm-prototype → DECISION GATE
+→ /pm-plan-stakeholder-review → /pm-spec-review → Engineering Handoff
 ```
 
 ### Optimisation mode
 ```
-/office-hours (optimisation) → /metrics-review → /cpo-review
-→ /trade-off-analysis → /prototype → Engineering Handoff
-→ /post-launch-review (after experiment)
+/pm-office-hours (optimisation) → /pm-metrics-review → /pm-cpo-review
+→ /pm-trade-off-analysis → /pm-prototype → Engineering Handoff
+→ /pm-post-launch-review (after experiment)
 ```
 
 ### Research mode
 ```
-/office-hours (research) → /cpo-review
-→ FORK: user interviews OR /prototype (concept test)
-→ /competitive-intel (optional) → Synthesis
+/pm-office-hours (research) → /pm-cpo-review
+→ FORK: user interviews OR /pm-prototype (concept test)
+→ /pm-competitive-intel (optional) → Synthesis
 → feeds into New Feature or Optimisation mode
 ```
 
 ### Strategy mode
 ```
-/office-hours (strategy) → /cpo-review → /prioritisation
-→ /roadmap-review → /comms-draft
+/pm-office-hours (strategy) → /pm-cpo-review → /pm-prioritisation
+→ /pm-roadmap-review → /pm-comms-draft
 → Break into initiatives → each runs New Feature mode
 ```
 
 ### QBR mode (full cycle)
 ```
-/qbr-context → /qbr-narrative → /metrics-review
-→ /qbr-stress-test → /qbr-red-team → REVISION LOOP
-→ /qbr-generate → Final Deliverable
+/pm-qbr-context → /pm-qbr-narrative → /pm-metrics-review
+→ /pm-qbr-stress-test → /pm-qbr-red-team → REVISION LOOP
+→ /pm-qbr-generate → Final Deliverable
 ```
 
 ### QBR mode (quick — existing draft)
 ```
-Upload deck/doc → /qbr-stress-test → /qbr-red-team
-→ REVISION LOOP → /qbr-generate → Final Deliverable
+Upload deck/doc → /pm-qbr-stress-test → /pm-qbr-red-team
+→ REVISION LOOP → /pm-qbr-generate → Final Deliverable
 ```
 
 ## Filesystem state
@@ -170,7 +170,7 @@ All artifacts are stored in `~/.pmstack/` and automatically discovered by downst
 │   ├── {slug}-{branch}-prototype-spec-{datetime}.md
 │   └── {slug}-{branch}-test-results-{datetime}.md
 ├── reviews/                       # CPO review reports, stakeholder reviews
-├── specs/                         # Polished specs from /spec-review
+├── specs/                         # Polished specs from /pm-spec-review
 ├── research/                      # Research briefs, interview guides, findings
 ├── competitive/                   # Competitive analysis reports
 ├── retros/                        # Post-launch review snapshots
@@ -189,7 +189,7 @@ All artifacts are stored in `~/.pmstack/` and automatically discovered by downst
 
 ### Thoughtful Execution (Annina Koskinen, Spotify)
 
-The Thoughtful Execution framework is integrated into `/office-hours` for New Feature and Optimisation modes. It prevents teams from jumping from a goal directly to a single solution.
+The Thoughtful Execution framework is integrated into `/pm-office-hours` for New Feature and Optimisation modes. It prevents teams from jumping from a goal directly to a single solution.
 
 The TE tree structure:
 ```
@@ -219,7 +219,7 @@ Reference: https://anninakoskinen.com/project/thoughtful-execution
 
 ### CPO Review
 
-`/cpo-review` is the product-world equivalent of gstack's `/plan-ceo-review`. The agent adopts the persona of a Chief Product Officer — someone who has deeply internalised the principles of modern product management and has the judgment to know when a PM is on the right track and when they're fooling themselves.
+`/pm-cpo-review` is the product-world equivalent of gstack's `/plan-ceo-review`. The agent adopts the persona of a Chief Product Officer — someone who has deeply internalised the principles of modern product management and has the judgment to know when a PM is on the right track and when they're fooling themselves.
 
 This is not a framework-citation engine. It is an opinionated product leader who thinks with taste, user empathy, and strategic clarity, then backs up their perspective with evidence from the open web.
 
@@ -258,11 +258,11 @@ The CPO weaves the research into their review, citing sources naturally. Not "Le
 
 gstack's CEO review asks "what is the 10-star product hiding inside this request?" — it dreams big and challenges scope. The CPO review asks "is this the right problem, solved the right way, with sufficient evidence?" — it challenges rigor. Both push back hard. The CEO pushes toward ambition. The CPO pushes toward truth.
 
-**Output:** CPO Review Report saved to `~/.pmstack/reviews/`. Contains: verdict, key challenges, research-backed evidence, specific risks, and recommended next actions. Automatically referenced by downstream skills (`/prototype` uses the CPO's challenges to focus test plans, `/plan-stakeholder-review` uses the CPO's concerns to anticipate stakeholder questions).
+**Output:** CPO Review Report saved to `~/.pmstack/reviews/`. Contains: verdict, key challenges, research-backed evidence, specific risks, and recommended next actions. Automatically referenced by downstream skills (`/pm-prototype` uses the CPO's challenges to focus test plans, `/pm-plan-stakeholder-review` uses the CPO's concerns to anticipate stakeholder questions).
 
 ### Prototype & Test
 
-`/prototype` generates structured output for Figma Make (the primary prototyping tool) and auto-drafts test plans from all prior artifacts.
+`/pm-prototype` generates structured output for Figma Make (the primary prototyping tool) and auto-drafts test plans from all prior artifacts.
 
 The auto-drafted test plan reads:
 - Product Brief → success metrics and hypotheses
@@ -377,7 +377,7 @@ These engineering-only skills are not needed:
 - `qa/`, `qa-only/` — code-level QA
 - `design-review/`, `design-consultation/` — visual design auditing
 - `cso/` — security review
-- `codex/` — replaced by `/cpo-review`
+- `codex/` — replaced by `/pm-cpo-review`
 - `careful/`, `freeze/`, `guard/`, `unfreeze/` — code safety guardrails
 - `document-release/` — release documentation
 - `benchmark/` — performance benchmarking
@@ -386,7 +386,7 @@ These engineering-only skills are not needed:
 
 ### Expert content strategy
 
-`/cpo-review` does NOT use a pre-built knowledge base or local content archive. Instead it uses targeted web search at review time to find relevant expert content from practitioners like Lenny Rachitsky, Marty Cagan (SVPG), Teresa Torres, Shreyas Doshi, and others. This avoids licensing issues with content archives and ensures the agent always finds the most current thinking.
+`/pm-cpo-review` does NOT use a pre-built knowledge base or local content archive. Instead it uses targeted web search at review time to find relevant expert content from practitioners like Lenny Rachitsky, Marty Cagan (SVPG), Teresa Torres, Shreyas Doshi, and others. This avoids licensing issues with content archives and ensures the agent always finds the most current thinking.
 
 The agent derives search queries from the Product Brief's specific domain, problem pattern, user segment, and product stage. It looks for case studies, relevant frameworks, counter-examples, and expert perspectives. Results are woven into the CPO's own reasoning, not presented as a separate "expert says" pass.
 

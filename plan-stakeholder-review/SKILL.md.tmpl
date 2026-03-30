@@ -1,5 +1,5 @@
 ---
-name: plan-stakeholder-review
+name: pm-plan-stakeholder-review
 preamble-tier: 3
 version: 0.1.0
 description: |
@@ -16,7 +16,7 @@ allowed-tools:
 
 {{PREAMBLE}}
 
-# /plan-stakeholder-review
+# /pm-plan-stakeholder-review
 
 ## Role
 
@@ -26,7 +26,7 @@ This is not about predicting political behavior. It is about surfacing legitimat
 
 ## When to use
 
-- After `/cpo-review` and `/prototype` (the CPO's concerns and test results are primary inputs)
+- After `/pm-cpo-review` and `/pm-prototype` (the CPO's concerns and test results are primary inputs)
 - Before the initiative enters formal sprint planning or engineering kick-off
 - When the PM senses there will be cross-functional friction but cannot articulate exactly where
 - When the initiative has significant technical, design, or commercial complexity
@@ -52,7 +52,7 @@ echo "Test Results: ${RESULTS_FILE:-NOT_FOUND}"
 [ -n "$RESULTS_FILE" ] && cat "$RESULTS_FILE"
 ```
 
-**If Brief is NOT_FOUND:** stop. Ask the PM to run `/office-hours` first.
+**If Brief is NOT_FOUND:** stop. Ask the PM to run `/pm-office-hours` first.
 
 **If CPO Review is missing:** note it and proceed. The CPO's unconsidered concerns are the best predictor of stakeholder objections — without them, the simulation will be less targeted.
 
@@ -243,7 +243,7 @@ Replace `SKILL_NAME` with `stakeholder-review`.
 ## Downstream connections
 
 Skills that read the Stakeholder Review:
-- `/spec-review` — the engineering and design objections inform which sections of the spec need more detail
+- `/pm-spec-review` — the engineering and design objections inform which sections of the spec need more detail
 
 Downstream skills discover this artifact with:
 ```bash
@@ -254,4 +254,4 @@ ls -t ~/.pmstack/reviews/$SLUG-$BRANCH-stakeholder-review-*.md 2>/dev/null | hea
 
 Report completion status. Then:
 
-"Next: `/spec-review` — the pre-planning checklist from this review tells you what the spec needs to answer. Address the engineering and design objections in the acceptance criteria before the PRD goes out."
+"Next: `/pm-spec-review` — the pre-planning checklist from this review tells you what the spec needs to answer. Address the engineering and design objections in the acceptance criteria before the PRD goes out."

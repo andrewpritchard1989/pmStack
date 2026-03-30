@@ -91,7 +91,7 @@ The shared preamble skill with PM skill suggestions and browse setup reference.
 
 ---
 
-## Phase 2: `/office-hours` -- Discovery Session
+## Phase 2: `/pm-office-hours` -- Discovery Session
 
 **Goal**: First PM skill, the entry point for all flows. 4 modes with Thoughtful Execution integration.
 
@@ -114,13 +114,13 @@ The shared preamble skill with PM skill suggestions and browse setup reference.
 |---|---|---|
 | Structural | `bun run gen:skill-docs` | `office-hours/SKILL.md` builds, no unresolved placeholders |
 | Sections | Read generated SKILL.md | Contains: Role, When to use, Phases, Output format, Downstream connections, Completion |
-| Dry-run | Invoke `/office-hours` with "Mobile checkout abandonment is 68%" | Mode selection prompt, walks through questions, produces Product Brief |
+| Dry-run | Invoke `/pm-office-hours` with "Mobile checkout abandonment is 68%" | Mode selection prompt, walks through questions, produces Product Brief |
 | Artifact | Check `~/.pmstack/initiatives/` | Brief saved with correct `{slug}-{branch}-brief-{datetime}.md` naming |
 | TE tree | New Feature mode | TE tree artifact also saved |
 
 ---
 
-## Phase 3: `/problem-framing` -- Deep Problem Decomposition
+## Phase 3: `/pm-problem-framing` -- Deep Problem Decomposition
 
 **Goal**: New skill (no gstack equivalent). Deep problem decomposition and segment definition.
 
@@ -132,7 +132,7 @@ The shared preamble skill with PM skill suggestions and browse setup reference.
 - Reads Product Brief from `~/.pmstack/initiatives/`
 - Phases: customer segment definition, jobs-to-be-done mapping, pain severity rating, opportunity sizing
 - Output: Problem Frame to `~/.pmstack/initiatives/{slug}-{branch}-problem-frame-{datetime}.md`
-- Feeds into: `/assumption-audit`
+- Feeds into: `/pm-assumption-audit`
 
 ### Phase 3 Testing
 
@@ -144,7 +144,7 @@ The shared preamble skill with PM skill suggestions and browse setup reference.
 
 ---
 
-## Phase 4: `/assumption-audit` -- Risk & Assumption Mapping
+## Phase 4: `/pm-assumption-audit` -- Risk & Assumption Mapping
 
 **Goal**: New skill. Extract, rate, and design tests for every assumption.
 
@@ -157,7 +157,7 @@ The shared preamble skill with PM skill suggestions and browse setup reference.
 - Risk rating: high/medium/low with justification
 - Test design for each high-risk assumption
 - Output: Assumption Map to `~/.pmstack/initiatives/{slug}-{branch}-assumption-map-{datetime}.md`
-- Feeds into: `/cpo-review`, `/prototype`
+- Feeds into: `/pm-cpo-review`, `/pm-prototype`
 
 ### Phase 4 Testing
 
@@ -170,7 +170,7 @@ The shared preamble skill with PM skill suggestions and browse setup reference.
 
 ---
 
-## Phase 5: `/cpo-review` -- Chief Product Officer Review
+## Phase 5: `/pm-cpo-review` -- Chief Product Officer Review
 
 **Goal**: The most complex PM skill. Two-phase review: pure reasoning then web research. Adapted from gstack's `plan-ceo-review`.
 
@@ -184,7 +184,7 @@ The shared preamble skill with PM skill suggestions and browse setup reference.
 - **Phase 2 (research)**: Targeted WebSearch derived from Brief's domain, problem pattern, user segment. Finds case studies, frameworks, counter-examples, expert perspectives. Weaves into existing reasoning.
 - **Output**: CPO Review Report to `~/.pmstack/reviews/{slug}-{branch}-cpo-review-{datetime}.md`
 - **Review Readiness Dashboard**: Rendered at end of review showing gate status
-- Feeds into: `/prototype`, `/plan-stakeholder-review`
+- Feeds into: `/pm-prototype`, `/pm-plan-stakeholder-review`
 
 ### Phase 5 Testing
 
@@ -199,7 +199,7 @@ The shared preamble skill with PM skill suggestions and browse setup reference.
 
 ---
 
-## Phase 6: `/prototype` -- Build & Test with Customers
+## Phase 6: `/pm-prototype` -- Build & Test with Customers
 
 **Goal**: New skill. Generates prototypes and auto-drafts test plans from all prior artifacts.
 
@@ -226,17 +226,17 @@ The shared preamble skill with PM skill suggestions and browse setup reference.
 
 ---
 
-## Phase 7: `/plan-stakeholder-review` + `/spec-review` -- Final New Feature Flow Skills
+## Phase 7: `/pm-plan-stakeholder-review` + `/pm-spec-review` -- Final New Feature Flow Skills
 
 **Goal**: Complete the New Feature flow with the two recommended-but-not-blocking skills.
 
-### 7.1 `/plan-stakeholder-review`
+### 7.1 `/pm-plan-stakeholder-review`
 - Adapted from `plan-ceo-review` structure (multi-lens instead of single lens)
 - Simulates 3 perspectives: Engineering lead, Design lead, Business/revenue lead
 - Cross-stakeholder conflict identification
 - Output: `~/.pmstack/reviews/{slug}-{branch}-stakeholder-review-{datetime}.md`
 
-### 7.2 `/spec-review`
+### 7.2 `/pm-spec-review`
 - Adapted from `plan-eng-review` structure (PRD audit instead of eng architecture)
 - Systematic audit: user stories, acceptance criteria, edge cases, success metrics, dependencies, scope boundaries
 - Interactive resolution via AskUserQuestion
@@ -323,20 +323,20 @@ Document the full system:
 
 ### 10.1 New Feature Flow E2E
 Run the full chain with sample initiative "Reduce checkout abandonment in mobile marketplace app":
-1. `/office-hours` (New Feature) -> Product Brief + TE tree
-2. `/problem-framing` -> Problem Frame (discovers Brief)
-3. `/assumption-audit` -> Assumption Map (discovers Brief + Frame)
-4. `/cpo-review` -> CPO Review (discovers all above)
-5. `/prototype` -> Prototype Spec + Test Plan (discovers all above)
-6. `/plan-stakeholder-review` -> Stakeholder Review
-7. `/spec-review` -> Polished Spec
+1. `/pm-office-hours` (New Feature) -> Product Brief + TE tree
+2. `/pm-problem-framing` -> Problem Frame (discovers Brief)
+3. `/pm-assumption-audit` -> Assumption Map (discovers Brief + Frame)
+4. `/pm-cpo-review` -> CPO Review (discovers all above)
+5. `/pm-prototype` -> Prototype Spec + Test Plan (discovers all above)
+6. `/pm-plan-stakeholder-review` -> Stakeholder Review
+7. `/pm-spec-review` -> Polished Spec
 
 **Verify**: Each skill discovers upstream artifacts. Dashboard updates. Completion status reported.
 
 ### 10.2 Cross-Flow Integration
-- `/prioritisation` reads multiple briefs
-- `/competitive-intel` uses browse correctly
-- `/post-launch-review` reads prior launch artifacts
+- `/pm-prioritisation` reads multiple briefs
+- `/pm-competitive-intel` uses browse correctly
+- `/pm-post-launch-review` reads prior launch artifacts
 
 ### 10.3 Build System Validation
 - `bun run gen:skill-docs --dry-run` -> all FRESH
@@ -375,17 +375,17 @@ Create `test/` directory:
 ```
 Phase 1  (Infrastructure)
    |
-Phase 2  (/office-hours)
+Phase 2  (/pm-office-hours)
    |
-Phase 3  (/problem-framing)
+Phase 3  (/pm-problem-framing)
    |
-Phase 4  (/assumption-audit)
+Phase 4  (/pm-assumption-audit)
    |
-Phase 5  (/cpo-review)
+Phase 5  (/pm-cpo-review)
    |
-Phase 6  (/prototype)
+Phase 6  (/pm-prototype)
    |
-Phase 7  (/plan-stakeholder-review + /spec-review)
+Phase 7  (/pm-plan-stakeholder-review + /pm-spec-review)
    |
 Phase 8  (7 remaining skills -- can be parallelised)
    |

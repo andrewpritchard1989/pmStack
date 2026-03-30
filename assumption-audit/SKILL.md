@@ -1,12 +1,12 @@
 ---
-name: assumption-audit
+name: pm-assumption-audit
 preamble-tier: 3
 version: 0.1.0
 description: |
   Risk and assumption mapping. Reads the Product Brief and Problem Frame, then extracts
   every load-bearing assumption across four categories (value, usability, feasibility,
   viability), rates each on risk and knowability, and designs tests for the high-risk ones.
-  Produces an Assumption Map that feeds /cpo-review and /prototype.
+  Produces an Assumption Map that feeds /pm-cpo-review and /pm-prototype.
 allowed-tools:
   - Bash
   - Read
@@ -34,38 +34,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"assumption-audit","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-assumption-audit","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -173,7 +173,7 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /assumption-audit
+# /pm-assumption-audit
 
 ## Role
 
@@ -185,9 +185,9 @@ The output is an Assumption Map: every assumption named, rated for risk and test
 
 ## When to use
 
-- After `/office-hours` and `/problem-framing` have run (both are required inputs)
-- Before `/cpo-review` — the CPO review uses the Assumption Map to run the assumption test
-- Before `/prototype` — the riskiest assumptions become the test tasks in the prototype test plan
+- After `/pm-office-hours` and `/pm-problem-framing` have run (both are required inputs)
+- Before `/pm-cpo-review` — the CPO review uses the Assumption Map to run the assumption test
+- Before `/pm-prototype` — the riskiest assumptions become the test tasks in the prototype test plan
 - When a team is about to commit significant engineering effort and wants to de-risk first
 
 ## Setup
@@ -205,9 +205,9 @@ echo "Problem Frame: ${FRAME_FILE:-NOT_FOUND}"
 [ -n "$FRAME_FILE" ] && cat "$FRAME_FILE"
 ```
 
-**If Brief is NOT_FOUND:** stop and ask the PM to run `/office-hours` first. Do not proceed without a Brief.
+**If Brief is NOT_FOUND:** stop and ask the PM to run `/pm-office-hours` first. Do not proceed without a Brief.
 
-**If Problem Frame is NOT_FOUND:** warn the PM that the audit will be less precise without a Problem Frame. Offer to proceed with the Brief alone or pause and run `/problem-framing` first. Use AskUserQuestion. The Problem Frame's evidence gaps are the highest-signal source of high-risk assumptions — missing it weakens the audit.
+**If Problem Frame is NOT_FOUND:** warn the PM that the audit will be less precise without a Problem Frame. Offer to proceed with the Brief alone or pause and run `/pm-problem-framing` first. Use AskUserQuestion. The Problem Frame's evidence gaps are the highest-signal source of high-risk assumptions — missing it weakens the audit.
 
 **If both found:** read both in full. The Brief provides hypotheses and goals. The Problem Frame provides the primary segment, JTBD, pain severity evidence, and the explicit evidence gaps that flagged as thin.
 
@@ -424,8 +424,8 @@ echo "Assumption Map saved: ~/.pmstack/initiatives/$SLUG-$BRANCH-assumption-map-
 ## Downstream connections
 
 Skills that read the Assumption Map:
-- `/cpo-review` — runs the Assumption Test against this map. Untestable high-risk assumptions are a primary focus.
-- `/prototype` — riskiest assumptions (High risk + Easy to test) become the test tasks in the prototype test plan. The test designs here feed directly into the test plan structure.
+- `/pm-cpo-review` — runs the Assumption Test against this map. Untestable high-risk assumptions are a primary focus.
+- `/pm-prototype` — riskiest assumptions (High risk + Easy to test) become the test tasks in the prototype test plan. The test designs here feed directly into the test plan structure.
 
 Downstream skills discover this artifact with:
 ```bash
@@ -436,4 +436,4 @@ ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-assumption-map-*.md 2>/dev/null | hea
 
 Report completion status. Then:
 
-"Next: `/cpo-review` — the Assumption Map is a primary input. The CPO will challenge the untestable high-risk assumptions hardest. Or run `/prototype` directly if you want to start testing the high-risk + easy-to-test assumptions now."
+"Next: `/pm-cpo-review` — the Assumption Map is a primary input. The CPO will challenge the untestable high-risk assumptions hardest. Or run `/pm-prototype` directly if you want to start testing the high-risk + easy-to-test assumptions now."

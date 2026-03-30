@@ -1,12 +1,12 @@
 ---
-name: qbr-red-team
+name: pm-qbr-red-team
 preamble-tier: 3
 version: 0.1.0
 description: |
   Adversarial review. Attacks the QBR narrative from six hostile lenses: data integrity,
   alternative interpretations, political risk, missing stakeholders, failure mode analysis,
   and certainty calibration. Produces a Red Team Findings report with severity ratings and
-  a priority revision queue for /qbr-generate.
+  a priority revision queue for /pm-qbr-generate.
 allowed-tools:
   - Bash
   - Read
@@ -16,7 +16,7 @@ allowed-tools:
 
 {{PREAMBLE}}
 
-# /qbr-red-team
+# /pm-qbr-red-team
 
 ## Role
 
@@ -28,8 +28,8 @@ The red team does not attack for the sake of it. Every finding must be specific,
 
 ## When to use
 
-- After `/qbr-stress-test` — run the stress test first so the red team can direct its attacks at the already-identified weak sections
-- Before `/qbr-generate` — the red team findings drive the final revision pass
+- After `/pm-qbr-stress-test` — run the stress test first so the red team can direct its attacks at the already-identified weak sections
+- Before `/pm-qbr-generate` — the red team findings drive the final revision pass
 - Any time a PM wants a hostile pre-read of a QBR before presenting
 - Can be run independently on any QBR narrative document, with or without prior artifacts
 
@@ -195,7 +195,7 @@ echo "Red Team Findings saved: ~/.pmstack/qbrs/$SLUG-$BRANCH-red-team-$DATETIME.
 ## Downstream connections
 
 Skills that read the Red Team Findings:
-- `/qbr-generate` — the priority revision queue drives the pre-generation revision pass; High-severity findings are addressed before the final deliverable is produced
+- `/pm-qbr-generate` — the priority revision queue drives the pre-generation revision pass; High-severity findings are addressed before the final deliverable is produced
 
 Downstream skills discover this artifact with:
 ```bash
@@ -206,4 +206,4 @@ ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-red-team-*.md 2>/dev/null | head -1
 
 Report completion status. Then:
 
-"Next: `/qbr-generate` to produce the final deliverable. Before generating, work through the High-severity findings in the priority revision queue. A QBR with known High-severity vulnerabilities will not survive the exec's questions — fix them now, not in the room."
+"Next: `/pm-qbr-generate` to produce the final deliverable. Before generating, work through the High-severity findings in the priority revision queue. A QBR with known High-severity vulnerabilities will not survive the exec's questions — fix them now, not in the room."

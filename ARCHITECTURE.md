@@ -148,31 +148,31 @@ All PMStack artifacts are stored in `~/.pmstack/` and automatically discoverable
 ```
 ~/.pmstack/
 ├── initiatives/
-│   ├── {slug}-{branch}-brief-{datetime}.md          # Product Brief (/office-hours)
-│   ├── {slug}-{branch}-te-tree-{datetime}.md         # TE Tree (/office-hours)
-│   ├── {slug}-{branch}-problem-frame-{datetime}.md   # Problem Frame (/problem-framing)
-│   ├── {slug}-{branch}-assumption-map-{datetime}.md  # Assumption Map (/assumption-audit)
-│   ├── {slug}-{branch}-prototype-spec-{datetime}.md  # Prototype Spec (/prototype)
-│   ├── {slug}-{branch}-test-results-{datetime}.md    # Test Results (/prototype)
-│   ├── {slug}-{branch}-prioritisation-{datetime}.md  # Prioritisation (/prioritisation)
-│   └── {slug}-{branch}-trade-off-{datetime}.md       # Trade-off (/trade-off-analysis)
+│   ├── {slug}-{branch}-brief-{datetime}.md          # Product Brief (/pm-office-hours)
+│   ├── {slug}-{branch}-te-tree-{datetime}.md         # TE Tree (/pm-office-hours)
+│   ├── {slug}-{branch}-problem-frame-{datetime}.md   # Problem Frame (/pm-problem-framing)
+│   ├── {slug}-{branch}-assumption-map-{datetime}.md  # Assumption Map (/pm-assumption-audit)
+│   ├── {slug}-{branch}-prototype-spec-{datetime}.md  # Prototype Spec (/pm-prototype)
+│   ├── {slug}-{branch}-test-results-{datetime}.md    # Test Results (/pm-prototype)
+│   ├── {slug}-{branch}-prioritisation-{datetime}.md  # Prioritisation (/pm-prioritisation)
+│   └── {slug}-{branch}-trade-off-{datetime}.md       # Trade-off (/pm-trade-off-analysis)
 ├── reviews/
-│   ├── {slug}-{branch}-cpo-review-{datetime}.md      # CPO Review (/cpo-review)
+│   ├── {slug}-{branch}-cpo-review-{datetime}.md      # CPO Review (/pm-cpo-review)
 │   ├── {slug}-{branch}-stakeholder-review-{datetime}.md  # Stakeholder Review
 │   └── {slug}-{branch}-roadmap-review-{datetime}.md  # Roadmap Review
 ├── specs/
-│   └── {slug}-{branch}-spec-{datetime}.md            # Polished Spec (/spec-review)
+│   └── {slug}-{branch}-spec-{datetime}.md            # Polished Spec (/pm-spec-review)
 ├── research/                                          # Research artifacts (manual)
 ├── competitive/
 │   └── {slug}-{branch}-competitive-intel-{datetime}.md  # Competitive Intel
 ├── retros/
 │   └── {slug}-{branch}-post-launch-review-{datetime}.md  # Post-launch Review
 ├── qbrs/
-│   ├── {slug}-{branch}-context-{datetime}.md             # QBR Context (/qbr-context)
-│   ├── {slug}-{branch}-narrative-{datetime}.md           # QBR Narrative (/qbr-narrative)
-│   ├── {slug}-{branch}-stress-test-{datetime}.md         # Stress Test (/qbr-stress-test)
-│   ├── {slug}-{branch}-red-team-{datetime}.md            # Red Team (/qbr-red-team)
-│   └── {slug}-{branch}-output-{datetime}.md              # Final Output (/qbr-generate)
+│   ├── {slug}-{branch}-context-{datetime}.md             # QBR Context (/pm-qbr-context)
+│   ├── {slug}-{branch}-narrative-{datetime}.md           # QBR Narrative (/pm-qbr-narrative)
+│   ├── {slug}-{branch}-stress-test-{datetime}.md         # Stress Test (/pm-qbr-stress-test)
+│   ├── {slug}-{branch}-red-team-{datetime}.md            # Red Team (/pm-qbr-red-team)
+│   └── {slug}-{branch}-output-{datetime}.md              # Final Output (/pm-qbr-generate)
 ├── analytics/
 │   ├── skill-usage.jsonl                             # Telemetry (local only)
 │   └── {slug}-{branch}-measurement-plan-{datetime}.md   # Measurement Plan
@@ -199,30 +199,30 @@ The `-t` flag sorts by modification time, so the most recent artifact is always 
 
 ### New Feature mode
 ```
-/office-hours (new feature)
+/pm-office-hours (new feature)
   → Produces: Brief, TE tree
   ↓
-/problem-framing
+/pm-problem-framing
   → Reads: Brief
   → Produces: Problem Frame
   ↓
-/assumption-audit
+/pm-assumption-audit
   → Reads: Brief, Problem Frame
   → Produces: Assumption Map
   ↓
-/cpo-review
+/pm-cpo-review
   → Reads: Brief, Problem Frame, Assumption Map, TE tree
   → Produces: CPO Review Report
   → Updates: Review Readiness Dashboard
   ↓
-/prototype
+/pm-prototype
   → Reads: Brief, TE tree, Assumption Map, CPO Review
   → Produces: Prototype Spec, Test Results
   → Updates: Review Readiness Dashboard
   ↓
   [DECISION GATE — all required reviews complete]
   ↓
-/plan-stakeholder-review           /spec-review
+/pm-plan-stakeholder-review           /pm-spec-review
   → Reads: Brief, CPO Review,         → Reads: Brief, CPO Review,
     Prototype Spec, Test Results         Test Results, Stakeholder Review
   → Produces: Stakeholder Review      → Produces: Polished Spec
@@ -233,66 +233,66 @@ The `-t` flag sorts by modification time, so the most recent artifact is always 
 
 ### Optimisation mode
 ```
-/office-hours (optimisation)
+/pm-office-hours (optimisation)
   → Produces: Brief with measurement scaffold
   ↓
-/metrics-review
+/pm-metrics-review
   → Reads: Brief
   → Produces: Measurement Plan
   ↓
-/cpo-review → /trade-off-analysis → /prototype → /post-launch-review
+/pm-cpo-review → /pm-trade-off-analysis → /pm-prototype → /pm-post-launch-review
 ```
 
 ### Research mode
 ```
-/office-hours (research)
+/pm-office-hours (research)
   → Produces: Brief with research plan and interview guide
   ↓
-/cpo-review (optional, for early challenge)
+/pm-cpo-review (optional, for early challenge)
   ↓
 [Run user interviews / usability test]
   ↓
-/competitive-intel (optional)
+/pm-competitive-intel (optional)
   ↓
-Return to /office-hours (New Feature or Optimisation mode) with findings
+Return to /pm-office-hours (New Feature or Optimisation mode) with findings
 ```
 
 ### Strategy mode
 ```
-/office-hours (strategy)
+/pm-office-hours (strategy)
   → Produces: Brief with initiative inventory
   ↓
-/cpo-review (portfolio-level challenge)
+/pm-cpo-review (portfolio-level challenge)
   ↓
-/prioritisation → /roadmap-review → /comms-draft
+/pm-prioritisation → /pm-roadmap-review → /pm-comms-draft
   ↓
 Break into individual initiatives → each runs New Feature mode
 ```
 
 ### QBR mode (full cycle)
 ```
-/qbr-context
+/pm-qbr-context
   → Produces: QBR Context doc (audience profile, team work summary, decisions needed)
   ↓
-/qbr-narrative
+/pm-qbr-narrative
   → Reads: QBR Context doc
   → Produces: QBR Narrative arc
   ↓
-/metrics-review (QBR pass)
+/pm-metrics-review (QBR pass)
   → Reads: QBR Narrative arc
   → Produces: Metrics Review (QBR)
   ↓
-/qbr-stress-test
+/pm-qbr-stress-test
   → Reads: QBR Narrative arc, Metrics Review
   → Produces: Stress Test report
   ↓
-/qbr-red-team
+/pm-qbr-red-team
   → Reads: QBR Narrative arc, Stress Test report
   → Produces: Red Team report
   ↓
   [REVISION LOOP — address findings, update narrative, re-run stress test if needed]
   ↓
-/qbr-generate
+/pm-qbr-generate
   → Reads: All QBR artifacts
   → Produces: Slide outline, exec memo, and/or speaker script
   → Saves to: ~/.pmstack/qbrs/
@@ -302,11 +302,11 @@ Break into individual initiatives → each runs New Feature mode
 ```
 Upload deck/doc
   ↓
-/qbr-stress-test → /qbr-red-team
+/pm-qbr-stress-test → /pm-qbr-red-team
   ↓
   [REVISION LOOP]
   ↓
-/qbr-generate → Final Deliverable
+/pm-qbr-generate → Final Deliverable
 ```
 
 ---

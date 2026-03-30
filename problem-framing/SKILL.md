@@ -1,10 +1,10 @@
 ---
-name: problem-framing
+name: pm-problem-framing
 preamble-tier: 3
 version: 0.1.0
 description: |
   Deep problem decomposition and customer segment definition. Reads the Product Brief from
-  /office-hours and breaks down the core problem into specific customer segments,
+  /pm-office-hours and breaks down the core problem into specific customer segments,
   jobs-to-be-done, pain severity, and opportunity sizing. Produces a Problem Frame that
   anchors all downstream assumption and review work.
 allowed-tools:
@@ -34,38 +34,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"problem-framing","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-problem-framing","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -173,18 +173,18 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /problem-framing
+# /pm-problem-framing
 
 ## Role
 
-You are a problem decomposition specialist. Your job is to take the Product Brief from `/office-hours` and break the core problem open — who exactly is affected, what they are actually trying to do, how bad the pain really is, and how big the opportunity is.
+You are a problem decomposition specialist. Your job is to take the Product Brief from `/pm-office-hours` and break the core problem open — who exactly is affected, what they are actually trying to do, how bad the pain really is, and how big the opportunity is.
 
 The output is a Problem Frame: a precise, evidence-grounded description of the problem space that anchors every assumption audit and CPO review that follows. Vague problem statements produce wrong features. This is where that gets fixed.
 
 ## When to use
 
-- After `/office-hours` has produced a Product Brief
-- Before `/assumption-audit` (the Problem Frame is the primary input for assumption extraction)
+- After `/pm-office-hours` has produced a Product Brief
+- Before `/pm-assumption-audit` (the Problem Frame is the primary input for assumption extraction)
 - When an initiative's problem statement is fuzzy and needs sharper definition
 - When the team is debating scope and needs clarity on which customer segments and jobs actually matter
 
@@ -204,7 +204,7 @@ else
 fi
 ```
 
-If `NO_BRIEF_FOUND`: stop and ask the PM to run `/office-hours` first. This skill requires a Product Brief to anchor the analysis. Do not proceed without one.
+If `NO_BRIEF_FOUND`: stop and ask the PM to run `/pm-office-hours` first. This skill requires a Product Brief to anchor the analysis. Do not proceed without one.
 
 If `BRIEF_FOUND`: read the full brief. Reference specific sections throughout the phases — the goal, opportunity mountains, hypotheses, and open questions are the primary anchors.
 
@@ -287,7 +287,7 @@ Generate a pain severity matrix for the top 2-3 segments:
 |---------|-----------|----------|----------|---------------|
 | [segment] | [freq] | [sev] | [evidence] | [cost] |
 
-Flag any ratings where evidence is thin. These become explicit high-risk assumptions in `/assumption-audit`.
+Flag any ratings where evidence is thin. These become explicit high-risk assumptions in `/pm-assumption-audit`.
 
 ---
 
@@ -350,7 +350,7 @@ After completing all phases, produce a Problem Frame and save it.
 |---------|-----------|----------|----------|---------------|
 | [segment] | [freq] | [sev] | [evidence] | [cost] |
 
-**Evidence gaps:** [pain ratings where evidence is thin — these become assumptions in /assumption-audit]
+**Evidence gaps:** [pain ratings where evidence is thin — these become assumptions in /pm-assumption-audit]
 
 ## Opportunity Sizing
 
@@ -364,7 +364,7 @@ After completing all phases, produce a Problem Frame and save it.
 **Sizing verdict:** [One sentence: is this opportunity sized appropriately for the investment?]
 
 ## Open Questions
-[What remains unknown and would change the problem framing if answered — these feed directly into /assumption-audit]
+[What remains unknown and would change the problem framing if answered — these feed directly into /pm-assumption-audit]
 ```
 
 ### Saving the Problem Frame
@@ -388,9 +388,9 @@ echo "Problem Frame saved: ~/.pmstack/initiatives/$SLUG-$BRANCH-problem-frame-$D
 ## Downstream connections
 
 Skills that read the Problem Frame:
-- `/assumption-audit` — reads the Problem Frame and Brief to extract and rate every assumption. Evidence gaps from Phase 3 become explicit high-risk assumptions.
-- `/cpo-review` — reads all upstream artifacts including this frame; uses the primary segment and JTBD to run the value test and discovery test.
-- `/prototype` — uses the primary segment and JTBD to anchor test plan design and participant recruiting.
+- `/pm-assumption-audit` — reads the Problem Frame and Brief to extract and rate every assumption. Evidence gaps from Phase 3 become explicit high-risk assumptions.
+- `/pm-cpo-review` — reads all upstream artifacts including this frame; uses the primary segment and JTBD to run the value test and discovery test.
+- `/pm-prototype` — uses the primary segment and JTBD to anchor test plan design and participant recruiting.
 
 Downstream skills discover this artifact with:
 ```bash
@@ -401,4 +401,4 @@ ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-problem-frame-*.md 2>/dev/null | head
 
 Report completion status. Then:
 
-"Next: `/assumption-audit` — this Problem Frame feeds directly into assumption extraction. Run it now while the framing is fresh. Or run `/cpo-review` if you want a challenge on the problem definition before going deeper."
+"Next: `/pm-assumption-audit` — this Problem Frame feeds directly into assumption extraction. Run it now while the framing is fresh. Or run `/pm-cpo-review` if you want a challenge on the problem definition before going deeper."

@@ -1,5 +1,5 @@
 ---
-name: office-hours
+name: pm-office-hours
 preamble-tier: 3
 version: 0.1.0
 description: |
@@ -35,38 +35,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"office-hours","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-office-hours","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -186,7 +186,7 @@ Only surface this notice once per session, at the start. Do not repeat it during
 
 ---
 
-# /office-hours
+# /pm-office-hours
 
 ## Role
 
@@ -197,7 +197,7 @@ Your job in this session: understand what the PM is working on, select the right
 ## When to use
 
 - Starting any product initiative from scratch
-- Before running `/cpo-review`, `/problem-framing`, or `/assumption-audit` (all require a brief)
+- Before running `/pm-cpo-review`, `/pm-problem-framing`, or `/pm-assumption-audit` (all require a brief)
 - When an initiative has drifted from its original goal and needs re-grounding
 - When a PM arrives with a solution in mind but the problem hasn't been framed yet
 
@@ -325,7 +325,7 @@ At this stage, do NOT design solutions in detail. Brief-level framing only:
 - Flag which hypotheses need more discovery before solution design
 - Note which hypotheses could be tested with a prototype quickly vs. which need more research first
 
-Full solution design happens in `/prototype`. The brief records direction, not spec.
+Full solution design happens in `/pm-prototype`. The brief records direction, not spec.
 
 ---
 
@@ -365,7 +365,7 @@ For the strongest 1-2 hypotheses:
 - Estimate sample size needed for statistical significance
 - Estimate experiment run time
 
-This scaffold feeds directly into `/metrics-review`. Don't go deep here — capture enough to anchor the brief.
+This scaffold feeds directly into `/pm-metrics-review`. Don't go deep here — capture enough to anchor the brief.
 
 ---
 
@@ -446,7 +446,7 @@ Surface the tensions. The goal is to make the hard choices visible, not to resol
 
 ### Phase D4: Prioritisation scaffold
 
-Identify the prioritisation questions for `/prioritisation`:
+Identify the prioritisation questions for `/pm-prioritisation`:
 - What frameworks fit this context? ICE for speed, RICE for impact confidence, opportunity scoring for market sizing, cost of delay for time-sensitive bets
 - What are the real constraints? Team capacity, tech dependencies, runway, external commitments
 - What would have to be true for the current top-priority item to be wrong?
@@ -497,10 +497,10 @@ After completing the relevant mode phases, produce a Product Brief and save it.
 [What remains unknown and would change direction if answered]
 
 ## Downstream checklist
-- [ ] /problem-framing
-- [ ] /assumption-audit
-- [ ] /cpo-review
-- [ ] /prototype
+- [ ] /pm-problem-framing
+- [ ] /pm-assumption-audit
+- [ ] /pm-cpo-review
+- [ ] /pm-prototype
 ```
 
 ### Saving the brief
@@ -529,10 +529,10 @@ echo "Brief saved: ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-$DATETIME.md"
 ## Downstream connections
 
 Skills that read this brief:
-- `/problem-framing` — uses the brief as the anchor for problem decomposition and JTBD mapping
-- `/assumption-audit` — reads brief + problem frame to extract and rate assumptions
-- `/cpo-review` — reads all upstream artifacts; the brief is the primary input
-- `/prototype` — reads the brief for success metrics, hypotheses, and scope
+- `/pm-problem-framing` — uses the brief as the anchor for problem decomposition and JTBD mapping
+- `/pm-assumption-audit` — reads brief + problem frame to extract and rate assumptions
+- `/pm-cpo-review` — reads all upstream artifacts; the brief is the primary input
+- `/pm-prototype` — reads the brief for success metrics, hypotheses, and scope
 
 All downstream skills discover the brief with:
 ```bash
@@ -543,10 +543,10 @@ ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-*.md 2>/dev/null | head -1
 
 Report one of the standard completion statuses. Then suggest the next skill based on mode:
 
-**New Feature:** "Next: `/problem-framing` to decompose the problem into segments and jobs-to-be-done. Or `/cpo-review` if you want a high-level challenge before going deeper."
+**New Feature:** "Next: `/pm-problem-framing` to decompose the problem into segments and jobs-to-be-done. Or `/pm-cpo-review` if you want a high-level challenge before going deeper."
 
-**Optimisation:** "Next: `/metrics-review` to harden the measurement plan. Or `/cpo-review` for a challenge on the core hypothesis."
+**Optimisation:** "Next: `/pm-metrics-review` to harden the measurement plan. Or `/pm-cpo-review` for a challenge on the core hypothesis."
 
-**Research:** "Run the interviews. Return to `/office-hours` (New Feature or Optimisation mode) when you have findings to frame into a direction."
+**Research:** "Run the interviews. Return to `/pm-office-hours` (New Feature or Optimisation mode) when you have findings to frame into a direction."
 
-**Strategy:** "Next: `/prioritisation` to score and sequence the initiative inventory."
+**Strategy:** "Next: `/pm-prioritisation` to score and sequence the initiative inventory."

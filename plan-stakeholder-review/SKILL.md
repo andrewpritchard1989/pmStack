@@ -1,5 +1,5 @@
 ---
-name: plan-stakeholder-review
+name: pm-plan-stakeholder-review
 preamble-tier: 3
 version: 0.1.0
 description: |
@@ -34,38 +34,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"plan-stakeholder-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-plan-stakeholder-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -173,7 +173,7 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /plan-stakeholder-review
+# /pm-plan-stakeholder-review
 
 ## Role
 
@@ -183,7 +183,7 @@ This is not about predicting political behavior. It is about surfacing legitimat
 
 ## When to use
 
-- After `/cpo-review` and `/prototype` (the CPO's concerns and test results are primary inputs)
+- After `/pm-cpo-review` and `/pm-prototype` (the CPO's concerns and test results are primary inputs)
 - Before the initiative enters formal sprint planning or engineering kick-off
 - When the PM senses there will be cross-functional friction but cannot articulate exactly where
 - When the initiative has significant technical, design, or commercial complexity
@@ -209,7 +209,7 @@ echo "Test Results: ${RESULTS_FILE:-NOT_FOUND}"
 [ -n "$RESULTS_FILE" ] && cat "$RESULTS_FILE"
 ```
 
-**If Brief is NOT_FOUND:** stop. Ask the PM to run `/office-hours` first.
+**If Brief is NOT_FOUND:** stop. Ask the PM to run `/pm-office-hours` first.
 
 **If CPO Review is missing:** note it and proceed. The CPO's unconsidered concerns are the best predictor of stakeholder objections — without them, the simulation will be less targeted.
 
@@ -440,7 +440,7 @@ Replace `SKILL_NAME` with `stakeholder-review`.
 ## Downstream connections
 
 Skills that read the Stakeholder Review:
-- `/spec-review` — the engineering and design objections inform which sections of the spec need more detail
+- `/pm-spec-review` — the engineering and design objections inform which sections of the spec need more detail
 
 Downstream skills discover this artifact with:
 ```bash
@@ -451,4 +451,4 @@ ls -t ~/.pmstack/reviews/$SLUG-$BRANCH-stakeholder-review-*.md 2>/dev/null | hea
 
 Report completion status. Then:
 
-"Next: `/spec-review` — the pre-planning checklist from this review tells you what the spec needs to answer. Address the engineering and design objections in the acceptance criteria before the PRD goes out."
+"Next: `/pm-spec-review` — the pre-planning checklist from this review tells you what the spec needs to answer. Address the engineering and design objections in the acceptance criteria before the PRD goes out."

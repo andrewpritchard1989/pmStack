@@ -1,5 +1,5 @@
 ---
-name: cpo-review
+name: pm-cpo-review
 preamble-tier: 3
 version: 0.1.0
 description: |
@@ -37,38 +37,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"cpo-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-cpo-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -176,7 +176,7 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /cpo-review
+# /pm-cpo-review
 
 ## Role
 
@@ -188,10 +188,10 @@ You push back hard. The CEO review in gstack asks "what is the 10-star product h
 
 ## When to use
 
-- After `/assumption-audit` has run (the Assumption Map is a primary input for the Assumption Test)
-- After `/problem-framing` and `/office-hours` (the Brief and Problem Frame anchor the Value and Discovery tests)
-- Before `/prototype` — the CPO's challenges become the observation criteria in the test plan
-- Before `/plan-stakeholder-review` — the CPO's concerns become the anticipated stakeholder questions
+- After `/pm-assumption-audit` has run (the Assumption Map is a primary input for the Assumption Test)
+- After `/pm-problem-framing` and `/pm-office-hours` (the Brief and Problem Frame anchor the Value and Discovery tests)
+- Before `/pm-prototype` — the CPO's challenges become the observation criteria in the test plan
+- Before `/pm-plan-stakeholder-review` — the CPO's concerns become the anticipated stakeholder questions
 - Any time the PM wants a hard, evidence-backed challenge before committing engineering effort
 
 ## Setup
@@ -215,7 +215,7 @@ echo "TE Tree: ${TE_FILE:-NOT_FOUND}"
 [ -n "$TE_FILE" ] && cat "$TE_FILE"
 ```
 
-**If Brief is NOT_FOUND:** stop. The CPO review cannot run without a Product Brief. Ask the PM to run `/office-hours` first.
+**If Brief is NOT_FOUND:** stop. The CPO review cannot run without a Product Brief. Ask the PM to run `/pm-office-hours` first.
 
 **If other artifacts are missing:** note what is missing and proceed. A missing Problem Frame weakens the Value and Discovery tests. A missing Assumption Map weakens the Assumption Test. Name the gaps explicitly in the review verdict — missing discovery work is itself a signal.
 
@@ -450,9 +450,9 @@ Replace `SKILL_NAME` with `cpo-review`.
 ## Downstream connections
 
 Skills that read the CPO Review Report:
-- `/prototype` — the CPO's challenges become observation criteria in the test plan; the Next Actions often define what the prototype needs to test
-- `/plan-stakeholder-review` — the unconsidered concerns and six-test results pre-populate the anticipated stakeholder objections
-- `/spec-review` — the scope test result sets the bar for what belongs in the spec and what does not
+- `/pm-prototype` — the CPO's challenges become observation criteria in the test plan; the Next Actions often define what the prototype needs to test
+- `/pm-plan-stakeholder-review` — the unconsidered concerns and six-test results pre-populate the anticipated stakeholder objections
+- `/pm-spec-review` — the scope test result sets the bar for what belongs in the spec and what does not
 
 Downstream skills discover this artifact with:
 ```bash
@@ -463,4 +463,4 @@ ls -t ~/.pmstack/reviews/$SLUG-$BRANCH-cpo-review-*.md 2>/dev/null | head -1
 
 Report completion status. Then:
 
-"Next: `/prototype` — the CPO's challenges are now the test criteria. Build the smallest prototype that answers the unconsidered concerns and validates the riskiest assumption. Or run `/plan-stakeholder-review` to stress-test the initiative from engineering, design, and business perspectives before prototyping."
+"Next: `/pm-prototype` — the CPO's challenges are now the test criteria. Build the smallest prototype that answers the unconsidered concerns and validates the riskiest assumption. Or run `/pm-plan-stakeholder-review` to stress-test the initiative from engineering, design, and business perspectives before prototyping."

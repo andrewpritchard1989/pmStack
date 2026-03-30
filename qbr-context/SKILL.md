@@ -1,5 +1,5 @@
 ---
-name: qbr-context
+name: pm-qbr-context
 preamble-tier: 3
 version: 0.1.0
 description: |
@@ -33,38 +33,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"qbr-context","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-qbr-context","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -184,7 +184,7 @@ Only surface this notice once per session, at the start. Do not repeat it during
 
 ---
 
-# /qbr-context
+# /pm-qbr-context
 
 ## Role
 
@@ -197,7 +197,7 @@ The gap between "reporting on what happened" and "building executive conviction"
 ## When to use
 
 - Starting any QBR cycle from scratch
-- Before `/qbr-narrative` — the narrative must be written for a specific audience
+- Before `/pm-qbr-narrative` — the narrative must be written for a specific audience
 - When a QBR draft exists but the PM feels uncertain how the exec will receive it
 - At the beginning of a new quarter when the PM wants to set up the strategic narrative
 
@@ -296,7 +296,7 @@ If the PM has a slide template or prior QBR deck, ask them to share it via Read 
 - Level of detail (bullet summaries vs. dense data tables vs. narrative prose)
 - Types of evidence used (screenshots, charts, tables, customer quotes, experiment results)
 
-Produce a format profile — a 4-6 bullet summary of the conventions to follow in `/qbr-generate`. If no template is provided, note this and the agent will default to the exec's communication preference from Phase 1.
+Produce a format profile — a 4-6 bullet summary of the conventions to follow in `/pm-qbr-generate`. If no template is provided, note this and the agent will default to the exec's communication preference from Phase 1.
 
 ---
 
@@ -387,9 +387,9 @@ echo "QBR Context Brief saved: ~/.pmstack/qbrs/$SLUG-$BRANCH-context-$DATETIME.m
 ## Downstream connections
 
 Skills that read the QBR Context Brief:
-- `/qbr-narrative` — reads the audience profile and core message to shape the narrative arc and format; the format profile constrains the output structure
-- `/qbr-stress-test` — reads the full brief to simulate the exec's perspective; the executive incentives and anticipated pushback are the primary inputs for the simulation
-- `/qbr-red-team` — reads the anticipated pushback and known omissions to direct the adversarial lenses
+- `/pm-qbr-narrative` — reads the audience profile and core message to shape the narrative arc and format; the format profile constrains the output structure
+- `/pm-qbr-stress-test` — reads the full brief to simulate the exec's perspective; the executive incentives and anticipated pushback are the primary inputs for the simulation
+- `/pm-qbr-red-team` — reads the anticipated pushback and known omissions to direct the adversarial lenses
 
 Downstream skills discover this artifact with:
 ```bash
@@ -400,4 +400,4 @@ ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-context-*.md 2>/dev/null | head -1
 
 Report completion status. Then:
 
-"Next: `/qbr-narrative` to build the arc. The audience profile is the constraint — every choice in the narrative should be traceable back to how this exec processes information. Bring the Context Brief into that session."
+"Next: `/pm-qbr-narrative` to build the arc. The audience profile is the constraint — every choice in the narrative should be traceable back to how this exec processes information. Bring the Context Brief into that session."

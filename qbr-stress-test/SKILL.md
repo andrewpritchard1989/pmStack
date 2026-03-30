@@ -1,5 +1,5 @@
 ---
-name: qbr-stress-test
+name: pm-qbr-stress-test
 preamble-tier: 3
 version: 0.1.0
 description: |
@@ -35,38 +35,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"qbr-stress-test","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-qbr-stress-test","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -174,7 +174,7 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /qbr-stress-test
+# /pm-qbr-stress-test
 
 ## Role
 
@@ -186,8 +186,8 @@ Key principle: execs are good at seeming certain. When they push back confidentl
 
 ## When to use
 
-- After `/qbr-narrative` has produced a draft narrative
-- Before `/qbr-red-team` — the stress test identifies the weak sections that deserve the deepest adversarial attack
+- After `/pm-qbr-narrative` has produced a draft narrative
+- Before `/pm-qbr-red-team` — the stress test identifies the weak sections that deserve the deepest adversarial attack
 - After major revisions to the narrative — re-run the stress test to confirm the alignment score improved
 - Any time the PM feels uncertain about how the exec will react
 
@@ -212,7 +212,7 @@ echo "QBR Red Team: ${QBR_REDTEAM:-NOT_FOUND}"
 [ -n "$QBR_REDTEAM" ] && cat "$QBR_REDTEAM"
 ```
 
-If `QBR_CONTEXT` is `NOT_FOUND`: stop and ask the PM to run `/qbr-context` first. This skill requires a QBR Context Brief to anchor the analysis.
+If `QBR_CONTEXT` is `NOT_FOUND`: stop and ask the PM to run `/pm-qbr-context` first. This skill requires a QBR Context Brief to anchor the analysis.
 
 If artifacts are found: read them all. The Context Brief anchors the exec persona. The Narrative is what's being tested or generated from. The Stress Test and Red Team findings drive revision.
 
@@ -377,8 +377,8 @@ echo "Stress Test saved: ~/.pmstack/qbrs/$SLUG-$BRANCH-stress-test-$DATETIME.md"
 ## Downstream connections
 
 Skills that read the Stress Test Report:
-- `/qbr-red-team` — the GAP sections and LOST/PHONE sections are the highest-priority attack targets for the adversarial review
-- `/qbr-generate` — the recommended adjustments feed into the pre-generation revision pass; the breadcrumb threads become pre-emptive responses in speaker notes
+- `/pm-qbr-red-team` — the GAP sections and LOST/PHONE sections are the highest-priority attack targets for the adversarial review
+- `/pm-qbr-generate` — the recommended adjustments feed into the pre-generation revision pass; the breadcrumb threads become pre-emptive responses in speaker notes
 
 Downstream skills discover this artifact with:
 ```bash
@@ -391,4 +391,4 @@ Report completion status. Then:
 
 "The narrative is prepared. Now set aside the defensive posture. Your job in the room is to learn, not to win. Every exec reaction — including pushback — is data about what they care about, what they are uncertain about, and what they need to feel confident. The PM who walks in to defend will treat every challenge as a threat. The PM who walks in to learn will treat every challenge as a signal. You have done the preparation. Go in curious.
 
-Next: `/qbr-red-team` for adversarial review. Start the red team on the GAP sections and LOST/PHONE sections — those are where the narrative is weakest and where a hostile read will find the most to attack."
+Next: `/pm-qbr-red-team` for adversarial review. Start the red team on the GAP sections and LOST/PHONE sections — those are where the narrative is weakest and where a hostile read will find the most to attack."

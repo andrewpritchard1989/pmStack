@@ -1,12 +1,12 @@
 ---
-name: qbr-narrative
+name: pm-qbr-narrative
 preamble-tier: 3
 version: 0.1.0
 description: |
   Build the narrative arc for a QBR. Connects team-level work to company goals using
   Minto Pyramid structure: conclusion first, arguments, then evidence. Produces an
   opening context block, metric ladder, strategic options, deprioritisations, and
-  appendix strategy. The draft narrative is the primary input for /qbr-stress-test.
+  appendix strategy. The draft narrative is the primary input for /pm-qbr-stress-test.
 allowed-tools:
   - Bash
   - Read
@@ -16,7 +16,7 @@ allowed-tools:
 
 {{PREAMBLE}}
 
-# /qbr-narrative
+# /pm-qbr-narrative
 
 ## Role
 
@@ -24,12 +24,12 @@ You are a Strategic Communications Architect. Not a deck writer.
 
 A QBR narrative is an argument, not a report. Every section exists to support a conclusion the exec should reach. If you cannot state the conclusion the section is building toward, the section should not exist.
 
-Your job is architecture before execution: structure the argument, validate the logic, force the PM to make choices about what to include and what to cut. The formatted output comes later in `/qbr-generate`. Here you are building the skeleton.
+Your job is architecture before execution: structure the argument, validate the logic, force the PM to make choices about what to include and what to cut. The formatted output comes later in `/pm-qbr-generate`. Here you are building the skeleton.
 
 ## When to use
 
-- After `/qbr-context` has produced a QBR Context Brief
-- Before `/qbr-stress-test` — the narrative is what gets stress-tested against the exec's incentives
+- After `/pm-qbr-context` has produced a QBR Context Brief
+- Before `/pm-qbr-stress-test` — the narrative is what gets stress-tested against the exec's incentives
 - When an existing QBR draft feels like a data dump and needs restructuring
 
 ## Setup
@@ -214,9 +214,9 @@ echo "QBR Narrative saved: ~/.pmstack/qbrs/$SLUG-$BRANCH-narrative-$DATETIME.md"
 ## Downstream connections
 
 Skills that read the QBR Narrative:
-- `/qbr-stress-test` — tests the narrative section by section against the exec profile from the Context Brief; the section structure and options framing are the highest-variance choices
-- `/qbr-red-team` — attacks the narrative's arguments, evidence quality, and omissions from adversarial angles
-- `/qbr-generate` — uses the narrative as the structural source for the final formatted deliverable
+- `/pm-qbr-stress-test` — tests the narrative section by section against the exec profile from the Context Brief; the section structure and options framing are the highest-variance choices
+- `/pm-qbr-red-team` — attacks the narrative's arguments, evidence quality, and omissions from adversarial angles
+- `/pm-qbr-generate` — uses the narrative as the structural source for the final formatted deliverable
 
 Downstream skills discover this artifact with:
 ```bash
@@ -227,4 +227,4 @@ ls -t ~/.pmstack/qbrs/$SLUG-$BRANCH-narrative-*.md 2>/dev/null | head -1
 
 Report completion status. Then:
 
-"Next: `/qbr-stress-test` to simulate how the exec will receive this. Specifically the section order and the options framing — those are the highest-variance choices in the narrative. Run the stress test before making further edits."
+"Next: `/pm-qbr-stress-test` to simulate how the exec will receive this. Specifically the section order and the options framing — those are the highest-variance choices in the narrative. Run the stress test before making further edits."

@@ -1,5 +1,5 @@
 ---
-name: office-hours
+name: pm-office-hours
 preamble-tier: 3
 version: 0.1.0
 description: |
@@ -29,7 +29,7 @@ Only surface this notice once per session, at the start. Do not repeat it during
 
 ---
 
-# /office-hours
+# /pm-office-hours
 
 ## Role
 
@@ -40,7 +40,7 @@ Your job in this session: understand what the PM is working on, select the right
 ## When to use
 
 - Starting any product initiative from scratch
-- Before running `/cpo-review`, `/problem-framing`, or `/assumption-audit` (all require a brief)
+- Before running `/pm-cpo-review`, `/pm-problem-framing`, or `/pm-assumption-audit` (all require a brief)
 - When an initiative has drifted from its original goal and needs re-grounding
 - When a PM arrives with a solution in mind but the problem hasn't been framed yet
 
@@ -132,7 +132,7 @@ At this stage, do NOT design solutions in detail. Brief-level framing only:
 - Flag which hypotheses need more discovery before solution design
 - Note which hypotheses could be tested with a prototype quickly vs. which need more research first
 
-Full solution design happens in `/prototype`. The brief records direction, not spec.
+Full solution design happens in `/pm-prototype`. The brief records direction, not spec.
 
 ---
 
@@ -172,7 +172,7 @@ For the strongest 1-2 hypotheses:
 - Estimate sample size needed for statistical significance
 - Estimate experiment run time
 
-This scaffold feeds directly into `/metrics-review`. Don't go deep here — capture enough to anchor the brief.
+This scaffold feeds directly into `/pm-metrics-review`. Don't go deep here — capture enough to anchor the brief.
 
 ---
 
@@ -253,7 +253,7 @@ Surface the tensions. The goal is to make the hard choices visible, not to resol
 
 ### Phase D4: Prioritisation scaffold
 
-Identify the prioritisation questions for `/prioritisation`:
+Identify the prioritisation questions for `/pm-prioritisation`:
 - What frameworks fit this context? ICE for speed, RICE for impact confidence, opportunity scoring for market sizing, cost of delay for time-sensitive bets
 - What are the real constraints? Team capacity, tech dependencies, runway, external commitments
 - What would have to be true for the current top-priority item to be wrong?
@@ -304,10 +304,10 @@ After completing the relevant mode phases, produce a Product Brief and save it.
 [What remains unknown and would change direction if answered]
 
 ## Downstream checklist
-- [ ] /problem-framing
-- [ ] /assumption-audit
-- [ ] /cpo-review
-- [ ] /prototype
+- [ ] /pm-problem-framing
+- [ ] /pm-assumption-audit
+- [ ] /pm-cpo-review
+- [ ] /pm-prototype
 ```
 
 ### Saving the brief
@@ -332,10 +332,10 @@ echo "Brief saved: ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-$DATETIME.md"
 ## Downstream connections
 
 Skills that read this brief:
-- `/problem-framing` — uses the brief as the anchor for problem decomposition and JTBD mapping
-- `/assumption-audit` — reads brief + problem frame to extract and rate assumptions
-- `/cpo-review` — reads all upstream artifacts; the brief is the primary input
-- `/prototype` — reads the brief for success metrics, hypotheses, and scope
+- `/pm-problem-framing` — uses the brief as the anchor for problem decomposition and JTBD mapping
+- `/pm-assumption-audit` — reads brief + problem frame to extract and rate assumptions
+- `/pm-cpo-review` — reads all upstream artifacts; the brief is the primary input
+- `/pm-prototype` — reads the brief for success metrics, hypotheses, and scope
 
 All downstream skills discover the brief with:
 ```bash
@@ -346,10 +346,10 @@ ls -t ~/.pmstack/initiatives/$SLUG-$BRANCH-brief-*.md 2>/dev/null | head -1
 
 Report one of the standard completion statuses. Then suggest the next skill based on mode:
 
-**New Feature:** "Next: `/problem-framing` to decompose the problem into segments and jobs-to-be-done. Or `/cpo-review` if you want a high-level challenge before going deeper."
+**New Feature:** "Next: `/pm-problem-framing` to decompose the problem into segments and jobs-to-be-done. Or `/pm-cpo-review` if you want a high-level challenge before going deeper."
 
-**Optimisation:** "Next: `/metrics-review` to harden the measurement plan. Or `/cpo-review` for a challenge on the core hypothesis."
+**Optimisation:** "Next: `/pm-metrics-review` to harden the measurement plan. Or `/pm-cpo-review` for a challenge on the core hypothesis."
 
-**Research:** "Run the interviews. Return to `/office-hours` (New Feature or Optimisation mode) when you have findings to frame into a direction."
+**Research:** "Run the interviews. Return to `/pm-office-hours` (New Feature or Optimisation mode) when you have findings to frame into a direction."
 
-**Strategy:** "Next: `/prioritisation` to score and sequence the initiative inventory."
+**Strategy:** "Next: `/pm-prioritisation` to score and sequence the initiative inventory."

@@ -1,5 +1,5 @@
 ---
-name: qbr-generate
+name: pm-qbr-generate
 preamble-tier: 2
 version: 0.1.0
 description: |
@@ -16,17 +16,17 @@ allowed-tools:
 
 {{PREAMBLE}}
 
-# /qbr-generate
+# /pm-qbr-generate
 
 ## Role
 
 You are a Document Producer. The heavy analytical work is done. Your job is to apply the format choices, incorporate the revisions, and produce something the PM can present or hand off today.
 
-This skill assembles — it does not re-analyse. If new strategic concerns surface during generation, note them in a section at the end of the deliverable and recommend re-running `/qbr-stress-test` or `/qbr-red-team`. Do not delay generating to resolve them.
+This skill assembles — it does not re-analyse. If new strategic concerns surface during generation, note them in a section at the end of the deliverable and recommend re-running `/pm-qbr-stress-test` or `/pm-qbr-red-team`. Do not delay generating to resolve them.
 
 ## When to use
 
-- After `/qbr-stress-test` and `/qbr-red-team` have both run (the revision pass depends on their output)
+- After `/pm-qbr-stress-test` and `/pm-qbr-red-team` have both run (the revision pass depends on their output)
 - When the PM is ready to produce the actual deck, memo, or script
 - In the quick QBR flow: after uploading an existing deck and running it through stress test and red team
 
@@ -51,7 +51,7 @@ echo "Red Team: ${QBR_REDTEAM:-NOT_FOUND}"
 [ -n "$QBR_REDTEAM" ] && cat "$QBR_REDTEAM"
 ```
 
-If neither `QBR_CONTEXT` nor `QBR_NARRATIVE` is found: stop. Ask the PM to run `/qbr-context` and `/qbr-narrative` first, or share the existing QBR material directly by pasting it into the conversation.
+If neither `QBR_CONTEXT` nor `QBR_NARRATIVE` is found: stop. Ask the PM to run `/pm-qbr-context` and `/pm-qbr-narrative` first, or share the existing QBR material directly by pasting it into the conversation.
 
 If `QBR_STRESS` or `QBR_REDTEAM` is missing: note it and proceed. The revision pass will be limited, but generating is still possible.
 
@@ -427,7 +427,7 @@ ls -lh ~/.pmstack/qbrs/$SLUG-$BRANCH-output-$DATETIME.*
 
 This is the terminal skill in the QBR Mode flow. There is no downstream consumer.
 
-After the QBR: if the exec's reaction generates a new strategic direction or reveals gaps in the team's understanding, return to `/qbr-context` for the next quarter. Capture what landed well and what did not in the Context Brief for the next cycle.
+After the QBR: if the exec's reaction generates a new strategic direction or reveals gaps in the team's understanding, return to `/pm-qbr-context` for the next quarter. Capture what landed well and what did not in the Context Brief for the next cycle.
 
 ## Completion
 

@@ -1,5 +1,5 @@
 ---
-name: prototype
+name: pm-prototype
 preamble-tier: 3
 version: 0.1.0
 description: |
@@ -34,38 +34,38 @@ echo "PROTOTYPE_TOOL: $_PROTOTYPE_TOOL"
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 mkdir -p ~/.pmstack/analytics
-echo '{"skill":"prototype","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"pm-prototype","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.pmstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -173,7 +173,7 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 
 Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with success/error/abort. If you cannot determine the outcome, use "unknown".
 
-# /prototype
+# /pm-prototype
 
 ## Role
 
@@ -185,8 +185,8 @@ This is the final required gate before engineering handoff. If the test passes, 
 
 ## When to use
 
-- After `/cpo-review` (the CPO's challenges become the test observation criteria)
-- After `/assumption-audit` (the riskiest assumptions become the test tasks)
+- After `/pm-cpo-review` (the CPO's challenges become the test observation criteria)
+- After `/pm-assumption-audit` (the riskiest assumptions become the test tasks)
 - When the PM is ready to test a specific hypothesis with real users before committing to build
 - When the initiative has cleared the CPO review and needs a prototype to validate key unknowns
 
@@ -211,7 +211,7 @@ echo "CPO Review: ${CPO_FILE:-NOT_FOUND}"
 [ -n "$CPO_FILE" ] && cat "$CPO_FILE"
 ```
 
-**If Brief is NOT_FOUND:** stop. Ask the PM to run `/office-hours` first.
+**If Brief is NOT_FOUND:** stop. Ask the PM to run `/pm-office-hours` first.
 
 **If other artifacts are missing:** note the gaps and continue. A missing CPO Review means the test plan cannot be anchored to the CPO's challenges — flag this and derive test criteria from the Assumption Map directly.
 
@@ -369,7 +369,7 @@ Produce a Prototype Spec and save it. The test results are saved separately afte
 1. [Set up the prototype — if Figma Make, paste the prompt. If HTML, open index.html.]
 2. [Recruit [n] participants matching [criteria]]
 3. [Run sessions using the test tasks and observation criteria above]
-4. [Return to `/prototype` with findings to generate the Test Results artifact]
+4. [Return to `/pm-prototype` with findings to generate the Test Results artifact]
 
 ## Assumptions being tested
 | Assumption | Category | Risk | Test task |
@@ -478,8 +478,8 @@ Replace `SKILL_NAME` with `prototype-test`.
 ## Downstream connections
 
 Skills that read the Prototype Spec and Test Results:
-- `/plan-stakeholder-review` — uses the test results as evidence when simulating stakeholder questions
-- `/spec-review` — the validated hypothesis and test results define what belongs in the spec
+- `/pm-plan-stakeholder-review` — uses the test results as evidence when simulating stakeholder questions
+- `/pm-spec-review` — the validated hypothesis and test results define what belongs in the spec
 
 Downstream skills discover these artifacts with:
 ```bash
@@ -495,4 +495,4 @@ Report completion status. If the test plan and prototype have been generated but
 
 If Test Results have been documented:
 
-"Next: `/plan-stakeholder-review` to simulate how engineering, design, and business stakeholders will respond to this initiative before you take it into planning. Or `/spec-review` if you are moving directly to writing the PRD."
+"Next: `/pm-plan-stakeholder-review` to simulate how engineering, design, and business stakeholders will respond to this initiative before you take it into planning. Or `/pm-spec-review` if you are moving directly to writing the PRD."

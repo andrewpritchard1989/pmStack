@@ -5,8 +5,8 @@ version: 0.1.0
 description: |
   PMStack — product management toolkit. Discovery partner, CPO reviewer,
   spec auditor, prototyping coach, and strategic advisor as slash commands.
-  Start with /office-hours. New Feature flow: /office-hours → /problem-framing
-  → /assumption-audit → /cpo-review → /prototype → /spec-review
+  Start with /pm-office-hours. New Feature flow: /pm-office-hours → /pm-problem-framing
+  → /pm-assumption-audit → /pm-cpo-review → /pm-prototype → /pm-spec-review
 allowed-tools:
   - Bash
   - Read
@@ -38,33 +38,33 @@ echo '{"skill":"pmstack","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(base
 
 If `PROACTIVE` is `"false"`, do not proactively suggest PMStack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
-types (e.g., /office-hours, /cpo-review). If you would have auto-invoked a skill,
+types (e.g., /pm-office-hours, /pm-cpo-review). If you would have auto-invoked a skill,
 briefly say: "I think /skill-name might help here — want me to run it?" and wait.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "PMStack v{new} is available (you have v{old}). Run `cd ~/.claude/skills/pmstack && git pull && ./setup` to upgrade." If `JUST_UPGRADED <from> <to>`: tell user "Running PMStack v{to} (just updated!)" and continue.
 
 **PM skill flow reference:**
-- Discovery: `/office-hours` (start here)
-- Problem definition: `/problem-framing`
-- Assumption testing: `/assumption-audit`
-- CPO challenge: `/cpo-review`
-- Prototyping: `/prototype`
-- Stakeholder simulation: `/plan-stakeholder-review`
-- Spec audit: `/spec-review`
-- Prioritisation: `/prioritisation`
-- Trade-off decisions: `/trade-off-analysis`
-- Metrics: `/metrics-review`
-- Roadmap: `/roadmap-review`
-- Competitive research: `/competitive-intel`
-- Communications: `/comms-draft`
-- Post-launch: `/post-launch-review`
+- Discovery: `/pm-office-hours` (start here)
+- Problem definition: `/pm-problem-framing`
+- Assumption testing: `/pm-assumption-audit`
+- CPO challenge: `/pm-cpo-review`
+- Prototyping: `/pm-prototype`
+- Stakeholder simulation: `/pm-plan-stakeholder-review`
+- Spec audit: `/pm-spec-review`
+- Prioritisation: `/pm-prioritisation`
+- Trade-off decisions: `/pm-trade-off-analysis`
+- Metrics: `/pm-metrics-review`
+- Roadmap: `/pm-roadmap-review`
+- Competitive research: `/pm-competitive-intel`
+- Communications: `/pm-comms-draft`
+- Post-launch: `/pm-post-launch-review`
 - Browser: `/browse`
 - Cookie import: `/setup-browser-cookies`
-- QBR preparation: `/qbr-context` (start here for QBRs)
-- QBR narrative: `/qbr-narrative`
-- QBR stress test: `/qbr-stress-test`
-- QBR red team: `/qbr-red-team`
-- QBR output: `/qbr-generate`
+- QBR preparation: `/pm-qbr-context` (start here for QBRs)
+- QBR narrative: `/pm-qbr-narrative`
+- QBR stress test: `/pm-qbr-stress-test`
+- QBR red team: `/pm-qbr-red-team`
+- QBR output: `/pm-qbr-generate`
 
 ## Voice
 
@@ -100,22 +100,22 @@ Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with
 ## PMStack Skills
 
 **New Feature flow** (in order):
-1. `/office-hours` — discovery session, 4 modes (New Feature, Optimisation, Research, Strategy)
-2. `/problem-framing` — deep problem decomposition and segment definition
-3. `/assumption-audit` — extract, rate, and design tests for every assumption
-4. `/cpo-review` — Chief Product Officer challenge: pure reasoning + web research
-5. `/prototype` — build prototype and auto-draft test plan from all prior artifacts
-6. `/plan-stakeholder-review` — simulate engineering, design, and business perspectives
-7. `/spec-review` — PRD quality audit: user stories, acceptance criteria, edge cases
+1. `/pm-office-hours` — discovery session, 4 modes (New Feature, Optimisation, Research, Strategy)
+2. `/pm-problem-framing` — deep problem decomposition and segment definition
+3. `/pm-assumption-audit` — extract, rate, and design tests for every assumption
+4. `/pm-cpo-review` — Chief Product Officer challenge: pure reasoning + web research
+5. `/pm-prototype` — build prototype and auto-draft test plan from all prior artifacts
+6. `/pm-plan-stakeholder-review` — simulate engineering, design, and business perspectives
+7. `/pm-spec-review` — PRD quality audit: user stories, acceptance criteria, edge cases
 
 **Other skills:**
-- `/prioritisation` — multi-framework scoring (ICE, RICE, opportunity, cost of delay)
-- `/trade-off-analysis` — structured decision analysis for genuine trade-offs
-- `/metrics-review` — measurement plan audit: proxy metrics, baselines, counter-metrics
-- `/roadmap-review` — roadmap integrity: alignment, dependencies, capacity
-- `/competitive-intel` — competitive landscape analysis using /browse
-- `/comms-draft` — product communication drafts for different audiences
-- `/post-launch-review` — post-launch analysis: hypothesis validation, learnings, next steps
+- `/pm-prioritisation` — multi-framework scoring (ICE, RICE, opportunity, cost of delay)
+- `/pm-trade-off-analysis` — structured decision analysis for genuine trade-offs
+- `/pm-metrics-review` — measurement plan audit: proxy metrics, baselines, counter-metrics
+- `/pm-roadmap-review` — roadmap integrity: alignment, dependencies, capacity
+- `/pm-competitive-intel` — competitive landscape analysis using /browse
+- `/pm-comms-draft` — product communication drafts for different audiences
+- `/pm-post-launch-review` — post-launch analysis: hypothesis validation, learnings, next steps
 - `/browse` — real Chromium browser for competitive research and prototype review
 - `/setup-browser-cookies` — import browser sessions for authenticated testing
 
