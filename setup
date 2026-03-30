@@ -27,9 +27,12 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# --local: install to .claude/skills/ in the current working directory
+# --local: install to .claude/skills/ in the project root (the parent of the .pmstack directory)
+# Running setup from inside .pmstack means INSTALL_PMSTACK_DIR is .pmstack/ and its parent
+# is the actual project root where Claude Code looks for .claude/skills/.
 if [ "$LOCAL_INSTALL" -eq 1 ]; then
-  INSTALL_SKILLS_DIR="$(pwd)/.claude/skills"
+  PROJECT_ROOT="$(dirname "$INSTALL_PMSTACK_DIR")"
+  INSTALL_SKILLS_DIR="$PROJECT_ROOT/.claude/skills"
   mkdir -p "$INSTALL_SKILLS_DIR"
 fi
 
