@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMStack — Product Management Toolkit for Claude Code</title>
+<meta name="description" content="Turn Claude Code into your PM team. Discovery partner, CPO reviewer, spec auditor, prototyping coach, and strategic advisor — all as slash commands.">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --bg-card: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #666;
+    --text-light: #999;
+    --border: #e0dfd9;
+    --border-hover: #bbb;
+    --accent: #1a1a1a;
+    --radius: 12px;
+    --radius-sm: 8px;
+
+    /* Mode colours */
+    --feature-bg: #eff6ff;  --feature-text: #1e40af;  --feature-border: #bfdbfe;
+    --optim-bg: #f0fdf4;    --optim-text: #166534;    --optim-border: #bbf7d0;
+    --research-bg: #fdf4ff; --research-text: #6b21a8;  --research-border: #e9d5ff;
+    --strategy-bg: #fff7ed; --strategy-text: #9a3412;  --strategy-border: #fed7aa;
+    --qbr-bg: #fefce8;      --qbr-text: #854d0e;       --qbr-border: #fef08a;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ── */
+  .container { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+  .container-narrow { max-width: 740px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(245, 244, 240, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--text-muted); font-weight: 400; }
+  .nav-links { display: flex; align-items: center; gap: 24px; }
+  .nav-links a {
+    font-size: 14px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--accent);
+    color: #fff !important;
+    padding: 8px 18px;
+    border-radius: 99px;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .nav-cta:hover { opacity: 0.85; color: #fff !important; }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 96px 0 80px;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+  }
+  .hero-eyebrow .dot {
+    width: 6px; height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.08;
+    color: var(--text);
+    margin-bottom: 20px;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--text-muted);
+  }
+  .hero-sub {
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 520px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+  }
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 99px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-card);
+    color: var(--text);
+    padding: 14px 28px;
+    border-radius: 99px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1.5px solid var(--border);
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+
+  /* ── Command preview ── */
+  .command-preview {
+    margin: 64px 0 0;
+    background: #1a1a1a;
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    text-align: left;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+  }
+  .command-preview .cmd-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    opacity: 0.4;
+  }
+  .cmd-bar .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .cmd-bar .dot:nth-child(1) { background: #ff5f57; }
+  .cmd-bar .dot:nth-child(2) { background: #febc2e; }
+  .cmd-bar .dot:nth-child(3) { background: #28c840; }
+  .cmd-line { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .cmd-prompt { color: #6ee7b7; font-size: 13px; line-height: 1.7; flex-shrink: 0; }
+  .cmd-text { color: #e2e8f0; font-size: 13px; line-height: 1.7; }
+  .cmd-comment { color: #4b5563; font-size: 12px; padding-left: 20px; margin-bottom: 4px; }
+  .cmd-output { color: #94a3b8; font-size: 12px; padding-left: 20px; }
+
+  /* ── Sprint process ── */
+  .sprint-process { padding: 80px 0; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .section-title {
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.15;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .section-sub {
+    font-size: 16px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 48px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .process-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+  .process-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 100px;
+  }
+  .step-icon {
+    width: 48px; height: 48px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  .step-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.2px;
+  }
+  .step-arrow {
+    font-size: 18px;
+    color: var(--border-hover);
+    padding: 0 4px;
+    align-self: center;
+    margin-bottom: 24px; /* offset for label */
+  }
+
+  /* ── Modes ── */
+  .modes { padding: 80px 0; }
+  .mode-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .mode-tab {
+    padding: 9px 20px;
+    border-radius: 99px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-card);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .mode-tab:hover { border-color: var(--border-hover); color: var(--text); }
+  .mode-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .mode-panel { display: none; }
+  .mode-panel.active { display: block; }
+
+  .mode-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+  }
+  .mode-card-header { margin-bottom: 24px; }
+  .mode-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .mode-badge.feature  { background: var(--feature-bg);  color: var(--feature-text);  border: 1px solid var(--feature-border); }
+  .mode-badge.optim    { background: var(--optim-bg);    color: var(--optim-text);    border: 1px solid var(--optim-border); }
+  .mode-badge.research { background: var(--research-bg); color: var(--research-text); border: 1px solid var(--research-border); }
+  .mode-badge.strategy { background: var(--strategy-bg); color: var(--strategy-text); border: 1px solid var(--strategy-border); }
+  .mode-badge.qbr      { background: var(--qbr-bg);      color: var(--qbr-text);      border: 1px solid var(--qbr-border); }
+
+  .mode-card-header h3 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    margin-bottom: 6px;
+  }
+  .mode-card-header p { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
+
+  .mode-body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 640px) { .mode-body { grid-template-columns: 1fr; } }
+
+  .mode-flow h4 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 14px;
+  }
+  .flow-steps { display: flex; flex-direction: column; gap: 6px; }
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .flow-step-command {
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    background: #f0efeb;
+    color: var(--text);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .flow-step-desc { font-size: 13px; color: var(--text-muted); }
+  .flow-connector {
+    width: 1.5px;
+    height: 16px;
+    background: var(--border);
+    margin-left: 38px;
+  }
+  .flow-gate {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #9a3412;
+    margin-top: 4px;
+  }
+
+  .mode-use-cases h4 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 14px;
+  }
+  .use-case-list { display: flex; flex-direction: column; gap: 8px; }
+  .use-case {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .use-case-check {
+    width: 18px; height: 18px;
+    background: #d1fae5;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 10px;
+    color: #065f46;
+  }
+  .use-case-text { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+
+  /* ── Skills grid ── */
+  .skills { padding: 80px 0; }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    margin-top: 40px;
+  }
+  .skill-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .skill-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+  .skill-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .skill-command {
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    background: #f0efeb;
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+  .skill-mode-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 99px;
+    letter-spacing: 0.3px;
+  }
+  .skill-mode-tag.feature  { background: var(--feature-bg);  color: var(--feature-text); }
+  .skill-mode-tag.optim    { background: var(--optim-bg);    color: var(--optim-text); }
+  .skill-mode-tag.research { background: var(--research-bg); color: var(--research-text); }
+  .skill-mode-tag.strategy { background: var(--strategy-bg); color: var(--strategy-text); }
+  .skill-mode-tag.qbr      { background: var(--qbr-bg);      color: var(--qbr-text); }
+  .skill-mode-tag.core     { background: #f0efeb; color: var(--text-muted); }
+
+  .skill-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    letter-spacing: -0.2px;
+  }
+  .skill-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+  /* ── Thoughtful Execution ── */
+  .te-section { padding: 80px 0; }
+  .te-card {
+    background: #fef3c7;
+    border: 1.5px solid #fde68a;
+    border-radius: var(--radius);
+    padding: 40px;
+  }
+  .te-card h3 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    margin-bottom: 8px;
+    color: #78350f;
+  }
+  .te-card p { font-size: 15px; color: #92400e; margin-bottom: 28px; line-height: 1.6; }
+  .te-tree {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 580px) { .te-tree { grid-template-columns: 1fr; } }
+  .te-node {
+    background: rgba(255,255,255,0.6);
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #78350f;
+    font-weight: 500;
+  }
+  .te-node.root {
+    grid-column: 1 / -1;
+    background: rgba(255,255,255,0.8);
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+  }
+  .te-node .te-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  /* ── CTA ── */
+  .cta { padding: 96px 0; }
+  .cta-card {
+    background: var(--accent);
+    border-radius: 20px;
+    padding: 64px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(255,255,255,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .cta-card h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+  .cta-card p {
+    font-size: 17px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 36px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: var(--accent);
+    padding: 14px 28px;
+    border-radius: 99px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .btn-cta-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: rgba(255,255,255,0.75);
+    padding: 14px 28px;
+    border-radius: 99px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    transition: border-color 0.15s;
+  }
+  .btn-cta-secondary:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+  }
+  footer .inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  footer .logo { font-size: 14px; font-weight: 700; color: var(--text); text-decoration: none; }
+  footer .tagline { font-size: 13px; color: var(--text-light); }
+  footer .links { display: flex; gap: 20px; }
+  footer .links a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+  footer .links a:hover { color: var(--text); }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 560px) {
+    .hero { padding: 64px 0 56px; }
+    .cta-card { padding: 40px 24px; }
+    nav .inner { padding: 0 16px; }
+    .nav-links a:not(.nav-cta) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <div class="inner">
+    <a href="#" class="nav-logo">PMStack <span>for Claude Code</span></a>
+    <div class="nav-links">
+      <a href="#modes">Modes</a>
+      <a href="#skills">Skills</a>
+      <a href="flows.html">Flows</a>
+      <a href="https://github.com/andrewpritchard1989/pmStack" class="nav-cta" target="_blank" rel="noopener">
+        View on GitHub
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="container-narrow">
+    <div class="hero-eyebrow">
+      <span class="dot"></span>
+      Claude Code extension &mdash; Free &amp; open source
+    </div>
+    <h1>Your AI product team,<br><em>as slash commands.</em></h1>
+    <p class="hero-sub">
+      PMStack turns Claude Code into a team of product specialists. Discovery partner, CPO reviewer, spec auditor, prototyping coach, and strategic advisor &mdash; all built in.
+    </p>
+    <div class="hero-actions">
+      <a href="https://github.com/andrewpritchard1989/pmStack" class="btn-primary" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        Get started on GitHub
+      </a>
+      <a href="#modes" class="btn-secondary">
+        Explore modes
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <!-- Terminal preview -->
+    <div class="command-preview">
+      <div class="cmd-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <div class="cmd-line">
+        <span class="cmd-prompt">$</span>
+        <span class="cmd-text">/pm-office-hours</span>
+      </div>
+      <div class="cmd-comment"># Start a discovery session for a new feature</div>
+      <div class="cmd-line" style="margin-top:10px">
+        <span class="cmd-prompt">$</span>
+        <span class="cmd-text">/pm-cpo-review</span>
+      </div>
+      <div class="cmd-comment"># CPO challenges your assumptions with web-backed evidence</div>
+      <div class="cmd-line" style="margin-top:10px">
+        <span class="cmd-prompt">$</span>
+        <span class="cmd-text">/pm-prototype</span>
+      </div>
+      <div class="cmd-comment"># Generate a Figma Make prompt + customer test plan</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── Sprint process ── -->
+<section class="sprint-process">
+  <div class="container">
+    <p class="section-label">The PM sprint</p>
+    <h2 class="section-title">From idea to engineering handoff</h2>
+    <p class="section-sub">Each skill feeds the next. Artifacts are auto-discovered so you never repeat context.</p>
+
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="step-icon">🔍</div>
+        <div class="step-label">Discover</div>
+      </div>
+      <div class="step-arrow">›</div>
+      <div class="process-step">
+        <div class="step-icon">🗺️</div>
+        <div class="step-label">Define</div>
+      </div>
+      <div class="step-arrow">›</div>
+      <div class="process-step">
+        <div class="step-icon">🧪</div>
+        <div class="step-label">Validate</div>
+      </div>
+      <div class="step-arrow">›</div>
+      <div class="process-step">
+        <div class="step-icon">⚖️</div>
+        <div class="step-label">Decide</div>
+      </div>
+      <div class="step-arrow">›</div>
+      <div class="process-step">
+        <div class="step-icon">📋</div>
+        <div class="step-label">Specify</div>
+      </div>
+      <div class="step-arrow">›</div>
+      <div class="process-step">
+        <div class="step-icon">🚀</div>
+        <div class="step-label">Handoff</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── Modes ── -->
+<section class="modes" id="modes">
+  <div class="container">
+    <p class="section-label">Five modes</p>
+    <h2 class="section-title">Pick the mode that fits your work</h2>
+    <p class="section-sub">Each mode is a structured workflow. Skills chain together automatically.</p>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" onclick="switchMode('feature', this)">New Feature</button>
+      <button class="mode-tab" onclick="switchMode('optim', this)">Optimisation</button>
+      <button class="mode-tab" onclick="switchMode('research', this)">Research</button>
+      <button class="mode-tab" onclick="switchMode('strategy', this)">Strategy</button>
+      <button class="mode-tab" onclick="switchMode('qbr', this)">QBR</button>
+    </div>
+
+    <!-- New Feature -->
+    <div class="mode-panel active" id="panel-feature">
+      <div class="mode-card">
+        <div class="mode-card-header">
+          <div class="mode-badge feature">New Feature</div>
+          <h3>Build the right thing the right way</h3>
+          <p>Start with real discovery. Map opportunities and hypotheses before touching a design. Gate on customer evidence before engineering starts.</p>
+        </div>
+        <div class="mode-body">
+          <div class="mode-flow">
+            <h4>Workflow</h4>
+            <div class="flow-steps">
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-office-hours</span>
+                <span class="flow-step-desc">Discovery session + TE tree</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-problem-framing</span>
+                <span class="flow-step-desc">Deep problem decomposition</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-assumption-audit</span>
+                <span class="flow-step-desc">Risk &amp; assumption mapping</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-cpo-review</span>
+                <span class="flow-step-desc">CPO challenge + web research</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-prototype</span>
+                <span class="flow-step-desc">Build + test with customers</span>
+              </div>
+              <div class="flow-gate">Decision gate &mdash; proceed or pivot</div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-spec-review</span>
+                <span class="flow-step-desc">PRD quality audit</span>
+              </div>
+            </div>
+          </div>
+          <div class="mode-use-cases">
+            <h4>When to use</h4>
+            <div class="use-case-list">
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You have a vague idea or stakeholder request and need to shape it into a validated initiative</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You want to avoid building the wrong thing by jumping straight from goal to solution</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">Engineering is asking for a spec and you haven't validated the core hypothesis yet</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You want a structured handoff doc with acceptance criteria, edge cases, and metrics baked in</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optimisation -->
+    <div class="mode-panel" id="panel-optim">
+      <div class="mode-card">
+        <div class="mode-card-header">
+          <div class="mode-badge optim">Optimisation</div>
+          <h3>Improve what you've already shipped</h3>
+          <p>Start from data, not opinion. Identify the right lever to pull, design a rigorous experiment, and validate before scaling changes.</p>
+        </div>
+        <div class="mode-body">
+          <div class="mode-flow">
+            <h4>Workflow</h4>
+            <div class="flow-steps">
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-office-hours</span>
+                <span class="flow-step-desc">Optimisation framing session</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-metrics-review</span>
+                <span class="flow-step-desc">Measurement plan audit</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-cpo-review</span>
+                <span class="flow-step-desc">Validate hypothesis &amp; approach</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-trade-off-analysis</span>
+                <span class="flow-step-desc">Structured decision analysis</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-prototype</span>
+                <span class="flow-step-desc">Experiment design + test</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-post-launch-review</span>
+                <span class="flow-step-desc">After experiment: hypothesis validation</span>
+              </div>
+            </div>
+          </div>
+          <div class="mode-use-cases">
+            <h4>When to use</h4>
+            <div class="use-case-list">
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">A metric is underperforming and you need to diagnose the cause before designing a fix</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You want to run an A/B test and need a rigorous measurement plan with proxy metrics and counter-metrics</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You have multiple improvement options and need a structured framework to evaluate the trade-offs</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">An experiment shipped and you need to capture learnings and decide the next step</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Research -->
+    <div class="mode-panel" id="panel-research">
+      <div class="mode-card">
+        <div class="mode-card-header">
+          <div class="mode-badge research">Research</div>
+          <h3>Understand before you commit</h3>
+          <p>Structure a research sprint before committing to a direction. Explore the problem space, map the competitive landscape, and synthesise findings into clear next steps.</p>
+        </div>
+        <div class="mode-body">
+          <div class="mode-flow">
+            <h4>Workflow</h4>
+            <div class="flow-steps">
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-office-hours</span>
+                <span class="flow-step-desc">Research framing session</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-cpo-review</span>
+                <span class="flow-step-desc">Challenge research framing</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step" style="opacity:0.6; font-style:italic;">
+                <span class="flow-step-command" style="background:#e8e7e3;">/pm-prototype</span>
+                <span class="flow-step-desc">Optional: concept test</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-competitive-intel</span>
+                <span class="flow-step-desc">Landscape analysis via browser</span>
+              </div>
+              <div class="flow-gate">Synthesis &mdash; fork to Feature or Optimisation</div>
+            </div>
+          </div>
+          <div class="mode-use-cases">
+            <h4>When to use</h4>
+            <div class="use-case-list">
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You're entering a new problem space and need to understand the landscape before proposing solutions</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">Leadership has asked a strategic question and you need structured research to answer it credibly</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You want to run user interviews and need a structured guide based on your problem hypotheses</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Strategy -->
+    <div class="mode-panel" id="panel-strategy">
+      <div class="mode-card">
+        <div class="mode-card-header">
+          <div class="mode-badge strategy">Strategy</div>
+          <h3>Prioritise, plan, and communicate direction</h3>
+          <p>Turn a pile of opportunities into a coherent roadmap. Score initiatives across multiple frameworks, stress-test the plan, and write the comms to get stakeholders aligned.</p>
+        </div>
+        <div class="mode-body">
+          <div class="mode-flow">
+            <h4>Workflow</h4>
+            <div class="flow-steps">
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-office-hours</span>
+                <span class="flow-step-desc">Strategy framing session</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-cpo-review</span>
+                <span class="flow-step-desc">Challenge the direction</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-prioritisation</span>
+                <span class="flow-step-desc">ICE, RICE, opportunity scoring</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-roadmap-review</span>
+                <span class="flow-step-desc">Alignment, deps, capacity</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-comms-draft</span>
+                <span class="flow-step-desc">Launch announcements &amp; updates</span>
+              </div>
+              <div class="flow-gate">Break into initiatives &rarr; New Feature mode</div>
+            </div>
+          </div>
+          <div class="mode-use-cases">
+            <h4>When to use</h4>
+            <div class="use-case-list">
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">Planning season is approaching and you have more opportunities than capacity</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You need to present a roadmap to leadership and want it to be defensible against hard questions</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You need to communicate a direction change and want to tailor the message for different audiences</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QBR -->
+    <div class="mode-panel" id="panel-qbr">
+      <div class="mode-card">
+        <div class="mode-card-header">
+          <div class="mode-badge qbr">QBR</div>
+          <h3>Walk into your QBR fully prepared</h3>
+          <p>Build a narrative that connects your team's work to company goals. Simulate executive reactions, find the weak spots, and generate the final deliverable in your chosen format.</p>
+        </div>
+        <div class="mode-body">
+          <div class="mode-flow">
+            <h4>Full cycle workflow</h4>
+            <div class="flow-steps">
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-qbr-context</span>
+                <span class="flow-step-desc">Audience &amp; context brief</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-qbr-narrative</span>
+                <span class="flow-step-desc">Minto Pyramid narrative arc</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-metrics-review</span>
+                <span class="flow-step-desc">Validate metrics claims</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-qbr-stress-test</span>
+                <span class="flow-step-desc">Executive reaction simulation</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-qbr-red-team</span>
+                <span class="flow-step-desc">Adversarial review (6 lenses)</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <span class="flow-step-command">/pm-qbr-generate</span>
+                <span class="flow-step-desc">Output: deck, memo, or script</span>
+              </div>
+            </div>
+          </div>
+          <div class="mode-use-cases">
+            <h4>When to use</h4>
+            <div class="use-case-list">
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">Your quarterly business review is coming up and you need to build a narrative from raw data</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You have a draft deck and want to stress-test it before the exec sees it</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You need to connect team-level work to company OKRs in a way that actually lands with leadership</div>
+              </div>
+              <div class="use-case">
+                <div class="use-case-check">✓</div>
+                <div class="use-case-text">You want the final output as a real .pptx file, a written memo, or a presenter script</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── Thoughtful Execution ── -->
+<section class="te-section">
+  <div class="container-narrow">
+    <div class="te-card">
+      <h3>Built on Thoughtful Execution</h3>
+      <p>PMStack integrates Annina Koskinen's Thoughtful Execution framework (used at Spotify) into the New Feature mode. It enforces the discipline of working Goal &rarr; Data &rarr; Opportunities &rarr; Hypotheses &rarr; Solutions — preventing the most common PM failure mode: jumping straight from goal to solution.</p>
+      <div class="te-tree">
+        <div class="te-node root">
+          <span class="te-label">Goal</span>
+          Measurable metric
+        </div>
+        <div class="te-node">
+          <span class="te-label">Opportunity A</span>
+          Distinct problem space
+        </div>
+        <div class="te-node">
+          <span class="te-label">Opportunity B</span>
+          Distinct problem space
+        </div>
+        <div class="te-node">
+          <span class="te-label">Hypothesis A1 &rarr; A2</span>
+          Multiple per opportunity
+        </div>
+        <div class="te-node">
+          <span class="te-label">Solution designs</span>
+          Multiple per hypothesis
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── Skills grid ── -->
+<section class="skills" id="skills">
+  <div class="container">
+    <p class="section-label">All skills</p>
+    <h2 class="section-title">20 specialist commands</h2>
+    <p class="section-sub">Each command is a structured role with a defined methodology and opinionated outputs.</p>
+
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-office-hours</span>
+          <span class="skill-mode-tag core">Entry point</span>
+        </div>
+        <div class="skill-name">Discovery session</div>
+        <div class="skill-desc">Start here. 4 modes: New Feature, Optimisation, Research, Strategy. Produces Product Brief and TE tree.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-problem-framing</span>
+          <span class="skill-mode-tag feature">New Feature</span>
+        </div>
+        <div class="skill-name">Problem decomposition</div>
+        <div class="skill-desc">Deep problem analysis and customer segment definition. Maps the problem space before jumping to solutions.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-assumption-audit</span>
+          <span class="skill-mode-tag feature">New Feature</span>
+        </div>
+        <div class="skill-name">Risk &amp; assumption map</div>
+        <div class="skill-desc">Extracts every load-bearing assumption, rates them by risk, and designs tests for the riskiest ones.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-cpo-review</span>
+          <span class="skill-mode-tag core">All modes</span>
+        </div>
+        <div class="skill-name">CPO challenge + research</div>
+        <div class="skill-desc">Two-phase. Phase 1: opinionated challenge from a CPO lens. Phase 2: web research to back up or challenge the initiative.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-prototype</span>
+          <span class="skill-mode-tag feature">New Feature</span>
+        </div>
+        <div class="skill-name">Build &amp; test</div>
+        <div class="skill-desc">Generates Figma Make prompts or HTML prototypes, then auto-drafts a customer test plan from all prior artifacts.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-spec-review</span>
+          <span class="skill-mode-tag feature">New Feature</span>
+        </div>
+        <div class="skill-name">PRD quality audit</div>
+        <div class="skill-desc">Systematic review against upstream user stories, acceptance criteria, and edge cases. Blocks low-quality specs before handoff.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-plan-stakeholder-review</span>
+          <span class="skill-mode-tag feature">New Feature</span>
+        </div>
+        <div class="skill-name">Stakeholder simulation</div>
+        <div class="skill-desc">Simulates eng lead, design lead, and business lead perspectives to surface objections before the real meeting.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-metrics-review</span>
+          <span class="skill-mode-tag optim">Optimisation</span>
+        </div>
+        <div class="skill-name">Measurement plan audit</div>
+        <div class="skill-desc">Reviews proxy metrics, baselines, counter-metrics, and success criteria. Catches measurement traps before experiments run.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-trade-off-analysis</span>
+          <span class="skill-mode-tag optim">Optimisation</span>
+        </div>
+        <div class="skill-name">Structured decision analysis</div>
+        <div class="skill-desc">Captures the decision context, maps options and their trade-offs, and produces a decision record with clear rationale.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-post-launch-review</span>
+          <span class="skill-mode-tag optim">Optimisation</span>
+        </div>
+        <div class="skill-name">Post-launch analysis</div>
+        <div class="skill-desc">Validates hypotheses against actual results, extracts learnings, and determines next steps after an experiment or launch.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-competitive-intel</span>
+          <span class="skill-mode-tag research">Research</span>
+        </div>
+        <div class="skill-name">Competitive landscape</div>
+        <div class="skill-desc">Uses the live browser to map competitors, positioning, and market dynamics. Not a static snapshot.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-prioritisation</span>
+          <span class="skill-mode-tag strategy">Strategy</span>
+        </div>
+        <div class="skill-name">Multi-framework scoring</div>
+        <div class="skill-desc">Scores initiatives across ICE, RICE, opportunity scoring, and cost of delay. Surfaces the order that actually makes sense.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-roadmap-review</span>
+          <span class="skill-mode-tag strategy">Strategy</span>
+        </div>
+        <div class="skill-name">Roadmap integrity check</div>
+        <div class="skill-desc">Reviews alignment to strategic priorities, dependency sequencing, and capacity realism. Flags the roadmap risks leadership will ask about.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-comms-draft</span>
+          <span class="skill-mode-tag strategy">Strategy</span>
+        </div>
+        <div class="skill-name">Product communication</div>
+        <div class="skill-desc">Drafts launch announcements, internal updates, changelogs, and stakeholder emails tailored to each audience.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-qbr-context</span>
+          <span class="skill-mode-tag qbr">QBR</span>
+        </div>
+        <div class="skill-name">QBR context &amp; audience</div>
+        <div class="skill-desc">Start here for QBR prep. Gathers audience profile, executive incentives, and performance data into a context brief.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-qbr-narrative</span>
+          <span class="skill-mode-tag qbr">QBR</span>
+        </div>
+        <div class="skill-name">Narrative arc builder</div>
+        <div class="skill-desc">Connects team-level work to company goals using Minto Pyramid structure. Conclusion first, then the evidence.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-qbr-stress-test</span>
+          <span class="skill-mode-tag qbr">QBR</span>
+        </div>
+        <div class="skill-name">Executive simulation</div>
+        <div class="skill-desc">Adopts the exec's perspective from the Context Brief and challenges the narrative in real time.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-qbr-red-team</span>
+          <span class="skill-mode-tag qbr">QBR</span>
+        </div>
+        <div class="skill-name">Adversarial review</div>
+        <div class="skill-desc">Attacks the QBR narrative from six hostile lenses: data integrity, alternative interpretations, and more.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/pm-qbr-generate</span>
+          <span class="skill-mode-tag qbr">QBR</span>
+        </div>
+        <div class="skill-name">Final deliverable</div>
+        <div class="skill-desc">Generates the output in your chosen format: PowerPoint deck (.pptx), written memo, or presenter script.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-header">
+          <span class="skill-command">/browse</span>
+          <span class="skill-mode-tag core">Infrastructure</span>
+        </div>
+        <div class="skill-name">Live browser</div>
+        <div class="skill-desc">Real Chromium browser for competitive research, authenticated testing, and live site verification.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── CTA ── -->
+<section class="cta">
+  <div class="container">
+    <div class="cta-card">
+      <h2>Start your first<br>discovery session.</h2>
+      <p>Free, open source, and installs in under two minutes.</p>
+      <div class="cta-actions">
+        <a href="https://github.com/andrewpritchard1989/pmStack" class="btn-cta-primary" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.25 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+        <a href="flows.html" class="btn-cta-secondary">
+          Explore skill flows
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="inner">
+    <a href="#" class="logo">PMStack</a>
+    <span class="tagline">A fork of gstack &mdash; MIT License</span>
+    <div class="links">
+      <a href="https://github.com/andrewpritchard1989/pmStack" target="_blank" rel="noopener">GitHub</a>
+      <a href="flows.html">Skill flows</a>
+      <a href="https://github.com/garrytan/gstack" target="_blank" rel="noopener">gstack</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function switchMode(mode, btn) {
+    // Deactivate all tabs and panels
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
+
+    // Activate selected
+    btn.classList.add('active');
+    document.getElementById('panel-' + mode).classList.add('active');
+  }
+</script>
+
+</body>
+</html>
