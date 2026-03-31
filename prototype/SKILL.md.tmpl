@@ -60,6 +60,37 @@ echo "CPO Review: ${CPO_FILE:-NOT_FOUND}"
 
 ---
 
+## Phase 0.5: Research method selection
+
+Before drafting the test plan, identify the right research method. The right method depends on where the initiative sits in the Double Diamond: are you still exploring the problem (Discover) or evaluating a solution (Deliver)?
+
+**Read the upstream context** to determine the phase:
+- If the initiative has no prototype or design yet → problem space (Discover)
+- If a concept or design exists and needs evaluation → solution space (Deliver)
+
+**Discover (problem space) methods:**
+- **Generative interviews** — understand why users behave as they do. n≥8. Best when: the root cause is unknown, hypotheses need grounding in real user experience before any design starts.
+- **Diary study** — understand behaviour over time. n≥10. Best when: the behaviour is episodic or hard to recall accurately in a single session.
+
+**Deliver (solution space) methods:**
+- **Concept test** — does the concept effectively solve the problem? n≥7. Best when: testing whether users understand and value the solution direction before any engineering commitment.
+- **Usability test** — can users accomplish key tasks? n≥5. Best when: a design exists and you need to identify friction, confusion, and failure points in the flow. Nielsen: 5 users often uncover ~80% of usability issues. Increase n if testing multiple segments or running unmoderated.
+
+Use AskUserQuestion to present the options. Format your question as:
+
+```
+Re-ground: [initiative name], [Discover or Deliver phase], choosing research method before designing the test plan.
+Simplify: The method we choose shapes everything — the tasks, the questions, the participant count, and what we can conclude. Picking the wrong method wastes time and produces misleading signal.
+RECOMMENDATION: [Method] because [one-line rationale derived from the upstream artifacts].
+A) [Option 1] — n=[sample size]. [One-line rationale.]
+B) [Option 2] — n=[sample size]. [One-line rationale.]
+C) [Option 3 if applicable] — n=[sample size]. [One-line rationale.]
+```
+
+Carry the confirmed method and n= into Phase 1 — they determine the participant count, task structure, and success thresholds in the test plan.
+
+---
+
 ## Phase 1: Auto-draft the test plan
 
 Before asking the PM anything, draft the full test plan from the upstream artifacts. The PM reviews and tweaks — they do not start from scratch.
@@ -122,7 +153,29 @@ Draft the plan in this format:
 - Kill: [what finding would end the initiative]
 ```
 
-Present the draft to the PM via AskUserQuestion. Ask them to confirm, adjust, or add test tasks. They have context you don't — participant access, known constraints, prior test results.
+Present the draft test plan to the PM via AskUserQuestion and invite revisions:
+
+```
+Re-ground: [initiative name], test plan draft based on upstream artifacts. Review before we build the prototype.
+Simplify: Here is the full test plan. Before we move on, check each section — the tasks, the participant criteria, and the success thresholds. You have context I don't: who you can recruit, what constraints you're working under, what prior tests revealed.
+RECOMMENDATION: Review and confirm, or tell me what to change.
+A) Confirm this plan as-is — move to prototype
+B) Suggest changes (describe below)
+```
+
+Incorporate any changes the PM requests. Show the revised plan.
+
+Then ask for explicit confirmation via AskUserQuestion:
+
+```
+Re-ground: [initiative name], revised test plan. Confirming before moving to prototype creation.
+Simplify: Here is the updated test plan. Once confirmed, we move to building the prototype — no going back without starting over.
+RECOMMENDATION: Confirm if this is correct. If anything is still off, describe it now.
+A) Confirmed — this test plan is complete, move to prototype
+B) One more change (describe below)
+```
+
+Do not proceed to Phase 2 until the PM explicitly selects "confirmed" or otherwise signals the plan is locked. They have context you don't — participant access, known constraints, prior test results.
 
 ---
 
@@ -140,7 +193,9 @@ Use AskUserQuestion to confirm the choice. RECOMMENDATION: Figma Make, because i
 
 ### Option A: Figma Make prompt
 
-Generate a structured prompt for Figma Make. The prompt must specify:
+Generate the structured Figma Make prompt, then **display it in full in the conversation** before saving anything. The PM must see it and have a chance to correct it before it is finalised.
+
+The prompt must specify:
 
 ```
 ## Figma Make Prompt: [Initiative Name]
@@ -166,6 +221,18 @@ Generate a structured prompt for Figma Make. The prompt must specify:
 
 **Fidelity notes:** [Medium fidelity. Real copy, placeholder data. No branding required unless branding is being tested.]
 ```
+
+After displaying the prompt, ask for review via AskUserQuestion:
+
+```
+Re-ground: [initiative name], Figma Make prompt ready for review before finalising.
+Simplify: This is the prompt you will paste into Figma Make to generate the prototype. Review it carefully — once saved, this is what drives the build. Check the flow, screens, and interactions match what the test plan needs.
+RECOMMENDATION: Review and confirm, or describe any corrections.
+A) Looks good — finalise and save this prompt
+B) I want to change [describe]
+```
+
+Incorporate any corrections and show the revised prompt. Once the PM confirms, save the finalised prompt as part of the Prototype Spec artifact (see Output format section). Do not save until confirmed.
 
 ### Option B: HTML prototype
 
