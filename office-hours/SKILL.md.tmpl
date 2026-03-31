@@ -209,48 +209,158 @@ This scaffold feeds directly into `/pm-metrics-review`. Don't go deep here — c
 
 ## Mode C: Research
 
-### Phase C1: Research question
+### Phase C0: Should you run this research?
 
-Pin the research question before anything else.
+Before framing anything, validate the research is worth running. Research without a clear decision it informs is activity without impact.
 
-A good research question:
-- Resolves a specific unknown (not "understand users better" but "understand why users abandon the flow at step 3")
-- Would change your product direction depending on the answer
-- Can be answered within a defined time and budget
+Research is worth investing in when:
+- There are high assumptions or unknowns about how users will behave
+- There are conflicting opinions across the team that need evidence to resolve
+- You're facing a major redesign or new feature with unclear user impact
 
-Ask: "If this research goes perfectly, what will you know that you don't know today? How will it change your next decision?"
+Research should be deferred when:
+- The change is low-risk with minimal user impact
+- You already have sufficient data or research that answers the question
+- Results won't inform a decision or there's no time to act on findings
+- The goal isn't clear enough to define what you're trying to learn
 
-If the research question is too broad ("understand our users"), push to narrow it: "Which specific decision will this research inform? What would make you go left vs. right?"
+Ask the PM: "If this research goes perfectly, what decision changes? What would you do differently on Monday morning with these findings? If you can't answer that, we should pause before designing a study."
 
-### Phase C2: Current hypotheses
+If they can answer clearly, proceed to C1. If not, push them to define the decision first. Unclear goals produce unfocused research.
 
-Even in research mode, articulate the hypotheses you're entering with. Research confirms, challenges, or generates hypotheses — it never starts from a blank slate.
+### Phase C1: Research context
 
-Ask: "What's your current best guess about what's true? What would surprise you most?"
+Frame why this research is happening before defining what you'll learn. This becomes the Context section of the research plan.
 
-Document 2-4 hypotheses. These become the frame for interview questions.
+Ask:
+1. "Why this research, why now? What's the product or business situation driving it?"
+2. "Where in the product development phase does this sit?" Use Double Diamond as the frame: are you in the Discover phase (problem space — understanding user needs before any solution exists) or the Deliver phase (solution space — evaluating a concept or design you've already developed)?
+3. "What existing data do you have? Prior research, analytics, customer support insights — what do you already know?"
+4. "Who are the key stakeholders? Who will this research influence?"
 
-### Phase C3: Interview guide
+Summarise the context in 3-4 bullet points. This grounds everything that follows.
 
-Draft an interview guide. Structure:
+### Phase C2: Research goal and questions
+
+Separate the goal from the research questions — they serve different purposes.
+
+**Research goal** = broad aim. What you hope to achieve. Template:
+> We want to [understand / discover / evaluate / observe] [subject] in order to [desired outcome].
+
+Example: "We want to evaluate the effectiveness of the new onboarding experience in order to improve first-time user engagement and retention."
+
+**Research questions** = focused inquiries that inform the goal. To generate them, ask: what are the unknowns? What assumptions do we hold? Which aspects need exploration?
+
+Good research questions are:
+- **Specific** — targets a particular behaviour or aspect
+  - Weak: "What do users think about onboarding?"
+  - Strong: "To what extent does the new onboarding experience help users understand the product's core value?"
+- **Actionable** — leads to a product decision
+  - Weak: "What should we call this feature?"
+  - Strong: "What language do users naturally use to describe this feature?"
+- **Achievable** — answerable within the available time and budget
+  - Weak: "How well does this work across all markets?"
+  - Strong: "How well does this work for new users in the UK?"
+- **User-centred** — about needs, behaviours, and motivations, not business metrics
+  - Weak: "How can we make onboarding faster to reduce drop-offs?"
+  - Strong: "What challenges do users face when completing onboarding?"
+
+Draft the goal and 3-5 research questions, then run a bias check. Scan for:
+- **Confirmation bias** — questions framed to confirm what you already believe rather than genuinely explore. Reframe as open-ended.
+- **Leading language** — phrasing that suggests the expected answer ("don't you find X difficult?"). Replace with neutral alternatives.
+
+Ask the PM to confirm the goal and questions before moving on.
+
+**Current hypotheses:** Even in research mode, articulate what you believe going in. Research confirms, challenges, or generates hypotheses — it never starts from a blank slate.
+
+Ask: "What's your current best guess about what's true? What result would surprise you most?"
+
+Document 2-4 hypotheses. These become the frame for interview questions in C4.
+
+### Phase C3: Method selection
+
+Choose the research method based on the Double Diamond phase identified in C1.
+
+**Discover (problem space) — understanding user needs and behaviours:**
+- **Generative interviews** — understand why users behave as they do. n≥8. Best when: root causes are unknown and hypotheses need grounding in real experience.
+- **Diary study** — understand behaviour over time in context. n≥10. Best when: the behaviour is episodic or hard to recall accurately in a single session.
+- **Contextual inquiry** — observe users in their natural environment. n≥5. Best when: the task involves physical or environmental context that's hard to simulate.
+- **Card sort** — understand how users categorise and label things. n≥15. Best when: information architecture or navigation is the research focus.
+
+**Deliver (solution space) — evaluating a concept or design:**
+- **Concept test** — does the concept effectively solve the problem? n≥7. Best when: testing whether users understand and value the solution direction before any engineering starts.
+- **Usability test** — can users accomplish key tasks? n≥5. Best when: a design exists and you need to find friction and failure points in the flow. Nielsen principle: 5 users often uncover ~80% of usability issues. Increase n if testing multiple segments or running unmoderated.
+- **Content/copy test** — do users understand the language and labels? n≥5. Best when: terminology or messaging clarity is the primary unknown.
+- **Tree test** — can users find what they need in the information architecture? n≥20. Best when: navigation structure is being validated.
+
+Key distinction: a **concept test** asks "does this idea solve the right problem?" A **usability test** asks "can users operate this design?" Pick the wrong one and you'll answer a question that doesn't unblock your decision.
+
+Sample size guidance: More criteria in your screener means harder and more expensive recruitment. Only require what genuinely matters to the research question. Increase sample size when: running unmoderated (harder to probe), covering multiple segments (need representation), or if researcher inexperience is a factor.
+
+Use AskUserQuestion to present the recommended method and confirm:
+
+```
+Re-ground: [initiative name], [Discover or Deliver phase], selecting research method.
+Simplify: The method determines the tasks, the questions, the participant count, and what you can conclude. Picking the wrong method produces misleading signal.
+RECOMMENDATION: [Method] because [one-line rationale based on the research goal and phase].
+A) [Option 1] — n=[sample size]. [One-line rationale.]
+B) [Option 2] — n=[sample size]. [One-line rationale.]
+C) [Option 3 if applicable]
+```
+
+### Phase C4: Participants and recruitment
+
+Define who you need and how you'll find them.
+
+Ask:
+1. "Who can best answer your research goals? Current users, lapsed users, or prospective users?"
+2. "Which segments matter most? Think across: demographics (age, gender, location), behaviours (frequency, how they use the product), and psychographics (tech comfort, attitudes)."
+
+Then define:
+- **Recruitment criteria** — a bullet-point description of the target participant (e.g., "frequent train travellers who book online, aged 25-45")
+- **Screener questions** — the specific questions that operationalise each criterion (e.g., "How often do you travel by train? [Weekly / Monthly / A few times a year / Rarely]")
+
+Tip: more criteria means harder and costlier recruitment. Use only what genuinely matters to the research question.
+
+Flag selection bias risk: if your recruitment skews toward one channel, segment, or type of user, the findings may not represent your actual user population. Diversify recruitment channels where possible.
+
+### Phase C5: Interview or test guide
+
+Draft the guide for the confirmed method.
+
+**For generative interviews:**
 1. **Opening** — establish context, warm up (5 min)
-2. **Current behavior** — how do they do this today? Walk me through the last time you did X. (10 min)
+2. **Current behaviour** — how do they do this today? Walk me through the last time you did X. (10 min)
 3. **Pain and workarounds** — where does it break? What do you do when it fails? (10 min)
-4. **Concept reaction (if applicable)** — not "do you like this?" but "when would you use this? Walk me through how you'd use it." (10 min)
-5. **Close** — what should I have asked? Is there anything else I should know? (5 min)
+4. **Close** — what should I have asked? Is there anything else I should know? (5 min)
 
-Rules for the questions you draft:
+**For concept tests (add concept reaction section):**
+1. **Opening** — establish context, warm up (5 min)
+2. **Current behaviour** — how do they handle this today? (10 min)
+3. **Concept reaction** — not "do you like this?" but "when would you use this? Walk me through how you'd approach it." (10 min)
+4. **Close** — what should I have asked? (5 min)
+
+**For usability tests (task-based):**
+1. **Opening** — set the scene, explain think-aloud protocol (5 min)
+2. **Task 1** — [task description. Observe, don't help.] (10 min)
+3. **Task 2** — [task description] (10 min)
+4. **Post-task questions** — what was confusing? What were you expecting to happen? (10 min)
+5. **Close** (5 min)
+
+Rules for every question:
 - No leading questions ("don't you find X frustrating?")
-- Behavioral, not attitudinal ("tell me about the last time you did X" not "do you X often?")
+- Behavioural, not attitudinal ("tell me about the last time you did X" not "do you X often?")
 - Follow the pain: "tell me more about that" is always valid
 
-### Phase C4: Research plan
+### Phase C6: Research plan output
 
-Define:
-- Method (generative interviews / usability test / diary study / survey — pick one, explain why)
-- Target participants: specific segment, n=, how you'll recruit
-- Timeline: when you'll run sessions, when you'll synthesise
-- Decision it informs: what changes in the roadmap depending on the findings
+Produce a research plan with these 5 sections and include it in the Product Brief under "Research Plan":
+
+1. **Context** — why this research, why now, what development phase, what existing data, who the stakeholders are
+2. **Research Goal** — the broad aim using the "We want to [understand/discover/evaluate/observe]..." template
+3. **Research Questions** — 3-5 specific, actionable, achievable, user-centred questions
+4. **Participants and Recruitment** — target segment, n=, recruitment criteria, screener questions, channels
+5. **Method** — chosen method with rationale, timeline (when sessions run, when synthesis happens), and the decision the research informs
 
 ---
 
@@ -433,7 +543,7 @@ Report one of the standard completion statuses. Then suggest the next skill base
 
 **Optimisation:** "Next: `/pm-metrics-review` to harden the measurement plan. Or `/pm-cpo-review` for a challenge on the core hypothesis."
 
-**Research:** "Run the interviews. Return to `/pm-office-hours` (New Feature or Optimisation mode) when you have findings to frame into a direction."
+**Research:** "Run the sessions using the research plan and guide above. Return to `/pm-office-hours` (New Feature or Optimisation mode) when you have findings to frame into a direction. Or use `/pm-prototype` if your method is a concept or usability test — it will generate the prototype and test tasks from the research plan."
 
 **Strategy:** "Next: `/pm-prioritisation` to score and sequence the initiative inventory."
 
