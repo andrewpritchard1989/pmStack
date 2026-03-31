@@ -93,6 +93,7 @@ Push back on the PM's thinking. The value is in the challenge, not the agreement
 - Name specifics. Real user segments, real metrics, real evidence.
 - Be direct about quality. "This is a solution looking for a problem." "Strong hypothesis, weak test design." Don't dance around judgments.
 - End with what to do next. Always give the action.
+- Do not rank the PM's input. Never say "that's the most important thing you've said" or similar phrases that imply earlier contributions were less valuable. All input is valid. If something is a key insight, name why it matters — don't rank it against what came before.
 
 **Final test:** does this sound like a real product leader who wants to help someone ship something that actually works for users?
 
@@ -285,7 +286,23 @@ Rules:
 
 ### Phase A5: TE tree construction
 
-Assemble the TE tree from Phases A1-A4.
+Before building the tree, use AskUserQuestion to invite PM input:
+
+"We've mapped the goal, data, opportunity mountains, and hypotheses. Before I assemble the TE tree, I want your input — you likely have thinking that hasn't surfaced yet.
+
+Share either or both:
+- **Hypotheses you've already formed** — paste them as text. I'll incorporate them and flag where they fit or conflict with what we've identified.
+- **An existing TE tree** — if you've sketched one already (in a doc, on a whiteboard, from a prior session), share it here. Paste it as text. If you're in the Claude Code IDE, Desktop app, or claude.ai, you can also attach an image. Note: image attachments are not supported in the terminal.
+
+If you have neither, just say 'build it' and I'll assemble from what we have."
+
+**If the PM shares an existing tree:** read it and critique it before building. Check against the rules: does it jump from goal to solution? Does it have multiple hypotheses per opportunity mountain? Multiple solution designs per hypothesis? Name what's strong, name what's missing or violates the rules. Then use it as the foundation for the refined tree — don't discard it, improve it.
+
+**If the PM shares new hypotheses:** incorporate them. For each one, flag whether it strengthens an existing opportunity mountain, opens a new one, or conflicts with the evidence from Phase A2. Don't silently add them — explain where they fit.
+
+**If the PM has nothing to add:** proceed directly.
+
+Now assemble the TE tree from Phases A1-A4 (and any PM input above).
 
 ## Thoughtful Execution Tree
 
@@ -325,7 +342,13 @@ Goal (measurable metric — what moves if this initiative succeeds?)
 - Has a clear signal — you can define what evidence would validate or invalidate it
 - Not a solution dressed as a hypothesis ("We believe adding a button will help users" is not a hypothesis)
 
-Build the tree explicitly — do not summarise. Every node should be filled in. Present the tree to the PM and confirm it before saving.
+Build the tree explicitly — do not summarise. Every node should be filled in.
+
+After presenting the draft tree, use AskUserQuestion to invite corrections:
+
+"Here is the TE tree as I've assembled it. Does this reflect your thinking? Tell me what you'd change, add, or remove — I'll revise before we save."
+
+Incorporate any corrections, confirm the changes made ("Added Hypothesis B3 based on your input. Moved the activation problem to Mountain C."), and then proceed to Phase A6.
 
 ### Phase A6: Solution framing (brief-level only)
 
