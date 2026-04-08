@@ -113,7 +113,7 @@ AI makes completeness near-free. Always recommend the thorough analysis over the
 
 **What this means in practice:**
 - Map ALL assumptions, not just the obvious ones
-- Identify MULTIPLE opportunity mountains before picking one
+- Identify MULTIPLE opportunity/problem areas before picking one
 - Design tests for the riskiest assumptions, not just the easiest to test
 - Surface the uncomfortable questions, not just the ones with good answers
 
@@ -259,27 +259,27 @@ Ask:
 
 Record specifics. Vague answers like "users say they love it but don't use it" are worth probing: "How do you know? What research or data do you have?" If the PM says they have no data, flag it explicitly — that gap will appear in the CPO review.
 
-### Phase A3: Opportunity mountains
+### Phase A3: Opportunity/problem areas
 
-Now explore the problem space. Generate 3-5 distinct opportunity mountains — different problem areas that could each move the goal. Each mountain is a distinct place where users are struggling or where value is being left uncaptured.
+Now explore the problem space. Generate 3-5 distinct opportunity/problem areas — different problem areas that could each move the goal. Each opportunity/problem area is a distinct place where users are struggling or where value is being left uncaptured.
 
 For each candidate opportunity:
 - Ground it in specific data or evidence from Phase A2
 - Name the user segment affected and when in their journey the problem occurs
 - Describe what's broken from the user's perspective (not the PM's)
 
-Push back on single-mountain thinking. If the PM jumps to one opportunity, ask: "What are the other two or three ways this goal could be achieved? We want to pick the best mountain to climb, not just the first one we see."
+Push back on single-area thinking. If the PM jumps to one opportunity, ask: "What are the other two or three ways this goal could be achieved? We want to identify the best opportunity/problem area to focus on, not just the first one we see."
 
-Use AskUserQuestion to present the opportunity mountains you've identified. Get the PM's confirmation and input — they have context you don't.
+Use AskUserQuestion to present the opportunity/problem areas you've identified. Get the PM's confirmation and input — they have context you don't.
 
 ### Phase A4: Hypotheses
 
-For the top 2-3 opportunity mountains, generate hypotheses. A hypothesis is a testable belief about user behavior, not a solution.
+For the top 2-3 opportunity/problem areas, generate hypotheses. A hypothesis is a testable belief about user behavior, not a solution.
 
 Format: "We believe [user type] struggle with [specific problem] because [specific reason]. If we [intervention type], we expect [measurable outcome]."
 
 Rules:
-- Minimum 2 hypotheses per opportunity mountain
+- Minimum 2 hypotheses per opportunity/problem area
 - Each hypothesis should suggest a different direction for solution design
 - Distinguish causal hypotheses (why the problem exists) from behavioral hypotheses (what users will do differently)
 - A solution dressed as a hypothesis ("We believe adding a button will help users") is not a hypothesis — push back
@@ -288,7 +288,7 @@ Rules:
 
 Before building the tree, use AskUserQuestion to invite PM input:
 
-"We've mapped the goal, data, opportunity mountains, and hypotheses. Before I assemble the TE tree, I want your input — you likely have thinking that hasn't surfaced yet.
+"We've mapped the goal, data, opportunity/problem areas, and hypotheses. Before I assemble the TE tree, I want your input — you likely have thinking that hasn't surfaced yet.
 
 Share either or both:
 - **Hypotheses you've already formed** — paste them as text. I'll incorporate them and flag where they fit or conflict with what we've identified.
@@ -296,9 +296,9 @@ Share either or both:
 
 If you have neither, just say 'build it' and I'll assemble from what we have."
 
-**If the PM shares an existing tree:** read it and critique it before building. Check against the rules: does it jump from goal to solution? Does it have multiple hypotheses per opportunity mountain? Multiple solution designs per hypothesis? Name what's strong, name what's missing or violates the rules. Then use it as the foundation for the refined tree — don't discard it, improve it.
+**If the PM shares an existing tree:** read it and critique it before building. Check against the rules: does it jump from goal to solution? Does it have multiple hypotheses per opportunity/problem area? Multiple solution designs per hypothesis? Name what's strong, name what's missing or violates the rules. Then use it as the foundation for the refined tree — don't discard it, improve it.
 
-**If the PM shares new hypotheses:** incorporate them. For each one, flag whether it strengthens an existing opportunity mountain, opens a new one, or conflicts with the evidence from Phase A2. Don't silently add them — explain where they fit.
+**If the PM shares new hypotheses:** incorporate them. For each one, flag whether it strengthens an existing opportunity/problem area, opens a new one, or conflicts with the evidence from Phase A2. Don't silently add them — explain where they fit.
 
 **If the PM has nothing to add:** proceed directly.
 
@@ -312,16 +312,16 @@ The TE tree prevents jumping from goal directly to solution. Always build it top
 ```
 Goal (measurable metric — what moves if this initiative succeeds?)
 ├── Data & Insights (what we know — evidence, not assumptions)
-├── Opportunity Mountain A (a distinct problem/opportunity space)
+├── Opportunity/Problem Area A (a distinct problem/opportunity space)
 │   ├── Hypothesis A1 (testable belief about user behavior or motivation)
 │   │   ├── Solution Design A1a (specific intervention to test hypothesis)
 │   │   └── Solution Design A1b (alternative design for same hypothesis)
 │   ├── Hypothesis A2
 │   └── Hypothesis A3
-├── Opportunity Mountain B
+├── Opportunity/Problem Area B
 │   ├── Hypothesis B1
 │   └── Hypothesis B2
-└── Opportunity Mountain C
+└── Opportunity/Problem Area C
 ```
 
 **Rules to enforce:**
@@ -332,9 +332,9 @@ Goal (measurable metric — what moves if this initiative succeeds?)
 5. When a hypothesis fails, move to the next branch. Don't redesign the same failed approach.
 6. The TE tree is a living artifact. Update it after every prototype test and launch review.
 
-**What a good opportunity mountain looks like:**
+**What a good opportunity/problem area looks like:**
 - Grounded in specific user behavior or evidence, not assumptions
-- Distinct from other opportunity mountains (different problem, different user segment, different moment)
+- Distinct from other opportunity/problem areas (different problem, different user segment, different moment)
 - Falsifiable — you can design tests that would tell you if you're wrong
 
 **What a good hypothesis looks like:**
@@ -348,7 +348,7 @@ After presenting the draft tree, use AskUserQuestion to invite corrections:
 
 "Here is the TE tree as I've assembled it. Does this reflect your thinking? Tell me what you'd change, add, or remove — I'll revise before we save."
 
-Incorporate any corrections, confirm the changes made ("Added Hypothesis B3 based on your input. Moved the activation problem to Mountain C."), and then proceed to Phase A6.
+Incorporate any corrections, confirm the changes made ("Added Hypothesis B3 based on your input. Moved the activation problem to Opportunity/Problem Area C."), and then proceed to Phase A6.
 
 ### Phase A6: Solution framing (brief-level only)
 
@@ -369,7 +369,7 @@ Full solution design happens in `/pm-prototype`. The brief records direction, no
 2. "How long has this metric been at this level? Is it declining, flat, or growing too slowly?"
 3. "Who owns this metric? Is there alignment across the team on the target?"
 
-### Phase B2: Lever identification
+### Phase B2: Opportunity/problem area identification
 
 Walk through the user journey to find where the metric leaks.
 
@@ -378,16 +378,48 @@ Ask:
 2. "Do you have a breakdown by segment, platform, or cohort? Does the problem affect all users equally, or is it concentrated?"
 3. "What have you already tried? What moved the metric, even slightly? What didn't move it at all?"
 
-Generate 3-5 levers — specific points in the funnel or experience where intervention could move the metric. Each lever should be grounded in behavioral data, not intuition.
+Before generating the opportunity/problem areas, use AskUserQuestion to surface the PM's existing thinking:
+
+```
+Re-ground: State the metric and the current state signals gathered so far (drop-off points, segments, prior attempts).
+Simplify: Before mapping the opportunity/problem areas, I want to hear what areas you're already focused on. What do you think is driving the underperformance?
+RECOMMENDATION: Share your current thinking — even rough areas. I'll use them as anchors and identify any you haven't considered.
+A) Share your opportunity/problem areas (describe in free text)
+B) Skip — generate from the data we have
+```
+
+Incorporate any areas the PM names into the generated list. Do not discard PM input — flag where their areas align with or differ from the data signals captured above.
+
+Generate 3-5 opportunity/problem areas — specific points in the funnel or experience where intervention could move the metric. Each opportunity/problem area should be grounded in behavioral data, not intuition.
 
 ### Phase B3: Hypothesis generation
 
-For each lever, form a causal hypothesis:
-- What's causing the underperformance at this lever?
+Before generating hypotheses, use AskUserQuestion to surface any existing ideas the PM has:
+
+```
+Re-ground: List the opportunity/problem areas identified in B2.
+Simplify: Before I generate hypotheses for each area, do you have existing ideas or experiments in mind? These could be concepts from internal discussions, experiments you've already run, or directions you've been told to explore.
+RECOMMENDATION: Share anything you have — even half-formed ideas. I'll use your thinking to shape the hypotheses rather than starting from a blank slate.
+A) Share existing ideas (describe or paste them)
+B) No existing ideas — generate fresh from the data
+```
+
+Use any PM-provided ideas directly in the hypothesis construction below.
+
+For each opportunity/problem area, form a causal hypothesis using this format:
+
+"Given [specific data point from B1 or B2], if we [initiative], we will see [expected metric movement], because [causal mechanism — why this change produces that result]."
+
+Where:
+- **Given** = a specific data point already captured (metric value, drop-off point, segment insight, prior experiment result) — not a generic placeholder
+- **If we** = the initiative being proposed, tied to the opportunity/problem area
+- **We will see** = the specific expected metric movement
+- **Because** = the causal mechanism — why this change produces that result
+
+Rules:
+- Pull the "Given" clause from data captured in B1 and B2, not generic assumptions
 - What change would address the cause, not just the symptom?
 - How would you know if the hypothesis is right?
-
-Format: "We believe [metric] is low because [users experience X at step Y]. If we [change Z], we expect [specific metric movement]."
 
 ### Phase B4: Measurement plan scaffold
 
@@ -665,8 +697,8 @@ After completing the relevant mode phases, produce a Product Brief and save it.
 ## Data and Insights
 [Behavioral data, user research findings, prior experiment learnings — specifics only]
 
-## Opportunity Mountains
-[Each mountain with grounding evidence and affected user segment — New Feature and Optimisation modes]
+## Opportunity/Problem Areas
+[Each opportunity/problem area with grounding evidence and affected user segment — New Feature and Optimisation modes]
 
 ## Hypotheses
 [Each hypothesis in "We believe... because... if we... we expect..." format]
