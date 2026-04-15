@@ -6,23 +6,28 @@ This document describes how PMStack is built — the build pipeline, preamble sy
 
 ## Build pipeline
 
-Every skill in PMStack is defined as a template (`SKILL.md.tmpl`) and compiled to a generated file (`SKILL.md`). The generated files are tracked in git and used directly by Claude Code.
+Every skill in PMStack is defined as a template (`SKILL.md.tmpl`) and compiled to generated output files. The Claude (`SKILL.md`) files are tracked in git and used directly by Claude Code. Non-Claude host files (`SKILL.cursor.md` etc.) are generated on the user's machine during setup and gitignored.
 
 ```
-SKILL.md.tmpl  →  gen-skill-docs.ts  →  SKILL.md
-     +                                        ↑
-resolvers/                              [checked into git,
- index.ts                                used by Claude Code]
- preamble.ts
- pm-utility.ts
- pm-frameworks.ts
+SKILL.md.tmpl  →  gen-skill-docs.ts  →  SKILL.md           (Claude, committed)
+     +                |                  SKILL.cursor.md    (Cursor, gitignored)
+resolvers/            ↓
+ index.ts         hosts/
+ preamble.ts       claude.ts           ← path config, frontmatter rules
+ pm-utility.ts     cursor.ts
+ pm-frameworks.ts  index.ts            ← host registry
  browse.ts
  utility.ts
 ```
 
-**Build command:** `bun run gen:skill-docs`
+**Build commands:**
 
-**Dry-run (CI check):** `bun run gen:skill-docs --dry-run` — exits 1 if any SKILL.md is stale (different from what the template would produce). All SKILL.md files in the repo should always be FRESH.
+| Command | What it does |
+|---------|-------------|
+| `bun run gen:skill-docs` | Generate Claude `SKILL.md` files only (default, used in CI) |
+| `bun run gen:skill-docs --host cursor` | Generate Cursor `SKILL.cursor.md` files |
+| `bun run gen:skill-docs --host all` | Generate all non-Claude host files |
+| `bun run gen:skill-docs --dry-run` | Exit 1 if any Claude `SKILL.md` is stale |
 
 **Template discovery:** `scripts/discover-skills.ts` finds all `SKILL.md.tmpl` files at root level and one directory deep. It skips `node_modules`, `.git`, `dist`, and dotted directories.
 
@@ -98,16 +103,20 @@ A resolver is a TypeScript function that takes a `TemplateContext` and returns a
 interface TemplateContext {
   skillName: string;
   tmplPath: string;
-  benefitsFrom: string[];
-  host: string;
-  preambleTier: number;
+  benefitsFrom?: string[];
+  host: string;           // e.g. 'claude', 'cursor'
+  preambleTier?: number;
   paths: {
-    binDir: string;       // ~/.claude/skills/pmstack/bin
-    skillRoot: string;    // ~/.claude/skills/pmstack
+    binDir: string;       // ~/.claude/skills/pmstack/bin  (or $PMSTACK_BIN for non-Claude)
+    skillRoot: string;    // ~/.claude/skills/pmstack      (or $PMSTACK_ROOT)
     localSkillRoot: string;
+    browseDir: string;
   };
+  hostConfig?: HostConfig; // config for the current host — used for conditional generation
 }
 ```
+
+Resolvers use `ctx.hostConfig` to conditionally suppress content for non-Claude hosts. For example, `generatePreamble` in `preamble.ts` skips all bash execution blocks when `ctx.hostConfig.name !== 'claude'`.
 
 Resolvers are registered in `scripts/resolvers/index.ts`:
 
@@ -344,6 +353,45 @@ The dashboard tracks which required gates have been completed for an initiative.
 
 ---
 
+## Multi-host support
+
+PMStack generates skill files for multiple AI platforms from the same `.tmpl` source. Each platform is described by a `HostConfig` object in `hosts/`.
+
+```
+hosts/
+├── claude.ts    # Primary host — no rewrites, all frontmatter kept
+├── cursor.ts    # Cursor — strips to name+description, rewrites .claude/ → .cursor/
+└── index.ts     # Registry: ALL_HOST_CONFIGS, getHostConfig(), getExternalHosts()
+```
+
+The `HostConfig` interface (`scripts/host-config.ts`) defines:
+
+| Field | Purpose |
+|-------|---------|
+| `globalRoot` | Path relative to `~` where skills are installed (`'.cursor/skills/pmstack'`) |
+| `usesEnvVars` | `true` → paths in content use `$PMSTACK_ROOT` etc. instead of literal `~/.claude/` |
+| `frontmatter.mode` | `allowlist` (keep only listed fields) or `denylist` (strip listed fields) |
+| `frontmatter.keepFields` | Fields to keep in allowlist mode |
+| `pathRewrites` | Ordered list of `{ from, to }` string replacements applied to full content |
+| `suppressedResolvers` | Resolver names that return `''` for this host |
+
+**What non-Claude files look like:**
+- Frontmatter stripped to `name` and `description` only (no `allowed-tools`, `preamble-tier`, etc.)
+- Bash preamble blocks removed (the `{{PREAMBLE}}` resolver detects the host and skips them)
+- All `.claude/skills/pmstack` path references rewritten to the host-equivalent
+- Skill body content (phases, frameworks, output formats) unchanged
+
+**Adding a new host:**
+
+1. Create `hosts/myhost.ts` — copy `hosts/cursor.ts` as a starting point
+2. Add to `hosts/index.ts`: import, add to `ALL_HOST_CONFIGS`, add to re-exports
+3. Add `**/*.myhost.md` to `.gitignore`
+4. Add `"gen:skill-docs:myhost": "bun run scripts/gen-skill-docs.ts --host myhost"` to `package.json`
+5. Add detection to `setup` (follow the `register_for_cursor` pattern)
+6. Verify: `bun run gen:skill-docs:myhost` then `grep -r ".claude/skills" **/*.myhost.md` (should be 0)
+
+---
+
 ## How to add a new skill
 
 1. **Create the directory and template:**
@@ -395,9 +443,11 @@ The dashboard tracks which required gates have been completed for an initiative.
 
 6. **Build and verify:**
    ```bash
-   bun run gen:skill-docs
-   bun run gen:skill-docs --dry-run
-   grep -c '{{' my-skill/SKILL.md  # should be 0
+   bun run gen:skill-docs                    # generate Claude SKILL.md
+   bun run gen:skill-docs --dry-run          # confirm it's FRESH
+   grep -c '{{' my-skill/SKILL.md            # should be 0
+   bun run gen:skill-docs:cursor             # generate Cursor variant
+   grep -r ".claude/skills" my-skill/SKILL.cursor.md  # should be empty
    ```
 
 7. **Add to the preamble tier comment** in `scripts/resolvers/preamble.ts` so the skill assignment is documented.

@@ -93,6 +93,21 @@ cd .pmstack
 ./setup --local
 ```
 
+### Team install
+
+To keep PMStack automatically up to date across a team, run setup with the `--team` flag. This installs a `SessionStart` hook in `~/.claude/settings.json` so PMStack pulls the latest version every time Claude Code opens a new session:
+
+```bash
+cd ~/.claude/skills/pmstack
+./setup --team
+```
+
+Share this command with teammates — each person runs it once on their own machine. Version drift across the team is eliminated without any manual upgrade steps.
+
+### Cursor support
+
+If [Cursor](https://cursor.com) is installed, setup automatically detects it and generates Cursor-compatible skill files at `~/.cursor/skills/pmstack/`. These are stripped-down versions of the Claude skills — bash preamble removed, frontmatter reduced to `name` and `description` — suitable for Cursor's context system.
+
 ### Upgrading
 
 ```bash
@@ -299,10 +314,12 @@ The SKILL.md files in each skill directory are generated from `.tmpl` templates.
 
 ```bash
 cd ~/.claude/skills/pmstack
-bun run gen:skill-docs
+bun run gen:skill-docs            # Claude only (default, committed to repo)
+bun run gen:skill-docs:cursor     # Cursor only
+bun run gen:skill-docs:all        # All non-Claude hosts
 ```
 
-Validate all generated files:
+Validate all generated Claude files:
 
 ```bash
 bun run skill:check
@@ -313,6 +330,8 @@ Build everything (skill docs + browse binary):
 ```bash
 bun run build
 ```
+
+To add support for a new host platform, see [ARCHITECTURE.md](ARCHITECTURE.md#multi-host-support).
 
 ---
 
