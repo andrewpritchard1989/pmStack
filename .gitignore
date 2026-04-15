@@ -1,5 +1,7 @@
 .env
 node_modules/
+# Generated skill files for non-Claude hosts (source of truth is *.tmpl)
+**/*.cursor.md
 browse/dist/
 .pmstack/
 .claude/skills/
