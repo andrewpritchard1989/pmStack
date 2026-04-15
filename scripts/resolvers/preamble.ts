@@ -206,17 +206,50 @@ echo '{"skill":"SKILL_NAME","duration_s":"'"$_TEL_DUR"'","outcome":"OUTCOME","se
 Replace \`SKILL_NAME\` with the actual skill name from frontmatter, \`OUTCOME\` with success/error/abort. If you cannot determine the outcome, use "unknown".`;
 }
 
+/**
+ * Completion status without the bash telemetry block.
+ * Used for non-Claude hosts that don't execute preamble bash.
+ */
+function generateCompletionStatusNoBash(): string {
+  return `## Completion Status Protocol
+
+When completing a skill workflow, report status using one of:
+- **DONE** — All steps completed. Evidence provided for each claim.
+- **DONE_WITH_CONCERNS** — Completed, but with issues the PM should know about. List each concern.
+- **BLOCKED** — Cannot proceed. State what is blocking and what was tried.
+- **NEEDS_CONTEXT** — Missing information required to continue. State exactly what you need.
+
+It is always OK to stop and say "this is too hard" or "I'm not confident in this result."`;
+}
+
 // Preamble Composition (tier → sections)
 // ─────────────────────────────────────────────
 // T1: core bash + upgrade + voice(trimmed) + completion
 // T2: T1 + voice(full) + AskUserQuestion + thoroughness
 // T3: T2 + initiative discovery + research-before-deciding
 // T4: (same as T3 — reserved)
+//
+// Non-Claude hosts: bash blocks stripped, behavioral instructions kept.
 export function generatePreamble(ctx: TemplateContext): string {
   const tier = ctx.preambleTier ?? 3;
   if (tier < 1 || tier > 4) {
     throw new Error(`Invalid preamble-tier: ${tier} in ${ctx.tmplPath}. Must be 1-4.`);
   }
+
+  const isNonClaude = ctx.hostConfig != null && ctx.hostConfig.name !== 'claude';
+
+  if (isNonClaude) {
+    // Non-Claude hosts: voice + behavioral instructions only, no bash execution blocks.
+    // Initiative discovery (which uses bash) is also omitted.
+    const sections = [
+      generateVoiceDirective(tier),
+      ...(tier >= 2 ? [generateAskUserFormat(ctx), generateThoroughnessSection()] : []),
+      ...(tier >= 3 ? [generateResearchBeforeDeciding(ctx)] : []),
+      generateCompletionStatusNoBash(),
+    ];
+    return sections.join('\n\n');
+  }
+
   const sections = [
     generatePreambleBash(ctx),
     generateUpgradeCheck(ctx),

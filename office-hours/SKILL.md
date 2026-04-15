@@ -113,7 +113,7 @@ AI makes completeness near-free. Always recommend the thorough analysis over the
 
 **What this means in practice:**
 - Map ALL assumptions, not just the obvious ones
-- Identify MULTIPLE opportunity/problem areas before picking one
+- Identify MULTIPLE opportunity mountains before picking one
 - Design tests for the riskiest assumptions, not just the easiest to test
 - Surface the uncomfortable questions, not just the ones with good answers
 
@@ -312,16 +312,16 @@ The TE tree prevents jumping from goal directly to solution. Always build it top
 ```
 Goal (measurable metric — what moves if this initiative succeeds?)
 ├── Data & Insights (what we know — evidence, not assumptions)
-├── Opportunity/Problem Area A (a distinct problem/opportunity space)
+├── Opportunity Mountain A (a distinct problem/opportunity space)
 │   ├── Hypothesis A1 (testable belief about user behavior or motivation)
 │   │   ├── Solution Design A1a (specific intervention to test hypothesis)
 │   │   └── Solution Design A1b (alternative design for same hypothesis)
 │   ├── Hypothesis A2
 │   └── Hypothesis A3
-├── Opportunity/Problem Area B
+├── Opportunity Mountain B
 │   ├── Hypothesis B1
 │   └── Hypothesis B2
-└── Opportunity/Problem Area C
+└── Opportunity Mountain C
 ```
 
 **Rules to enforce:**
@@ -332,9 +332,9 @@ Goal (measurable metric — what moves if this initiative succeeds?)
 5. When a hypothesis fails, move to the next branch. Don't redesign the same failed approach.
 6. The TE tree is a living artifact. Update it after every prototype test and launch review.
 
-**What a good opportunity/problem area looks like:**
+**What a good opportunity mountain looks like:**
 - Grounded in specific user behavior or evidence, not assumptions
-- Distinct from other opportunity/problem areas (different problem, different user segment, different moment)
+- Distinct from other opportunity mountains (different problem, different user segment, different moment)
 - Falsifiable — you can design tests that would tell you if you're wrong
 
 **What a good hypothesis looks like:**

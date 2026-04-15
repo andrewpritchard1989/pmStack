@@ -20,12 +20,62 @@ esac
 
 # ─── Parse flags ──────────────────────────────────────────────
 LOCAL_INSTALL=0
+TEAM_INSTALL=0
+QUIET_INSTALL=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --local) LOCAL_INSTALL=1; shift ;;
+    --team)  TEAM_INSTALL=1; shift ;;
+    --quiet) QUIET_INSTALL=1; shift ;;
     *) shift ;;
   esac
 done
+
+# ─── Team auto-update hook installer ──────────────────────────
+install_team_hook() {
+  local settings_file="$HOME/.claude/settings.json"
+  local hook_command="git -C ~/.claude/skills/pmstack pull --quiet --ff-only 2>/dev/null && ~/.claude/skills/pmstack/setup --quiet 2>/dev/null || true"
+
+  # Create settings.json if it doesn't exist
+  if [ ! -f "$settings_file" ]; then
+    mkdir -p "$(dirname "$settings_file")"
+    echo '{}' > "$settings_file"
+  fi
+
+  # Fast idempotency check before touching JSON
+  if grep -q "pmstack.*setup.*quiet" "$settings_file" 2>/dev/null; then
+    echo "  SessionStart hook already installed — skipping"
+    return 0
+  fi
+
+  # Use bun to safely merge into existing JSON rather than clobbering it
+  SETTINGS_FILE="$settings_file" HOOK_CMD="$hook_command" \
+  bun --eval "
+    const fs = require('fs');
+    const filePath = process.env.SETTINGS_FILE;
+    const hookCmd = process.env.HOOK_CMD;
+    const hookEntry = { hooks: [{ type: 'command', command: hookCmd }] };
+    let settings = {};
+    try { settings = JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch {}
+    if (!settings.hooks) settings.hooks = {};
+    if (!settings.hooks.SessionStart) settings.hooks.SessionStart = [];
+    const alreadyPresent = settings.hooks.SessionStart.some(
+      e => e.hooks && e.hooks.some(h => h.command && h.command.includes('pmstack'))
+    );
+    if (!alreadyPresent) {
+      settings.hooks.SessionStart.push(hookEntry);
+      fs.writeFileSync(filePath, JSON.stringify(settings, null, 2) + '\n');
+      console.log('SessionStart hook installed');
+    } else {
+      console.log('SessionStart hook already present — skipping');
+    }
+  " 2>/dev/null \
+  || {
+    echo "  Warning: could not write settings.json — install bun or add the hook manually" >&2
+    echo "  Add this to $settings_file under hooks.SessionStart:" >&2
+    printf '    { "hooks": [{ "type": "command", "command": "%s" }] }\n' "$hook_command" >&2
+  }
+}
 
 # --local: install to .claude/skills/ in the project root (the parent of the .pmstack directory)
 # Running setup from inside .pmstack means INSTALL_PMSTACK_DIR is .pmstack/ and its parent
@@ -63,7 +113,7 @@ elif [ -f "$SOURCE_PMSTACK_DIR/bun.lock" ] && [ "$SOURCE_PMSTACK_DIR/bun.lock" -
 fi
 
 if [ "$NEEDS_BUILD" -eq 1 ]; then
-  echo "Building browse binary..."
+  [ "$QUIET_INSTALL" -eq 0 ] && echo "Building browse binary..."
   (
     cd "$SOURCE_PMSTACK_DIR"
     bun install
@@ -81,7 +131,7 @@ fi
 
 # 2. Ensure Playwright's Chromium is available
 if ! ensure_playwright_browser; then
-  echo "Installing Playwright Chromium..."
+  [ "$QUIET_INSTALL" -eq 0 ] && echo "Installing Playwright Chromium..."
   (
     cd "$SOURCE_PMSTACK_DIR"
     bunx playwright install chromium
@@ -107,7 +157,7 @@ if ! ensure_playwright_browser; then
 fi
 
 # 3. Create ~/.pmstack state directory and subdirectories
-echo "Creating PMStack state directory..."
+[ "$QUIET_INSTALL" -eq 0 ] && echo "Creating PMStack state directory..."
 mkdir -p \
   "$HOME/.pmstack/initiatives" \
   "$HOME/.pmstack/reviews" \
@@ -137,7 +187,7 @@ gates:
   cpo_review: true
   prototype_test: true
 EOF
-  echo "Created default config at $CONFIG_FILE"
+  [ "$QUIET_INSTALL" -eq 0 ] && echo "Created default config at $CONFIG_FILE"
 fi
 
 # ─── Helper: link PMStack skill subdirectories into a skills parent directory ──
@@ -217,22 +267,55 @@ if [ "$SKILLS_BASENAME" = "skills" ]; then
   # Link each skill directory directly (so /pm-office-hours, /cpo-review etc. work as slash commands)
   link_pmstack_skill_dirs "$SOURCE_PMSTACK_DIR" "$INSTALL_SKILLS_DIR"
 
-  if [ "$LOCAL_INSTALL" -eq 1 ]; then
-    echo "PMStack ready (project-local)."
-    echo "  skills: $INSTALL_SKILLS_DIR"
-  else
-    echo "PMStack ready."
-    echo "  skills: $INSTALL_SKILLS_DIR/pmstack/"
+  if [ "$QUIET_INSTALL" -eq 0 ]; then
+    if [ "$LOCAL_INSTALL" -eq 1 ]; then
+      echo "PMStack ready (project-local)."
+      echo "  skills: $INSTALL_SKILLS_DIR"
+    else
+      echo "PMStack ready."
+      echo "  skills: $INSTALL_SKILLS_DIR/pmstack/"
+    fi
+    echo "  browse: $BROWSE_BIN"
+    echo "  state:  $HOME/.pmstack/"
   fi
-  echo "  browse: $BROWSE_BIN"
-  echo "  state:  $HOME/.pmstack/"
 else
-  echo "PMStack ready."
-  echo "  browse: $BROWSE_BIN"
-  echo "  state:  $HOME/.pmstack/"
-  echo "  (skipped skill symlinks — not inside .claude/skills/)"
+  if [ "$QUIET_INSTALL" -eq 0 ]; then
+    echo "PMStack ready."
+    echo "  browse: $BROWSE_BIN"
+    echo "  state:  $HOME/.pmstack/"
+    echo "  (skipped skill symlinks — not inside .claude/skills/)"
+  fi
 fi
 
-echo ""
-echo "Start with: /pm-office-hours"
-echo ""
+# 5. Register for Cursor if detected
+register_for_cursor() {
+  local cursor_skills_dir="$HOME/.cursor/skills"
+  if [ -d "$HOME/.cursor" ] || command -v cursor >/dev/null 2>&1; then
+    [ "$QUIET_INSTALL" -eq 0 ] && echo "Cursor detected — generating Cursor skills..."
+    (cd "$SOURCE_PMSTACK_DIR" && bun run gen:skill-docs:cursor 2>/dev/null) || true
+    mkdir -p "$cursor_skills_dir"
+    local pmstack_link="$cursor_skills_dir/pmstack"
+    if [ -L "$pmstack_link" ] || [ ! -e "$pmstack_link" ]; then
+      ln -snf "$SOURCE_PMSTACK_DIR" "$pmstack_link"
+      [ "$QUIET_INSTALL" -eq 0 ] && echo "  Cursor skills registered at $pmstack_link"
+    fi
+  fi
+}
+register_for_cursor
+
+# 7. Install team auto-update hook if requested
+if [ "$TEAM_INSTALL" -eq 1 ]; then
+  echo "Installing team auto-update hook..."
+  install_team_hook
+  echo ""
+  echo "Team mode: PMStack will auto-update at the start of each Claude Code session."
+  echo "Share this command with teammates:"
+  echo "  cd ~/.claude/skills/pmstack && ./setup --team"
+  echo ""
+fi
+
+if [ "$QUIET_INSTALL" -eq 0 ]; then
+  echo ""
+  echo "Start with: /pm-office-hours"
+  echo ""
+fi
